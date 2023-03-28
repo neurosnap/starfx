@@ -1,4 +1,4 @@
-import { describe, expect, it } from "../../test/suite.ts";
+import { describe, expect, it } from "../test.ts";
 
 import { call } from "../mod.ts";
 import { createFxMiddleware, select } from "../redux.ts";
@@ -30,24 +30,20 @@ it(tests, "should be able to grab values from store", async () => {
   const store = createStore({ user: { id: "1" } });
   const { run, middleware } = createFxMiddleware();
   middleware(store);
-  await run([
-    function* () {
-      const actual = yield* select((s: TestState) => s["user"]);
-      expect(actual).toEqual({ id: "1" });
-    },
-  ]);
+  await run(function* () {
+    const actual = yield* select((s: TestState) => s.user);
+    expect(actual).toEqual({ id: "1" });
+  });
 });
 
 it(tests, "should be able to grab store from a nested call", async () => {
   const store = createStore({ user: { id: "2" } });
   const { run, middleware } = createFxMiddleware();
   middleware(store);
-  await run([
-    function* () {
-      const actual = yield* call(function* () {
-        return yield* select((s: TestState) => s["user"]);
-      });
-      expect(actual).toEqual({ id: "2" });
-    },
-  ]);
+  await run(function* () {
+    const actual = yield* call(function* () {
+      return yield* select((s: TestState) => s.user);
+    });
+    expect(actual).toEqual({ id: "2" });
+  });
 });

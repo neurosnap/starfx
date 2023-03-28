@@ -1,7 +1,24 @@
-import { createFuture, run, sleep, spawn } from "../deps.ts";
-import { describe, expect, it } from "../../test/suite.ts";
+import { Operation, run, sleep, spawn } from "../deps.ts";
+import { describe, expect, it } from "../test.ts";
 
 import { all } from "../mod.ts";
+
+interface Defer<T> {
+  promise: Operation<T>;
+  resolve: (t: T) => void;
+  reject: (t: Error) => void;
+}
+
+function defer<T>(): Defer<T> {
+  let resolve;
+  let reject;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { resolve, reject, promise } as any;
+}
 
 describe("all()", () => {
   it("should return empty array", async () => {
@@ -13,7 +30,7 @@ describe("all()", () => {
   });
 
   it("should resolve all async items", async () => {
-    const two = createFuture<number>();
+    const two = defer();
 
     function* one() {
       yield* sleep(5);
@@ -25,7 +42,7 @@ describe("all()", () => {
         yield* sleep(15);
         two.resolve(2);
       });
-      return yield* all([one, () => two.future]);
+      return yield* all([one, () => two.promise]);
     });
 
     expect(result).toEqual([1, 2]);
@@ -33,23 +50,24 @@ describe("all()", () => {
 
   it("should stop all operations when there is an error", async () => {
     let actual: number[] = [];
-    const one = createFuture<number>();
-    const two = createFuture<number>();
+    const one = defer<number>();
+    const two = defer<number>();
 
     function* genFn() {
       try {
-        actual = yield* all([() => one.future, () => two.future]);
+        actual = yield* all([() => one.promise, () => two.promise]);
       } catch (err) {
         actual = [err];
       }
     }
 
-    one.reject(new Error("error"));
+    const err = new Error("error");
+    one.reject(err);
     two.resolve(1);
 
     await run(genFn);
 
-    const expected = [new Error("error")];
+    const expected = [err];
     expect(actual).toEqual(expected);
   });
 });

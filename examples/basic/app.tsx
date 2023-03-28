@@ -9,9 +9,9 @@ import {
 } from "react-redux";
 
 // run `make npm` in `saga/` folder first
-import { ErrContext, forEach, go } from "../../npm/src/saga/mod";
-import { createFxMiddleware, take } from "../../npm/src/saga/redux";
-import { Provider } from "../../npm/src/saga/react";
+import { ErrContext, forEach, go, keepAlive } from "../../npm/src/mod";
+import { createFxMiddleware, take, supervise } from "../../npm/src/redux";
+import { Provider } from "../../npm/src/react";
 
 interface User {
   id: string;
@@ -82,7 +82,7 @@ function main() {
     });
   }
 
-  fx.run([users, mailboxes, logErrors]);
+  fx.run(() => keepAlive([users, mailboxes, logErrors]));
 
   const domNode = document.getElementById("root");
   const root = createRoot(domNode);
@@ -91,7 +91,7 @@ function main() {
       <Provider scope={fx.scope}>
         <App id="1" />
       </Provider>
-    </ReduxProvider>,
+    </ReduxProvider>
   );
 }
 

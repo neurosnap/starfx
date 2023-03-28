@@ -5,16 +5,14 @@ import { ErrContext } from "../context.ts";
 
 export interface ResultOk<T> {
   type: "ok";
+  ok: true;
   value: T;
-  isOk: true;
-  isErr: false;
 }
 
 export interface ResultErr {
   type: "err";
-  value: Error;
-  isOk: false;
-  isErr: true;
+  ok: false;
+  error: Error;
 }
 
 export type Result<T> = ResultOk<T> | ResultErr;
@@ -22,18 +20,16 @@ export type Result<T> = ResultOk<T> | ResultErr;
 export function Ok<T>(value: T): ResultOk<T> {
   return {
     type: "ok",
+    ok: true,
     value,
-    isOk: true,
-    isErr: false,
   };
 }
 
-export function Err(value: Error): ResultErr {
+export function Err(error: Error): ResultErr {
   return {
     type: "err",
-    value,
-    isOk: false,
-    isErr: true,
+    ok: false,
+    error,
   };
 }
 
@@ -70,7 +66,7 @@ export function* go<T>(op: OpFn<T>): Operation<Task<Result<T>>> {
     try {
       return Ok(yield* call(op));
     } catch (error) {
-      let { input } = yield* ErrContext;
+      const { input } = yield* ErrContext;
       yield* input.send(error);
       return Err(error);
     }
@@ -82,7 +78,7 @@ export function* safe<T>(opFn: OpFn<T>): Operation<Result<T>> {
     const value = yield* call(opFn);
     return Ok(value);
   } catch (error) {
-    let { input } = yield* ErrContext;
+    const { input } = yield* ErrContext;
     yield* input.send(error);
     return Err(error);
   }

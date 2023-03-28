@@ -1,0 +1,16 @@
+{
+  "lint": {
+    "files": {
+      "exclude": ["npm/", "examples/"]
+    },
+    "rules": {
+      "tags": ["recommended"],
+      "exclude": ["no-explicit-any", "require-yield"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "exclude": ["npm/", "examples/"]
+    }
+  }
+}

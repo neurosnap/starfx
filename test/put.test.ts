@@ -1,4 +1,4 @@
-import { describe, expect, it } from "../../test/suite.ts";
+import { describe, expect, it } from "../test.ts";
 
 import { run, sleep, spawn } from "../deps.ts";
 import { ActionContext, put, take } from "../redux.ts";
@@ -6,7 +6,7 @@ import { ActionContext, put, take } from "../redux.ts";
 const putTests = describe("put()");
 
 it(putTests, "should send actions through channel", async () => {
-  let actual: string[] = [];
+  const actual: string[] = [];
 
   function* genFn(arg: string) {
     yield* spawn(function* () {

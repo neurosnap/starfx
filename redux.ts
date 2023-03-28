@@ -1,8 +1,8 @@
-import type { Channel, Operation, Scope } from "./deps.ts";
+import type { Channel, Scope } from "./deps.ts";
 import { createChannel, createContext, createScope } from "./deps.ts";
 import { contextualize } from "./context.ts";
-import { all, emit, once, safe } from "./fx/mod.ts";
-import type { Action, StoreLike } from "./types.ts";
+import { call, emit, once } from "./fx/mod.ts";
+import type { Action, OpFn, StoreLike } from "./types.ts";
 import { ActionPattern } from "./matcher.ts";
 
 export const ActionContext = createContext<Channel<Action, void>>(
@@ -31,18 +31,10 @@ export function* put(action: Action | Action[]) {
   });
 }
 
-function supervise(op: () => Operation<void>) {
-  return function* keepAlive() {
-    while (true) {
-      yield* safe(op);
-    }
-  };
-}
-
 export function createFxMiddleware(scope: Scope = createScope()) {
-  function run(ops: (() => Operation<void>)[]) {
+  function run<T>(op: OpFn<T>) {
     const task = scope.run(function* runner() {
-      yield* all(ops.map(supervise));
+      yield* call(op);
     });
 
     return task;
@@ -50,7 +42,7 @@ export function createFxMiddleware(scope: Scope = createScope()) {
 
   function middleware<S = unknown, T = unknown>(store: StoreLike<S>) {
     scope.run(function* () {
-      yield* contextualize("store", store);
+      yield* contextualize("redux:store", store);
     });
 
     return (next: (a: Action) => T) => (action: Action) => {

@@ -7,6 +7,6 @@ export const ErrContext = createContext<Channel<Error, void>>(
 );
 
 export function* contextualize(context: string, value: unknown) {
-  let frame = yield* getframe();
+  const frame = yield* getframe();
   frame.context[context] = value;
 }

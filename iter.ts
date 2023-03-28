@@ -21,7 +21,7 @@ export function* map<T, R>(
   each: (value: T) => Operation<R>,
 ): Operation<R[]> {
   const results: R[] = [];
-  for (let value of values) {
+  for (const value of values) {
     results.push(yield* each(value));
   }
   return results;

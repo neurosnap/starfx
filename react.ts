@@ -34,7 +34,7 @@ export function useDispatchFx() {
   const scope = useScope();
   return (action: Action) =>
     scope.run(function* () {
-      let { input } = yield* ActionContext;
+      const { input } = yield* ActionContext;
       yield* input.send(action);
     });
 }

@@ -13,14 +13,14 @@ export function race<T>(operations: OpFn<T>[]): Operation<T> {
     );
 
     const winner = yield* action<T>(function* (resolve) {
-      for (let task of tasks) {
+      for (const task of tasks) {
         yield* spawn(function* () {
           resolve(yield* task);
         });
       }
     });
 
-    for (let task of tasks) {
+    for (const task of tasks) {
       if (task !== winner) {
         yield* spawn(() => task.halt());
       }

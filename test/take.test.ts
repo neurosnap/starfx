@@ -1,4 +1,4 @@
-import { describe, expect, it } from "../../test/suite.ts";
+import { describe, expect, it } from "../test.ts";
 
 import { run, sleep, spawn } from "../deps.ts";
 import { put, take } from "../redux.ts";
@@ -112,6 +112,5 @@ it(takeTests, "take from default channel", async () => {
     },
     "auto ended",
   ];
-  console.log(actual);
   expect(actual).toEqual(expected);
 });

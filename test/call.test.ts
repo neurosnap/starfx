@@ -1,4 +1,4 @@
-import { describe, expect, it } from "../../test/suite.ts";
+import { describe, expect, it } from "../test.ts";
 
 import { run } from "../deps.ts";
 import { call } from "../mod.ts";

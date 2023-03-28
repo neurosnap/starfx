@@ -5,7 +5,10 @@ export interface Action<P = any> {
   type: ActionType;
   payload?: P;
 }
-export type OpFn<T> = (() => Operation<T>) | (() => PromiseLike<T>) | (() => T);
+export type OpFn<T = unknown> =
+  | (() => Operation<T>)
+  | (() => PromiseLike<T>)
+  | (() => T);
 
 export interface StoreLike<S = unknown> {
   getState: () => S;
