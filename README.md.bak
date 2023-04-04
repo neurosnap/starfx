@@ -1,11 +1,11 @@
 # starfx
 
-This project is under active development, there are zero guarantees for API
+This project is under active development, there are zero guarentees for API
 stability.
 
 ## features
 
-- async flow control library for `deno`, `node`, and browser
+- async flow control library for deno, node, and browser
 
 ## usage
 
