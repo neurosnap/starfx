@@ -9,4 +9,5 @@ stability.
 
 ## usage
 
-Please see [examples/basic](./examples/basic) and [tests](./test) to understand how it works.
+Please see [examples/basic](./examples/basic) and [tests](./test) to understand
+how it works.
