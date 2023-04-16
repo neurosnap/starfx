@@ -1,5 +1,21 @@
 import type { Channel, Operation } from "./deps.ts";
 
+export function* cforEach<T>(
+  chan: Channel<T, void>,
+  each?: (val: T) => Operation<void>,
+) {
+  const { output } = chan;
+  const msgList = yield* output;
+  while (true) {
+    const next = yield* msgList;
+    if (next.done) {
+      return next.value;
+    } else if (each) {
+      yield* each(next.value);
+    }
+  }
+}
+
 export function* forEach<T>(
   chan: Operation<Channel<T, void>>,
   each?: (val: T) => Operation<void>,

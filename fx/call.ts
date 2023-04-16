@@ -1,37 +1,7 @@
 import type { Operation, Task } from "../deps.ts";
-import { action, expect, spawn } from "../deps.ts";
+import { action, Err, expect, Ok, Result, spawn } from "../deps.ts";
 import type { OpFn } from "../types.ts";
 import { ErrContext } from "../context.ts";
-
-export interface ResultOk<T> {
-  type: "ok";
-  ok: true;
-  value: T;
-}
-
-export interface ResultErr {
-  type: "err";
-  ok: false;
-  error: Error;
-}
-
-export type Result<T> = ResultOk<T> | ResultErr;
-
-export function Ok<T>(value: T): ResultOk<T> {
-  return {
-    type: "ok",
-    ok: true,
-    value,
-  };
-}
-
-export function Err(error: Error): ResultErr {
-  return {
-    type: "err",
-    ok: false,
-    error,
-  };
-}
 
 export const isFunc = (f: unknown) => typeof f === "function";
 export const isPromise = (p: unknown) =>

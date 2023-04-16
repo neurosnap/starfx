@@ -3,6 +3,7 @@ export { React };
 export type {
   Channel,
   Operation,
+  Result,
   Scope,
   Task,
 } from "https://deno.land/x/effection@3.0.0-alpha.7/mod.ts";
@@ -11,8 +12,10 @@ export {
   createChannel,
   createContext,
   createScope,
+  Err,
   expect,
   getframe,
+  Ok,
   resource,
   run,
   sleep,
