@@ -1,7 +1,7 @@
 import type { Channel, Operation, Result } from "../deps.ts";
 import { createChannel, resource, spawn } from "../deps.ts";
 import { safe } from "./call.ts";
-import type { OpFn } from "../types.ts";
+import type { Computation, OpFn } from "../types.ts";
 import { map } from "../iter.ts";
 
 import { toOperation } from "./call.ts";
@@ -19,8 +19,7 @@ export function all<T>(operations: OpFn<T>[]): Operation<T[]> {
   });
 }
 
-interface ParallelRet<T> {
-  wait: () => Operation<Result<T>[]>;
+interface ParallelRet<T> extends Computation<Result<T>[]> {
   sequence: Channel<Result<T>, void>;
   immediate: Channel<Result<T>, void>;
 }
@@ -57,5 +56,11 @@ export function* parallel<T>(operations: OpFn<T>[]): Operation<ParallelRet<T>> {
     return results;
   }
 
-  return { wait, sequence, immediate };
+  return {
+    sequence,
+    immediate,
+    *[Symbol.iterator]() {
+      return yield* wait();
+    },
+  };
 }

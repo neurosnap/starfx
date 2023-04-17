@@ -1,4 +1,8 @@
-import type { Operation } from "./deps.ts";
+import type { Instruction, Operation } from "./deps.ts";
+
+export interface Computation<T = any> {
+  [Symbol.iterator](): Iterator<Instruction, T, any>;
+}
 
 export type ActionType = string;
 export interface Action<P = any> {
