@@ -4,7 +4,8 @@ import type { ActionPattern } from "./matcher.ts";
 
 import { createChannel, createContext, createScope } from "./deps.ts";
 import { contextualize } from "./context.ts";
-import { call, emit, once, parallel } from "./fx/mod.ts";
+import { call, emit, parallel } from "./fx/mod.ts";
+import { once } from "./iter.ts";
 
 export const ActionContext = createContext<Channel<Action, void>>(
   "redux:action",
