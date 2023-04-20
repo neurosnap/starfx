@@ -21,7 +21,7 @@ it(tests, "should call the generator function", async () => {
 });
 
 it(tests, "should return an Err()", async () => {
-  const err = new Error("bang!")
+  const err = new Error("bang!");
   function* me() {
     throw err;
   }
@@ -29,7 +29,7 @@ it(tests, "should return an Err()", async () => {
   await run(function* () {
     const result = yield* call(me);
     if (!result.ok) {
-      expect(result.error).toEqual(err)
+      expect(result.error).toEqual(err);
     }
   });
 });

@@ -1,10 +1,19 @@
-import { safe } from "./fx/mod.ts";
+import { call } from "./fx/mod.ts";
+import type { Instruction, Result } from "./deps.ts";
+import { Err } from "./deps.ts";
 
-interface Middleware<Ctx> {}
-type Next = () => void;
-interface PipeCtx {}
+export type MdwCtx = Record<string, any>;
 
-export function compose<Ctx extends PipeCtx = PipeCtx>(
+export type Next<T = unknown> = () => Generator<Instruction, Result<T>, void>;
+export type Middleware<Ctx extends MdwCtx = MdwCtx> = (
+  ctx: Ctx,
+  next: Next,
+) => any;
+/* type MiddlewareCo<Ctx extends MdwCtx = MdwCtx> =
+  | Middleware<Ctx>
+  | Middleware<Ctx>[]; */
+
+export function compose<Ctx extends MdwCtx = MdwCtx>(
   middleware: Middleware<Ctx>[],
 ) {
   if (!Array.isArray(middleware)) {
@@ -17,20 +26,24 @@ export function compose<Ctx extends PipeCtx = PipeCtx>(
     }
   }
 
-  return function* composeFn(context: Ctx, next?: Next): SagaIterator<void> {
+  return function* composeFn<T>(context: Ctx, next?: Next) {
     // last called middleware #
     let index = -1;
-    yield* safe(() => dispatch(0));
 
-    function* dispatch(i: number) {
+    function* dispatch(i: number): Generator<Instruction, Result<T>, void> {
       if (i <= index) {
         throw new Error("next() called multiple times");
       }
       index = i;
       let fn: any = middleware[i];
       if (i === middleware.length) fn = next;
-      if (!fn) return;
-      yield* safe(() => fn(context, dispatch.bind(null, i + 1)));
+      if (!fn) return Err(new Error("fn is falsy"));
+      const nxt = dispatch.bind(null, i + 1);
+      const result = yield* call(() => fn(context, nxt));
+      return result;
     }
+
+    yield* dispatch(0);
+    return context;
   };
 }
