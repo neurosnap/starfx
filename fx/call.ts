@@ -1,6 +1,6 @@
 import type { OpFn } from "../types.ts";
-import type { Err, Ok, Operation, Result, Task } from "../deps.ts";
-import { action, expect, spawn } from "../deps.ts";
+import type { Operation, Result, Task } from "../deps.ts";
+import { action, Err, expect, Ok, spawn } from "../deps.ts";
 import { ErrContext } from "../context.ts";
 
 export const isFunc = (f: unknown) => typeof f === "function";
