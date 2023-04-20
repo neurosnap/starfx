@@ -1,4 +1,4 @@
-export * from "./all.ts";
+export * from "./parallel.ts";
 export * from "./call.ts";
 export * from "./cancel.ts";
 export * from "./cancelled.ts";

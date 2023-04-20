@@ -1,9 +1,10 @@
 import type { Channel, Scope } from "./deps.ts";
+import type { Action, OpFn, StoreLike } from "./types.ts";
+import type { ActionPattern } from "./matcher.ts";
+
 import { createChannel, createContext, createScope } from "./deps.ts";
 import { contextualize } from "./context.ts";
-import { call, emit, once } from "./fx/mod.ts";
-import type { Action, OpFn, StoreLike } from "./types.ts";
-import { ActionPattern } from "./matcher.ts";
+import { call, emit, once, parallel } from "./fx/mod.ts";
 
 export const ActionContext = createContext<Channel<Action, void>>(
   "redux:action",
@@ -48,7 +49,11 @@ export function createFxMiddleware(scope: Scope = createScope()) {
     return (next: (a: Action) => T) => (action: Action) => {
       const result = next(action); // hit reducers
       scope.run(function* () {
-        yield* put(action);
+        if (Array.isArray(action)) {
+          yield* parallel(action.map((a) => () => put(a)));
+        } else {
+          yield* put(action);
+        }
       });
       return result;
     };

@@ -1,7 +1,7 @@
-import { OpFn } from "../types.ts";
+import type { OpFn } from "../types.ts";
 
 import { safe } from "./call.ts";
-import { all } from "./all.ts";
+import { parallel } from "./parallel.ts";
 
 export function supervise<T>(op: OpFn<T>) {
   return function* () {
@@ -12,5 +12,5 @@ export function supervise<T>(op: OpFn<T>) {
 }
 
 export function* keepAlive(ops: OpFn[]) {
-  return yield* all(ops.map(supervise));
+  return yield* parallel(ops.map(supervise));
 }

@@ -1,7 +1,7 @@
 import type { Channel, Operation } from "../deps.ts";
 import type { Action } from "../types.ts";
 
-import { all } from "./all.ts";
+import { parallel } from "./parallel.ts";
 
 export function* emit({
   channel,
@@ -15,7 +15,7 @@ export function* emit({
     if (action.length === 0) {
       return;
     }
-    yield* all(action.map((a) => () => input.send(a)));
+    yield* parallel(action.map((a) => () => input.send(a)));
   } else {
     yield* input.send(action);
   }
