@@ -32,18 +32,18 @@ export function compose<Ctx extends MdwCtx = MdwCtx>(
 
     function* dispatch(i: number): Generator<Instruction, Result<T>, void> {
       if (i <= index) {
-        throw new Error("next() called multiple times");
+        return Err(new Error("next() called multiple times"));
       }
       index = i;
       let fn: any = middleware[i];
       if (i === middleware.length) fn = next;
       if (!fn) return Err(new Error("fn is falsy"));
       const nxt = dispatch.bind(null, i + 1);
-      const result = yield* call(() => fn(context, nxt));
+      const result = yield* fn(context, nxt);
       return result;
     }
 
-    yield* dispatch(0);
+    yield* call(() => dispatch(0));
     return context;
   };
 }
