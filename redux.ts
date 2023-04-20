@@ -1,10 +1,16 @@
-import type { Channel, Scope } from "./deps.ts";
+import type { Channel, Operation, Scope } from "./deps.ts";
 import type { Action, OpFn, StoreLike } from "./types.ts";
 import type { ActionPattern } from "./matcher.ts";
 
-import { createChannel, createContext, createScope } from "./deps.ts";
+import {
+  configureStore,
+  createChannel,
+  createContext,
+  createScope,
+  spawn,
+} from "./deps.ts";
 import { contextualize } from "./context.ts";
-import { call, emit, parallel } from "./fx/mod.ts";
+import { call, cancel, emit, parallel } from "./fx/mod.ts";
 import { once } from "./iter.ts";
 
 export const ActionContext = createContext<Channel<Action, void>>(
@@ -23,6 +29,49 @@ export function* take(pattern: ActionPattern) {
   return yield* once({
     channel: ActionContext,
     pattern,
+  });
+}
+
+export function* takeEvery<T>(
+  pattern: ActionPattern,
+  op: (action: Action) => Operation<T>,
+) {
+  return yield* spawn(function* () {
+    while (true) {
+      const action = yield* take(pattern);
+      if (!action) continue;
+      yield* spawn(() => op(action));
+    }
+  });
+}
+
+export function* takeLatest<T>(
+  pattern: ActionPattern,
+  op: (action: Action) => Operation<T>,
+) {
+  return yield* spawn(function* () {
+    let lastTask;
+    while (true) {
+      const action = yield* take(pattern);
+      if (lastTask) {
+        yield* cancel(lastTask);
+      }
+      if (!action) continue;
+      lastTask = yield* spawn(() => op(action));
+    }
+  });
+}
+
+export function* takeLeading<T>(
+  pattern: ActionPattern,
+  op: (action: Action) => Operation<T>,
+) {
+  return yield* spawn(function* () {
+    while (true) {
+      const action = yield* take(pattern);
+      if (!action) continue;
+      yield* call(() => op(action));
+    }
   });
 }
 
@@ -61,4 +110,18 @@ export function createFxMiddleware(scope: Scope = createScope()) {
   }
 
   return { run, scope, middleware };
+}
+
+interface SetupStoreProps<S = any> {
+  reducer: (s: S, _: Action) => S;
+}
+
+export function setupStore({ reducer }: SetupStoreProps) {
+  const fx = createFxMiddleware();
+  const store = configureStore({
+    reducer,
+    middleware: [fx.middleware],
+  });
+
+  return { store, fx };
 }

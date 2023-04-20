@@ -1,5 +1,6 @@
 import React from "https://esm.sh/react@18.2.0";
 export { React };
+export { configureStore } from "https://esm.sh/@reduxjs/toolkit@1.9.5";
 export type {
   Channel,
   Instruction,
