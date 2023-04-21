@@ -1,7 +1,7 @@
-import { describe, expect, it } from "../test.ts";
+import { describe, expect, it, setupReduxScope } from "../test.ts";
+import { sleep, spawn } from "../deps.ts";
 
-import { run, sleep, spawn } from "../deps.ts";
-import { ActionContext, put, take } from "../redux.ts";
+import { ActionContext, put, take } from "./index.ts";
 
 const putTests = describe("put()");
 
@@ -27,7 +27,8 @@ it(putTests, "should send actions through channel", async () => {
     });
   }
 
-  await run(() => genFn("arg"));
+  const scope = setupReduxScope();
+  await scope.run(() => genFn("arg"));
 
   const expected = ["arg", "2"];
   expect(actual).toEqual(expected);
@@ -56,7 +57,8 @@ it(putTests, "should handle nested puts", async () => {
     yield* spawn(genA);
   }
 
-  await run(root);
+  const scope = setupReduxScope();
+  await scope.run(() => root());
 
   const expected = ["put b", "put a"];
   expect(actual).toEqual(expected);
@@ -73,7 +75,8 @@ it(
       yield* sleep(0);
     }
 
-    await run(root);
+    const scope = setupReduxScope();
+    await scope.run(() => root());
     expect(true).toBe(true);
   },
 );
@@ -100,7 +103,8 @@ it(
       yield* tsk;
     }
 
-    await run(root);
+    const scope = setupReduxScope();
+    await scope.run(() => root());
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
   },

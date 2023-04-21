@@ -1,15 +1,21 @@
-import { build, emptyDir } from "https://deno.land/x/dnt@0.17.0/mod.ts";
-import { assert } from "https://deno.land/std@0.129.0/testing/asserts.ts";
+import { assert, build, emptyDir } from "./test.ts";
+
 await emptyDir("./npm");
 
 const version = Deno.env.get("NPM_VERSION");
 assert(version, "NPM_VERSION is required to build npm package");
 
 await build({
-  entryPoints: ["./mod.ts", "./react.ts", "./redux.ts"],
+  entryPoints: [
+    "./index.ts",
+    "./react.ts",
+    "./redux/index.ts",
+    "./query/index.ts",
+  ],
   outDir: "./npm",
   shims: {
     deno: false,
+    undici: true,
   },
   test: false,
   typeCheck: false,
@@ -18,10 +24,9 @@ await build({
     sourceMap: true,
   },
   package: {
-    // package.json properties
     name: "starfx",
     version,
-    description: "Declarative side-effects for your apps",
+    description: "",
     license: "MIT",
     repository: {
       author: "me@erock.io",
@@ -32,8 +37,13 @@ await build({
       url: "https://github.com/neurosnap/starfx/issues",
     },
     engines: {
-      node: ">= 14",
+      node: ">= 18",
     },
+    sideEffects: false,
+  },
+  postBuild() {
+    Deno.copyFileSync("LICENSE.md", "npm/LICENSE.md");
+    Deno.copyFileSync("README.md", "npm/README.md");
   },
 });
 

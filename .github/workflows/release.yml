@@ -1,0 +1,36 @@
+name: release to npm
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: setup deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: get version
+        id: vars
+        run: echo ::set-output name=version::$(echo ${{github.ref_name}} | sed 's/^v//')
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+          registry-url: https://registry.npmjs.com
+      - name: build
+        run: deno task npm $NPM_VERSION
+        env:
+          NPM_VERSION: ${{steps.vars.outputs.version}}
+      - name: publish
+        run: npm publish --access=public
+        working-directory: ./build/npm
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}

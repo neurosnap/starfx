@@ -1,6 +1,6 @@
-import type { Channel, Operation, Scope } from "./deps.ts";
-import type { Action, OpFn, StoreLike } from "./types.ts";
-import type { ActionPattern } from "./matcher.ts";
+import { BATCH, Channel, Instruction, Operation, Scope } from "../deps.ts";
+import type { Action, ActionWPayload, OpFn, StoreLike } from "../types.ts";
+import type { ActionPattern } from "../matcher.ts";
 
 import {
   configureStore,
@@ -8,10 +8,10 @@ import {
   createContext,
   createScope,
   spawn,
-} from "./deps.ts";
-import { contextualize } from "./context.ts";
-import { call, cancel, emit, parallel } from "./fx/mod.ts";
-import { once } from "./iter.ts";
+} from "../deps.ts";
+import { contextualize } from "../context.ts";
+import { call, cancel, emit, parallel } from "../fx/index.ts";
+import { once } from "../iter.ts";
 
 export const ActionContext = createContext<Channel<Action, void>>(
   "redux:action",
@@ -25,11 +25,18 @@ export function* select<S, R>(selectorFn: (s: S) => R) {
   return selectorFn(store.getState() as S);
 }
 
-export function* take(pattern: ActionPattern) {
-  return yield* once({
+// https://github.com/microsoft/TypeScript/issues/31751#issuecomment-498526919
+export function* take<P = never>(
+  pattern: ActionPattern,
+): Generator<
+  Instruction,
+  [P] extends [never] ? Action : ActionWPayload<P>
+> {
+  const action = yield* once({
     channel: ActionContext,
     pattern,
   });
+  return action as any;
 }
 
 export function* takeEvery<T>(
@@ -76,16 +83,44 @@ export function* takeLeading<T>(
 }
 
 export function* put(action: Action | Action[]) {
+  const store = yield* StoreContext;
+  if (Array.isArray(action)) {
+    action.map((act) => store.dispatch(act));
+  } else {
+    store.dispatch(action);
+  }
   yield* emit({
     channel: ActionContext,
     action,
   });
 }
 
+function* send(action: Action) {
+  if (action.type === BATCH) {
+    const actions: Action[] = action.payload;
+    yield* parallel(
+      actions.map(
+        (a) =>
+          function* () {
+            yield* emit({
+              channel: ActionContext,
+              action: a,
+            });
+          },
+      ),
+    );
+  } else {
+    yield* emit({
+      channel: ActionContext,
+      action,
+    });
+  }
+}
+
 export function createFxMiddleware(scope: Scope = createScope()) {
   function run<T>(op: OpFn<T>) {
     const task = scope.run(function* runner() {
-      yield* call(op);
+      return yield* call(op);
     });
 
     return task;
@@ -99,11 +134,7 @@ export function createFxMiddleware(scope: Scope = createScope()) {
     return (next: (a: Action) => T) => (action: Action) => {
       const result = next(action); // hit reducers
       scope.run(function* () {
-        if (Array.isArray(action)) {
-          yield* parallel(action.map((a) => () => put(a)));
-        } else {
-          yield* put(action);
-        }
+        yield* send(action);
       });
       return result;
     };
@@ -112,7 +143,7 @@ export function createFxMiddleware(scope: Scope = createScope()) {
   return { run, scope, middleware };
 }
 
-interface SetupStoreProps<S = any> {
+interface SetupStoreProps<S = unknown> {
   reducer: (s: S, _: Action) => S;
 }
 

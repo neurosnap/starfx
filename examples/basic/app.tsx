@@ -61,6 +61,7 @@ function main() {
   function* users() {
     while (true) {
       const action = yield* take("fetch-user");
+      console.log(action);
       yield* go(function* () {
         console.log(action);
       });
@@ -69,6 +70,7 @@ function main() {
   function* mailboxes() {
     while (true) {
       const action = yield* take("fetch-mailboxes");
+      console.log(action);
       yield* go(function* () {
         console.log(action);
         yield* sleep(1000);

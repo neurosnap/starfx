@@ -1,17 +1,17 @@
 import type { Action, ActionType } from "./types.ts";
 
 type GuardPredicate<G extends T, T = unknown> = (arg: T) => arg is G;
-type Predicate<T> = (arg: T) => boolean;
+type Predicate = (action: Action) => boolean;
 type StringableActionCreator<A extends Action = Action> = {
   (...args: unknown[]): A;
   toString(): string;
 };
-type SubPattern<T> = Predicate<T> | StringableActionCreator | ActionType;
-export type Pattern<T> = SubPattern<T> | SubPattern<T>[];
+type SubPattern = Predicate | StringableActionCreator | ActionType;
+export type Pattern = SubPattern | SubPattern[];
 type ActionSubPattern<Guard extends Action = Action> =
   | GuardPredicate<Guard, Action>
   | StringableActionCreator<Guard>
-  | Predicate<Action>
+  | Predicate
   | ActionType;
 export type ActionPattern<Guard extends Action = Action> =
   | ActionSubPattern<Guard>

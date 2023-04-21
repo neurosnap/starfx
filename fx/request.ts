@@ -1,4 +1,3 @@
-import { ErrContext } from "../context.ts";
 import { Err, expect, Ok, useAbortSignal } from "../deps.ts";
 
 export function* request(url: string | URL | Request, opts?: RequestInit) {
@@ -12,8 +11,6 @@ export function* json(response: Response) {
     const result = yield* expect(response.json());
     return Ok(result);
   } catch (error) {
-    const { input } = yield* ErrContext;
-    yield* input.send(error);
     return Err(error);
   }
 }

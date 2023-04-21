@@ -1,4 +1,4 @@
-import type { Channel, Operation } from "./deps.ts";
+import type { Channel, Operation, Stream } from "./deps.ts";
 import type { Action } from "./types.ts";
 import { ActionPattern, matcher } from "./matcher.ts";
 
@@ -21,28 +21,11 @@ export function* once({
   }
 }
 
-export function* cforEach<T>(
-  chan: Channel<T, void>,
-  each?: (val: T) => Operation<void>,
-) {
-  const { output } = chan;
-  const msgList = yield* output;
-  while (true) {
-    const next = yield* msgList;
-    if (next.done) {
-      return next.value;
-    } else if (each) {
-      yield* each(next.value);
-    }
-  }
-}
-
 export function* forEach<T>(
-  chan: Operation<Channel<T, void>>,
+  stream: Stream<T, void>,
   each?: (val: T) => Operation<void>,
 ) {
-  const { output } = yield* chan;
-  const msgList = yield* output;
+  const msgList = yield* stream;
   while (true) {
     const next = yield* msgList;
     if (next.done) {

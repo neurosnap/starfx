@@ -1,7 +1,6 @@
 import type { OpFn } from "../types.ts";
 import type { Operation, Result, Task } from "../deps.ts";
 import { action, Err, expect, Ok, spawn } from "../deps.ts";
-import { ErrContext } from "../context.ts";
 
 export const isFunc = (f: unknown) => typeof f === "function";
 export const isPromise = (p: unknown) =>
@@ -36,8 +35,6 @@ export function* call<T>(opFn: OpFn<T>): Operation<Result<T>> {
     const value = yield* unsafeCall(opFn);
     return Ok(value);
   } catch (error) {
-    const { input } = yield* ErrContext;
-    yield* input.send(error);
     return Err(error);
   }
 }
@@ -45,10 +42,6 @@ export function* call<T>(opFn: OpFn<T>): Operation<Result<T>> {
 export function* go<T>(op: OpFn<T>): Operation<Task<Result<T>>> {
   return yield* spawn(function* () {
     const result = yield* call(op);
-    if (!result.ok) {
-      const { input } = yield* ErrContext;
-      yield* input.send(result.error);
-    }
     return result;
   });
 }
