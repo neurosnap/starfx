@@ -1,7 +1,7 @@
-import { describe, expect, it } from "../test.ts";
+import { describe, expect, it } from "./test.ts";
 
-import { run, sleep } from "../deps.ts";
-import { compose } from "../compose.ts";
+import { run, sleep } from "./deps.ts";
+import { compose } from "./compose.ts";
 
 const tests = describe("compose()");
 

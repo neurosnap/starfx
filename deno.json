@@ -1,16 +1,17 @@
 {
+  "tasks": {
+    "types": "deno run --allow-write ./api-type-template.ts",
+    "npm": "deno run --allow-write --allow-read --allow-env --allow-run --allow-net --no-check ./npm.ts",
+    "test": "deno test --allow-env --allow-read"
+  },
   "lint": {
-    "files": {
-      "exclude": ["npm/", "examples/"]
-    },
+    "exclude": ["npm/", "examples/"],
     "rules": {
       "tags": ["recommended"],
       "exclude": ["no-explicit-any", "require-yield"]
     }
   },
   "fmt": {
-    "files": {
-      "exclude": ["npm/", "examples/"]
-    }
+    "exclude": ["npm/", "examples/"]
   }
 }

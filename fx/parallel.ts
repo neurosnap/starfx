@@ -1,9 +1,10 @@
 import type { Channel, Operation, Result } from "../deps.ts";
 import type { Computation, OpFn } from "../types.ts";
 import { createChannel, resource, spawn } from "../deps.ts";
+
 import { call } from "./call.ts";
 
-interface ParallelRet<T> extends Computation<Result<T>[]> {
+export interface ParallelRet<T> extends Computation<Result<T>[]> {
   sequence: Channel<Result<T>, void>;
   immediate: Channel<Result<T>, void>;
 }

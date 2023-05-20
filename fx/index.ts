@@ -6,3 +6,4 @@ export * from "./race.ts";
 export * from "./emit.ts";
 export * from "./request.ts";
 export * from "./watch.ts";
+export * from "./defer.ts";

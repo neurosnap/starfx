@@ -1,8 +1,8 @@
-import { describe, expect, it } from "../test.ts";
-
-import { run, sleep, spawn } from "../deps.ts";
-import { put, take } from "../redux.ts";
+import { describe, expect, it, setupReduxScope } from "../test.ts";
+import { sleep, spawn } from "../deps.ts";
 import type { Action } from "../types.ts";
+
+import { put, take } from "./index.ts";
 
 const takeTests = describe("take()");
 
@@ -10,7 +10,7 @@ it(
   takeTests,
   "a put should complete before more `take` are added and then consumed automatically",
   async () => {
-    const actual: any[] = [];
+    const actual: Action[] = [];
 
     function* channelFn() {
       yield* sleep(10);
@@ -25,11 +25,13 @@ it(
       actual.push(yield* take("action-1"));
     }
 
-    await run(root);
+    const scope = setupReduxScope();
+    await scope.run(root);
+
     expect(actual).toEqual([
       { type: "action-1", payload: 1 },
       { type: "action-1", payload: 2 },
-    ]); // actual: [ { type: "action-1", payload: 1 }, { type: "action-1", payload: 1 } ]
+    ]);
   },
 );
 
@@ -57,7 +59,7 @@ it(takeTests, "take from default channel", async () => {
     });
   }
 
-  const actual: any[] = [];
+  const actual: Action[] = [];
   function* genFn() {
     yield* spawn(channelFn);
 
@@ -79,11 +81,12 @@ it(takeTests, "take from default channel", async () => {
         ]),
       ); // take if match any from the mixed array
     } finally {
-      actual.push("auto ended");
+      actual.push({ type: "auto ended" });
     }
   }
 
-  await run(genFn);
+  const scope = setupReduxScope();
+  await scope.run(genFn);
 
   const expected = [
     {
@@ -110,7 +113,7 @@ it(takeTests, "take from default channel", async () => {
     {
       type: "action-3",
     },
-    "auto ended",
+    { type: "auto ended" },
   ];
   expect(actual).toEqual(expected);
 });

@@ -1,4 +1,4 @@
-import { call } from "./fx/mod.ts";
+import { call } from "./fx/index.ts";
 import type { Instruction, Result } from "./deps.ts";
 import { Err } from "./deps.ts";
 

@@ -5,10 +5,18 @@ export interface Computation<T = any> {
 }
 
 export type ActionType = string;
-export interface Action<P = any> {
+export interface Action {
   type: ActionType;
-  payload?: P;
+  payload?: any;
+  meta?: any;
+  error?: boolean;
 }
+export interface ActionWPayload<P> {
+  type: ActionType;
+  payload: P;
+}
+export type AnyAction = Action | ActionWPayload<unknown>;
+
 export type OpFn<T = unknown> =
   | (() => Operation<T>)
   | (() => PromiseLike<T>)

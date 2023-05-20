@@ -1,8 +1,8 @@
 import { describe, expect, it } from "../test.ts";
-
-import { setupStore, take, takeEvery } from "../redux.ts";
-import { cancel } from "../fx/mod.ts";
+import { cancel } from "../fx/index.ts";
 import type { Action } from "../types.ts";
+
+import { setupStore, take, takeEvery } from "./index.ts";
 
 const testEvery = describe("takeEvery()");
 
