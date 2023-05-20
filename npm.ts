@@ -26,7 +26,7 @@ await build({
   package: {
     name: "starfx",
     version,
-    description: "",
+    description: "Supercharged async flow control library",
     license: "MIT",
     repository: {
       author: "me@erock.io",
