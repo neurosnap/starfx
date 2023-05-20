@@ -31,6 +31,6 @@ jobs:
           NPM_VERSION: ${{steps.vars.outputs.version}}
       - name: publish
         run: npm publish --access=public
-        working-directory: ./build/npm
+        working-directory: ./npm
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
