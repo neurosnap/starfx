@@ -5,7 +5,7 @@
 Supercharged async flow control library.
 
 > This project is under active development, there are zero guarantees for API
-stability.
+> stability.
 
 ## features
 
