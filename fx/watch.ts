@@ -13,5 +13,5 @@ export function supervise<T>(op: OpFn<T>) {
 
 export function* keepAlive(ops: OpFn[]) {
   const results = yield* parallel(ops.map(supervise));
-  yield* results;
+  return yield* results;
 }

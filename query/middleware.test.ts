@@ -1,6 +1,6 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
 
-import { put, takeLatest } from "../redux/index.ts";
+import { configureStore, put, takeLatest } from "../redux/index.ts";
 import {
   createReducerMap,
   createTable,
@@ -20,7 +20,7 @@ import {
 } from "./middleware.ts";
 import type { UndoCtx } from "./middleware.ts";
 import type { ApiCtx } from "./types.ts";
-import { setupStore, sleep } from "./util.ts";
+import { sleep } from "./util.ts";
 import { createKey } from "./create-key.ts";
 import {
   createQueryState,
@@ -97,8 +97,8 @@ it(tests, "basic", () => {
   );
 
   const reducers = createReducerMap(cache);
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
 
   store.dispatch(fetchUsers());
   expect(store.getState()).toEqual({
@@ -141,8 +141,8 @@ it(tests, "with loader", () => {
   );
 
   const reducers = createReducerMap(users);
-  const { store, run } = setupStore(reducers, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   store.dispatch(fetchUsers());
   assertLike(store.getState(), {
@@ -184,8 +184,8 @@ it(tests, "with item loader", () => {
   );
 
   const reducers = createReducerMap(users);
-  const { store, run } = setupStore(reducers, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   const action = fetchUser({ id: mockUser.id });
   store.dispatch(action);
@@ -251,8 +251,9 @@ it(tests, "with POST", () => {
   );
 
   const reducers = createReducerMap(cache);
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
+
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
@@ -268,10 +269,8 @@ it(tests, "simpleCache", () => {
   });
 
   const fetchUsers = api.get("/users", api.cache());
-  const { store, run } = setupStore({ def: (s) => s || null }, {
-    fx: api.bootup,
-  });
-  run();
+  const { store, fx } = configureStore({ reducers: { init: () => null } });
+  fx.run(api.bootup);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -321,8 +320,8 @@ it(tests, "overriding default loader behavior", () => {
   );
 
   const reducers = createReducerMap(users);
-  const { store, run } = setupStore(reducers, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   store.dispatch(fetchUsers());
   assertLike(store.getState(), {
@@ -356,10 +355,8 @@ it(tests, "undo", () => {
     yield* next();
   });
 
-  const { store, run } = setupStore({ def: (s) => s || null }, {
-    fx: api.bootup,
-  });
-  run();
+  const { store, fx } = configureStore({ reducers: { init: () => null } });
+  fx.run(api.bootup);
 
   const action = createUser();
   store.dispatch(action);
@@ -397,8 +394,9 @@ it(tests, "requestMonitor - error handler", () => {
   const fetchUsers = query.create(`/users`);
 
   const reducers = createReducerMap(cache);
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
+
   store.dispatch(fetchUsers());
 });
 
@@ -447,8 +445,8 @@ it(tests, "createApi with own key", async () => {
   );
   const newUEmail = mockUser.email + ".org";
   const reducers = createReducerMap();
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
 
   store.dispatch(createUserCustomKey({ email: newUEmail }));
   await sleep(150);
@@ -512,8 +510,8 @@ it(tests, "createApi with custom key but no payload", async () => {
   );
 
   const reducers = createReducerMap();
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
 
   store.dispatch(getUsers());
   await sleep(150);

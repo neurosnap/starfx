@@ -1,17 +1,27 @@
-import { BATCH, Channel, Instruction, Operation, Scope } from "../deps.ts";
+import {
+  BATCH,
+  Channel,
+  Middleware,
+  Operation,
+  ReducersMapObject,
+  Scope,
+} from "../deps.ts";
 import type { Action, ActionWPayload, OpFn, StoreLike } from "../types.ts";
 import type { ActionPattern } from "../matcher.ts";
 
 import {
-  configureStore,
+  combineReducers,
+  configureStore as reduxStore,
   createChannel,
   createContext,
   createScope,
+  enableBatching,
   spawn,
 } from "../deps.ts";
 import { contextualize } from "../context.ts";
 import { call, cancel, emit, parallel } from "../fx/index.ts";
 import { once } from "../iter.ts";
+import { reducers as queryReducers } from "../query/index.ts";
 
 export const ActionContext = createContext<Channel<Action, void>>(
   "redux:action",
@@ -25,18 +35,13 @@ export function* select<S, R>(selectorFn: (s: S) => R) {
   return selectorFn(store.getState() as S);
 }
 
-// https://github.com/microsoft/TypeScript/issues/31751#issuecomment-498526919
-export function* take<P = never>(
-  pattern: ActionPattern,
-): Generator<
-  Instruction,
-  [P] extends [never] ? Action : ActionWPayload<P>
-> {
+export function take<P>(pattern: ActionPattern): Operation<ActionWPayload<P>>;
+export function* take(pattern: ActionPattern): Operation<Action> {
   const action = yield* once({
     channel: ActionContext,
     pattern,
   });
-  return action as any;
+  return action as Action;
 }
 
 export function* takeEvery<T>(
@@ -143,15 +148,42 @@ export function createFxMiddleware(scope: Scope = createScope()) {
   return { run, scope, middleware };
 }
 
-interface SetupStoreProps<S = unknown> {
-  reducer: (s: S, _: Action) => S;
+// deno-lint-ignore no-explicit-any
+interface SetupStoreProps<S = any> {
+  reducers: ReducersMapObject<S>;
+  middleware?: Middleware[];
 }
 
-export function setupStore({ reducer }: SetupStoreProps) {
+/**
+ * This function will integrate `starfx` and `redux`.
+ *
+ * In order to enable `starfx/query`, it will add some reducers to your `redux`
+ * store for decoupled loaders and a simple data cache.
+ *
+ * It also adds `redux-batched-actions` which is critical for `starfx`.
+ *
+ * @example
+ * ```ts
+ * import { configureStore } from 'starfx/redux';
+ *
+ * const { store, fx } = prepareStore({
+ *  reducers: { users: (state, action) => state },
+ * });
+ *
+ * fx.run(function*() {
+ *  yield* put({ type: 'LOADING' });
+ *  yield* fetch('https://bower.sh');
+ *  yield* put({ type: 'LOADING_COMPLETE' });
+ * });
+ * ```
+ */
+export function configureStore({ reducers, middleware = [] }: SetupStoreProps) {
   const fx = createFxMiddleware();
-  const store = configureStore({
-    reducer,
-    middleware: [fx.middleware],
+  const rootReducer = combineReducers({ ...queryReducers, ...reducers });
+  const store = reduxStore({
+    reducer: enableBatching(rootReducer),
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat([fx.middleware, ...middleware]),
   });
 
   return { store, fx };

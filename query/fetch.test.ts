@@ -1,14 +1,15 @@
 import { describe, expect, install, it, mock } from "../test.ts";
+import { configureStore } from "../redux/index.ts";
 
 import { fetcher, fetchRetry } from "./fetch.ts";
 import { createApi } from "./api.ts";
-import { setupStore } from "./util.ts";
 import { requestMonitor } from "./middleware.ts";
 
 install();
 
 const baseUrl = "https://saga-query.com";
 const mockUser = { id: "1", email: "test@saga-query.com" };
+const reducers = { init: () => null };
 
 const delay = (n = 200) =>
   new Promise((resolve) => {
@@ -45,8 +46,8 @@ it(
       expect(ctx.json).toEqual({ ok: true, data: mockUser });
     });
 
-    const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-    run();
+    const { store, fx } = configureStore({ reducers });
+    fx.run(api.bootup);
 
     const action = fetchUsers();
     store.dispatch(action);
@@ -78,8 +79,8 @@ it(
       expect(ctx.json).toEqual({ ok: true, data: "this is some text" });
     });
 
-    const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-    run();
+    const { store, fx } = configureStore({ reducers });
+    fx.run(api.bootup);
 
     const action = fetchUsers();
     store.dispatch(action);
@@ -111,8 +112,9 @@ it(tests, "fetch - error handling", async () => {
     expect(ctx.json).toEqual({ ok: false, data: errMsg });
   });
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
+
   const action = fetchUsers();
   store.dispatch(action);
 
@@ -144,8 +146,9 @@ it(tests, "fetch - status 204", async () => {
     expect(ctx.json).toEqual({ ok: true, data: {} });
   });
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
+
   const action = fetchUsers();
   store.dispatch(action);
 
@@ -183,8 +186,8 @@ it(tests, "fetch - malformed json", async () => {
     });
   });
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -219,8 +222,9 @@ it(tests, "fetch - POST", async () => {
     expect(ctx.json).toEqual({ ok: true, data: mockUser });
   });
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
+
   const action = fetchUsers();
   store.dispatch(action);
 
@@ -277,8 +281,8 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
     },
   );
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   store.dispatch(fetchUsers({ id: "1" }));
   store.dispatch(fetchUsersSecond({ id: "1" }));
@@ -311,8 +315,8 @@ it(
       },
     );
 
-    const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-    run();
+    const { store, fx } = configureStore({ reducers });
+    fx.run(api.bootup);
 
     const action = fetchUsers({ id: "" });
     store.dispatch(action);
@@ -355,8 +359,8 @@ it(
       fetchRetry((n) => (n > 4 ? -1 : 10)),
     ]);
 
-    const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-    run();
+    const { store, fx } = configureStore({ reducers });
+    fx.run(api.bootup);
 
     const action = fetchUsers();
     store.dispatch(action);
@@ -392,8 +396,8 @@ it.ignore(
       fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);
 
-    const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-    run();
+    const { store, fx } = configureStore({ reducers });
+    fx.run(api.bootup);
 
     const action = fetchUsers();
     store.dispatch(action);

@@ -1,12 +1,12 @@
 import { assertLike, asserts, describe, it } from "../test.ts";
 import { call } from "../fx/index.ts";
-import { put } from "../redux/index.ts";
+import { configureStore, put } from "../redux/index.ts";
 import { createReducerMap, createTable, sleep as delay } from "../deps.ts";
 import type { Action, MapEntity } from "../deps.ts";
 
 import { createPipe } from "./pipe.ts";
 import type { Next, PipeCtx } from "./types.ts";
-import { setupStore as prepStore, sleep } from "./util.ts";
+import { sleep } from "./util.ts";
 import { createQueryState } from "./slice.ts";
 import { OpFn } from "../types.ts";
 
@@ -133,9 +133,9 @@ function* saveToRedux(ctx: RoboCtx, next: Next) {
   yield* next();
 }
 
-function setupStore(fx: OpFn) {
-  const store = prepStore(reducers, { fx });
-  return store;
+function setupStore(op: OpFn) {
+  const { store, fx } = configureStore({ reducers });
+  return { store, run: () => fx.run(op) };
 }
 
 const tests = describe("createPipe()");

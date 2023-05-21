@@ -1,16 +1,17 @@
 import { describe, expect, it } from "../test.ts";
 
 import { call } from "../fx/index.ts";
-import { put, takeEvery } from "../redux/index.ts";
+import { configureStore, put, takeEvery } from "../redux/index.ts";
 import { createAction, createReducerMap, createTable } from "../deps.ts";
 import type { MapEntity } from "../deps.ts";
 
 import { queryCtx, requestMonitor, urlParser } from "./middleware.ts";
 import { createApi } from "./api.ts";
-import { setupStore, sleep } from "./util.ts";
+import { sleep } from "./util.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
-import { poll } from "./saga.ts";
+import { poll } from "./supervisor.ts";
+import { keepAlive } from "../index.ts";
 
 interface User {
   id: string;
@@ -23,6 +24,8 @@ const mockUser: User = { id: "1", name: "test", email: "test@test.com" };
 const jsonBlob = (data: unknown) => {
   return JSON.stringify(data);
 };
+
+const reducers = { init: () => null };
 
 const tests = describe("createApi()");
 
@@ -81,8 +84,8 @@ it(tests, "createApi - POST", async () => {
   );
 
   const reducers = createReducerMap(cache);
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
   await sleep(150);
@@ -134,8 +137,8 @@ it(tests, "POST with uri", () => {
   });
 
   const reducers = createReducerMap(cache);
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
 });
@@ -151,10 +154,8 @@ it(tests, "middleware - with request fn", () => {
     yield* next();
   });
   const createUser = query.create("/users", query.request({ method: "POST" }));
-  const { store, run } = setupStore({ def: (s) => s || null }, {
-    fx: query.bootup,
-  });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
 
   store.dispatch(createUser());
 });
@@ -177,8 +178,8 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     expect(acc).toEqual("ab");
   });
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   store.dispatch(action2());
 });
@@ -211,11 +212,8 @@ it(tests, "run() from a normal saga", () => {
     yield* task;
   }
 
-  const { store, run } = setupStore({ def: () => null }, {
-    api: api.bootup,
-    watchAction,
-  });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(() => keepAlive([api.bootup, watchAction]));
 
   store.dispatch(action2());
 });
@@ -264,8 +262,9 @@ it(tests, "createApi with hash key on a large post", async () => {
   const email = mockUser.email + "9";
   const largetext = "abc-def-ghi-jkl-mno-pqr".repeat(100);
   const reducers = createReducerMap();
-  const { store, run } = setupStore(reducers, { fx: query.bootup });
-  run();
+
+  const { store, fx } = configureStore({ reducers });
+  fx.run(query.bootup);
 
   store.dispatch(createUserDefaultKey({ email, largetext }));
   await sleep(150);
@@ -302,8 +301,9 @@ it(tests, "createApi - two identical endpoints", async () => {
     },
   );
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
+
   store.dispatch(first());
   store.dispatch(second());
 
@@ -343,8 +343,8 @@ it(tests, "ensure types for get() endpoint", () => {
     },
   );
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
@@ -379,8 +379,8 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
     },
   );
 
-  const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-  run();
+  const { store, fx } = configureStore({ reducers });
+  fx.run(api.bootup);
 
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
@@ -414,8 +414,8 @@ it(
       },
     );
 
-    const { store, run } = setupStore({ def: () => null }, { fx: api.bootup });
-    run();
+    const { store, fx } = configureStore({ reducers });
+    fx.run(api.bootup);
 
     store.dispatch(action1());
     expect(acc).toEqual(["wow"]);

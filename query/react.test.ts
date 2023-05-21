@@ -13,10 +13,10 @@ import {
   sleep as delay,
   useSelector,
 } from "../deps.ts";
+import { configureStore } from "../redux/index.ts";
 
 import { createApi } from "./api.ts";
 import { requestMonitor } from "./middleware.ts";
-import { setupStore } from "./util.ts";
 import { useApi } from "./react.ts";
 import { selectDataById } from "./slice.ts";
 import { createKey } from "./create-key.ts";
@@ -52,13 +52,9 @@ const setupTest = () => {
     slice.actions.set(ctx.json.data);
   });
 
-  const { store, run } = setupStore(
-    { user: slice.reducer },
-    {
-      fx: api.bootup,
-    },
-  );
-  run();
+  const { store, fx } = configureStore({ reducers: { user: slice.reducer } });
+  fx.run(api.bootup);
+
   return { store, fetchUser, api };
 };
 

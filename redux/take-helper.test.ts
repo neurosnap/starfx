@@ -2,7 +2,8 @@ import { describe, expect, it } from "../test.ts";
 import { cancel } from "../fx/index.ts";
 import type { Action } from "../types.ts";
 
-import { setupStore, take, takeEvery } from "./index.ts";
+import { configureStore, take, takeEvery } from "./index.ts";
+const reducers = { init: () => null };
 
 const testEvery = describe("takeEvery()");
 
@@ -23,7 +24,7 @@ it(testEvery, "should work", async () => {
     actual.push([arg1, arg2, action.payload]);
   }
 
-  const { store, fx } = setupStore({ reducer: (s) => s });
+  const { store, fx } = configureStore({ reducers });
   const task = fx.run(root);
 
   for (let i = 1; i <= loop / 2; i += 1) {

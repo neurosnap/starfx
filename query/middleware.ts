@@ -132,15 +132,16 @@ export function* loadingMonitorSimple<Ctx extends LoaderCtx = LoaderCtx>(
       setLoaderStart({ id: ctx.key }),
     ]),
   );
-  if (!ctx.loader) ctx.loader = {} as any;
+  if (!ctx.loader) {
+    ctx.loader = {};
+  }
 
   yield* next();
 
-  const payload = ctx.loader || {};
   yield* put(
     batchActions([
-      setLoaderSuccess({ id: ctx.name, ...payload }),
-      setLoaderSuccess({ id: ctx.key, ...payload }),
+      setLoaderSuccess({ ...ctx.loader, id: ctx.name }),
+      setLoaderSuccess({ ...ctx.loader, id: ctx.key }),
     ]),
   );
 }

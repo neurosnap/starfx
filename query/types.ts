@@ -24,8 +24,8 @@ export interface PipeCtx<P = any> extends Payload<P> {
   >;
 }
 
-export interface LoaderCtx<P = any> extends PipeCtx<P> {
-  loader: LoadingMapPayload<Record<string, any>> | null;
+export interface LoaderCtx<P = unknown> extends PipeCtx<P> {
+  loader: Partial<LoadingItemState> | null;
 }
 
 export interface ApiFetchSuccess<ApiSuccess = any> {

@@ -1,9 +1,4 @@
-import { configureStore } from "../deps.ts";
-import type { Reducer } from "../deps.ts";
-import type { OpFn } from "../types.ts";
-
 import type { ApiRequest, RequiredApiRequest } from "./types.ts";
-import { prepareStore } from "./store.ts";
 import { API_ACTION_PREFIX } from "./constant.ts";
 
 export const noop = () => {};
@@ -19,26 +14,9 @@ export const createAction = (curType: string) => {
   return action;
 };
 
-export function setupStore(
-  reducers: { [key: string]: Reducer } = {},
-  fx: { [key: string]: OpFn },
-) {
-  const fxx = typeof fx === "function" ? { fx } : fx;
-  const prepared = prepareStore({
-    reducers,
-    fx: fxx,
-  });
-  const store = configureStore({
-    reducer: prepared.reducer,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(...prepared.middleware),
-  });
-  return { store, run: prepared.run };
-}
-
 export const mergeHeaders = (
-  cur?: { [key: string]: string },
-  next?: { [key: string]: string },
+  cur?: HeadersInit,
+  next?: HeadersInit,
 ): HeadersInit => {
   if (!cur && !next) return {};
   if (!cur && next) return next;
@@ -58,7 +36,7 @@ export const mergeRequest = (
     ...defaultReq,
     ...cur,
     ...next,
-    headers: mergeHeaders((cur as any).headers, (next as any).headers),
+    headers: mergeHeaders(cur?.headers, next?.headers),
   };
 };
 
