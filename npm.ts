@@ -6,12 +6,19 @@ const version = Deno.env.get("NPM_VERSION");
 assert(version, "NPM_VERSION is required to build npm package");
 
 await build({
-  entryPoints: [
-    "./index.ts",
-    "./react.ts",
-    "./redux/index.ts",
-    "./query/index.ts",
-  ],
+  entryPoints: [{
+    name: "./index",
+    path: "index.ts",
+  }, {
+    name: "./react",
+    path: "react.ts",
+  }, {
+    name: "./redux",
+    path: "redux/index.ts",
+  }, {
+    name: "./query",
+    path: "./query/index.ts",
+  }],
   outDir: "./npm",
   shims: {
     deno: false,
