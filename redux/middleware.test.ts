@@ -1,6 +1,6 @@
 import { describe, expect, it } from "../test.ts";
 import { call } from "../fx/index.ts";
-import { Action } from "../types.ts";
+import { Action } from "../deps.ts";
 
 import { createFxMiddleware, select } from "./index.ts";
 

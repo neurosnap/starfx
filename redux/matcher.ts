@@ -1,5 +1,6 @@
-import type { Action, ActionType } from "./types.ts";
+import type { Action } from "../deps.ts";
 
+type ActionType = string;
 type GuardPredicate<G extends T, T = unknown> = (arg: T) => arg is G;
 type Predicate = (action: Action) => boolean;
 type StringableActionCreator<A extends Action = Action> = {

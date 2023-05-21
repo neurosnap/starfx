@@ -1,6 +1,6 @@
 import { describe, expect, it } from "../test.ts";
 import { cancel } from "../fx/index.ts";
-import type { Action } from "../types.ts";
+import type { AnyAction } from "../deps.ts";
 
 import { configureStore, take, takeEvery } from "./index.ts";
 const reducers = { init: () => null };
@@ -20,7 +20,7 @@ it(testEvery, "should work", async () => {
     yield* cancel(task);
   }
 
-  function* worker(arg1: string, arg2: string, action: Action) {
+  function* worker(arg1: string, arg2: string, action: AnyAction) {
     actual.push([arg1, arg2, action.payload]);
   }
 

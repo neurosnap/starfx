@@ -1,4 +1,6 @@
 import {
+  Action,
+  AnyAction,
   BATCH,
   Channel,
   Middleware,
@@ -6,8 +8,9 @@ import {
   ReducersMapObject,
   Scope,
 } from "../deps.ts";
-import type { Action, ActionWPayload, OpFn, StoreLike } from "../types.ts";
-import type { ActionPattern } from "../matcher.ts";
+
+import type { OpFn } from "../types.ts";
+import { ActionPattern, matcher } from "./matcher.ts";
 
 import {
   combineReducers,
@@ -20,8 +23,17 @@ import {
 } from "../deps.ts";
 import { contextualize } from "../context.ts";
 import { call, cancel, emit, parallel } from "../fx/index.ts";
-import { once } from "../iter.ts";
 import { reducers as queryReducers } from "../query/index.ts";
+
+export interface ActionWPayload<P> {
+  type: string;
+  payload: P;
+}
+
+export interface StoreLike<S = unknown> {
+  getState: () => S;
+  dispatch: (action: Action) => void;
+}
 
 export const ActionContext = createContext<Channel<Action, void>>(
   "redux:action",
@@ -29,6 +41,25 @@ export const ActionContext = createContext<Channel<Action, void>>(
 );
 
 export const StoreContext = createContext<StoreLike>("redux:store");
+
+export function* once({
+  channel,
+  pattern,
+}: {
+  channel: Operation<Channel<Action, void>>;
+  pattern: ActionPattern;
+}) {
+  const { output } = yield* channel;
+  const msgList = yield* output;
+  let next = yield* msgList;
+  while (!next.done) {
+    const match = matcher(pattern);
+    if (match(next.value)) {
+      return next.value;
+    }
+    next = yield* msgList;
+  }
+}
 
 export function* select<S, R>(selectorFn: (s: S) => R) {
   const store = yield* StoreContext;
@@ -87,7 +118,7 @@ export function* takeLeading<T>(
   });
 }
 
-export function* put(action: Action | Action[]) {
+export function* put(action: AnyAction | AnyAction[]) {
   const store = yield* StoreContext;
   if (Array.isArray(action)) {
     action.map((act) => store.dispatch(act));
@@ -100,7 +131,7 @@ export function* put(action: Action | Action[]) {
   });
 }
 
-function* send(action: Action) {
+function* send(action: AnyAction) {
   if (action.type === BATCH) {
     const actions: Action[] = action.payload;
     yield* parallel(

@@ -1,5 +1,4 @@
-import type { Channel, Operation } from "../deps.ts";
-import type { Action } from "../types.ts";
+import type { Action, Channel, Operation } from "../deps.ts";
 
 import { parallel } from "./parallel.ts";
 

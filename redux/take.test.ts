@@ -1,6 +1,5 @@
 import { describe, expect, it, setupReduxScope } from "../test.ts";
-import { sleep, spawn } from "../deps.ts";
-import type { Action } from "../types.ts";
+import { AnyAction, sleep, spawn } from "../deps.ts";
 
 import { put, take } from "./index.ts";
 
@@ -10,7 +9,7 @@ it(
   takeTests,
   "a put should complete before more `take` are added and then consumed automatically",
   async () => {
-    const actual: Action[] = [];
+    const actual: AnyAction[] = [];
 
     function* channelFn() {
       yield* sleep(10);
@@ -59,7 +58,7 @@ it(takeTests, "take from default channel", async () => {
     });
   }
 
-  const actual: Action[] = [];
+  const actual: AnyAction[] = [];
   function* genFn() {
     yield* spawn(channelFn);
 
@@ -67,17 +66,17 @@ it(takeTests, "take from default channel", async () => {
       actual.push(yield* take("*")); // take all actions
       actual.push(yield* take("action-1")); // take only actions of type 'action-1'
       actual.push(yield* take(["action-2", "action-2222"])); // take either type
-      actual.push(yield* take((a: Action) => a.payload?.isAction)); // take if match predicate
+      actual.push(yield* take((a: AnyAction) => a.payload?.isAction)); // take if match predicate
       actual.push(
         yield* take([
           "action-3",
-          (a: Action) => a.payload?.isMixedWithPredicate,
+          (a: AnyAction) => a.payload?.isMixedWithPredicate,
         ]),
       ); // take if match any from the mixed array
       actual.push(
         yield* take([
           "action-3",
-          (a: Action) => a.payload?.isMixedWithPredicate,
+          (a: AnyAction) => a.payload?.isMixedWithPredicate,
         ]),
       ); // take if match any from the mixed array
     } finally {
