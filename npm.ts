@@ -1,105 +1,92 @@
 import { assert, build, emptyDir } from "./test.ts";
 
-await emptyDir("./npm");
+main().then(console.log).catch(console.error);
 
-const version = Deno.env.get("NPM_VERSION");
-assert(version, "NPM_VERSION is required to build npm package");
+async function main() {
+  await emptyDir("./npm");
 
-await build({
-  entryPoints: [{
-    name: ".",
-    path: "index.ts",
-  }, {
-    name: "./react",
-    path: "react.ts",
-  }, {
-    name: "./redux",
-    path: "redux/index.ts",
-  }, {
-    name: "./query",
-    path: "./query/index.ts",
-  }],
-  mappings: {
-    "https://deno.land/x/effection@3.0.0-alpha.7/mod.ts": {
-      name: "effection",
-      version: "3.0.0-alpha.7",
-    },
-    "https://esm.sh/react@18.2.0": {
-      name: "react",
-      version: "^18.2.0",
-      peerDependency: true,
-    },
-    "https://esm.sh/robodux@15.0.1?pin=v122": {
-      name: "robodux",
-      version: "^15.0.1",
-    },
-    "https://esm.sh/@reduxjs/toolkit@1.9.5?pin=v122": {
-      name: "@reduxjs/toolkit",
-      version: "^1.9.5",
-    },
-    "https://esm.sh/redux-batched-actions@0.5.0?pin=v122": {
-      name: "redux-batched-actions",
-      version: "^0.5.0",
-    },
-    "https://esm.sh/react-redux@8.0.5?pin=v122": {
-      name: "react-redux",
-      version: "^8.0.5",
-    },
-  },
-  outDir: "./npm",
-  shims: {
-    deno: false,
-    custom: [{
-      package: {
-        name: "node-fetch",
-        version: "~3.3.1",
+  const version = Deno.env.get("NPM_VERSION");
+  assert(version, "NPM_VERSION is required to build npm package");
+
+  await build({
+    entryPoints: [
+      {
+        name: ".",
+        path: "index.ts",
       },
-      globalNames: [{
-        name: "RequestInit",
-        typeOnly: true,
-      }, {
-        name: "HeadersInit",
-        typeOnly: true,
-      }, {
-        name: "URL",
-        typeOnly: true,
-      }, {
-        name: "Response",
-        typeOnly: true,
-      }, {
-        name: "Request",
-        typeOnly: true,
-      }],
-    }],
-  },
-  test: false,
-  typeCheck: false,
-  compilerOptions: {
-    target: "ES2020",
-    sourceMap: true,
-  },
-  package: {
-    name: "starfx",
-    version,
-    description: "Supercharged async flow control library",
-    license: "MIT",
-    repository: {
-      author: "me@erock.io",
-      type: "git",
-      url: "git+https://github.com/neurosnap/starfx.git",
+      {
+        name: "./react",
+        path: "react.ts",
+      },
+      {
+        name: "./redux",
+        path: "redux/index.ts",
+      },
+      {
+        name: "./query",
+        path: "./query/index.ts",
+      },
+    ],
+    mappings: {
+      "https://deno.land/x/effection@3.0.0-alpha.7/mod.ts": {
+        name: "effection",
+        version: "3.0.0-alpha.7",
+      },
+      "https://esm.sh/react@18.2.0": {
+        name: "react",
+        version: "^18.2.0",
+        peerDependency: true,
+      },
+      "https://esm.sh/robodux@15.0.1?pin=v122": {
+        name: "robodux",
+        version: "^15.0.1",
+      },
+      "https://esm.sh/@reduxjs/toolkit@1.9.5?pin=v122": {
+        name: "@reduxjs/toolkit",
+        version: "^1.9.5",
+      },
+      "https://esm.sh/redux-batched-actions@0.5.0?pin=v122": {
+        name: "redux-batched-actions",
+        version: "^0.5.0",
+      },
+      "https://esm.sh/react-redux@8.0.5?pin=v122": {
+        name: "react-redux",
+        version: "^8.0.5",
+        peerDependency: true,
+      },
     },
-    bugs: {
-      url: "https://github.com/neurosnap/starfx/issues",
+    outDir: "./npm",
+    shims: {
+      deno: false,
     },
-    engines: {
-      node: ">= 18",
+    test: false,
+    typeCheck: true,
+    compilerOptions: {
+      target: "ES2020",
+      sourceMap: true,
+      lib: ["dom", "dom.iterable", "esnext"],
     },
-    sideEffects: false,
-  },
-  postBuild() {
-    Deno.copyFileSync("LICENSE.md", "npm/LICENSE.md");
-    Deno.copyFileSync("README.md", "npm/README.md");
-  },
-});
-
-await Deno.copyFile("README.md", "npm/README.md");
+    package: {
+      name: "starfx",
+      version,
+      description: "Supercharged async flow control library",
+      license: "MIT",
+      repository: {
+        author: "me@erock.io",
+        type: "git",
+        url: "git+https://github.com/neurosnap/starfx.git",
+      },
+      bugs: {
+        url: "https://github.com/neurosnap/starfx/issues",
+      },
+      engines: {
+        node: ">= 18",
+      },
+      sideEffects: false,
+    },
+    postBuild() {
+      Deno.copyFileSync("LICENSE.md", "npm/LICENSE.md");
+      Deno.copyFileSync("README.md", "npm/README.md");
+    },
+  });
+}

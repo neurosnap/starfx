@@ -15,5 +15,4 @@ Supercharged async flow control library.
 
 ## usage
 
-Please see [examples/basic](./examples/basic) and [tests](./test) to understand
-how it works.
+Please see [examples repo](https://github.com/neurosnap/starfx-examples).
