@@ -1,20 +1,17 @@
 import { call } from "./fx/index.ts";
-import type { Instruction, Result } from "./deps.ts";
-import { Err } from "./deps.ts";
+import type { Instruction, Operation, Result } from "./deps.ts";
+import { Err, Ok } from "./deps.ts";
+import type { Next } from './query/index.ts';
 
-export type MdwCtx = Record<string, any>;
-
-export type Next<T = unknown> = () => Generator<Instruction, Result<T>, void>;
-export type Middleware<Ctx extends MdwCtx = MdwCtx> = (
+// deno-lint-ignore no-explicit-any
+export type BaseCtx = Record<string, any>;
+export type BaseMiddleware<Ctx extends BaseCtx = BaseCtx, T = unknown> = (
   ctx: Ctx,
   next: Next,
-) => any;
-/* type MiddlewareCo<Ctx extends MdwCtx = MdwCtx> =
-  | Middleware<Ctx>
-  | Middleware<Ctx>[]; */
+) => Operation<T>;
 
-export function compose<Ctx extends MdwCtx = MdwCtx>(
-  middleware: Middleware<Ctx>[],
+export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
+  middleware: BaseMiddleware<Ctx, T>[],
 ) {
   if (!Array.isArray(middleware)) {
     throw new TypeError("Middleware stack must be an array!");
@@ -26,7 +23,7 @@ export function compose<Ctx extends MdwCtx = MdwCtx>(
     }
   }
 
-  return function* composeFn<T>(context: Ctx, next?: Next) {
+  return function* composeFn(context: Ctx, next?: BaseMiddleware<Ctx, T>) {
     // last called middleware #
     let index = -1;
 
@@ -35,12 +32,14 @@ export function compose<Ctx extends MdwCtx = MdwCtx>(
         return Err(new Error("next() called multiple times"));
       }
       index = i;
-      let fn: any = middleware[i];
-      if (i === middleware.length) fn = next;
+      let fn: BaseMiddleware<Ctx, T> | undefined = middleware[i];
+      if (i === middleware.length) {
+        fn = next;
+      }
       if (!fn) return Err(new Error("fn is falsy"));
       const nxt = dispatch.bind(null, i + 1);
       const result = yield* fn(context, nxt);
-      return result;
+      return Ok(result);
     }
 
     yield* call(() => dispatch(0));
