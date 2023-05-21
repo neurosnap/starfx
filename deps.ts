@@ -1,8 +1,8 @@
+import type { Result } from "https://deno.land/x/effection@3.0.0-alpha.7/mod.ts";
 export type {
   Channel,
   Instruction,
   Operation,
-  Result,
   Scope,
   Stream,
   Task,
@@ -12,16 +12,22 @@ export {
   createChannel,
   createContext,
   createScope,
-  Err,
   expect,
   getframe,
-  Ok,
   resource,
   run,
   sleep,
   spawn,
   useAbortSignal,
 } from "https://deno.land/x/effection@3.0.0-alpha.7/mod.ts";
+
+export type { Result };
+export function Ok<T>(value: T): Result<T> {
+  return { ok: true, value };
+}
+export function Err<T>(error: Error): Result<T> {
+  return { ok: false, error };
+}
 
 import React from "https://esm.sh/react@18.2.0";
 export { React };
