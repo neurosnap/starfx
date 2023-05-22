@@ -1,8 +1,8 @@
 import { describe, expect, it } from "../test.ts";
-import { call } from "../fx/index.ts";
+import { call } from "../fx/mod.ts";
 import { Action } from "../deps.ts";
 
-import { createFxMiddleware, select } from "./index.ts";
+import { createFxMiddleware, select } from "./mod.ts";
 
 const tests = describe("createMiddleware()");
 

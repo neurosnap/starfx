@@ -1,8 +1,8 @@
-import { call } from "../fx/index.ts";
-import { takeEvery } from "../redux/index.ts";
+import { call } from "../fx/mod.ts";
+import { takeEvery } from "../redux/mod.ts";
 import { compose } from "../compose.ts";
 import type { OpFn } from "../types.ts";
-import { parallel } from "../index.ts";
+import { parallel } from "../mod.ts";
 
 import { isFn, isObject } from "./util.ts";
 import { createKey } from "./create-key.ts";

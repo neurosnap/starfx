@@ -1,5 +1,5 @@
-import { call, race } from "../fx/index.ts";
-import { ActionWPayload, take } from "../redux/index.ts";
+import { call, race } from "../fx/mod.ts";
+import { ActionWPayload, take } from "../redux/mod.ts";
 import { Action, Operation, sleep, spawn, Task } from "../deps.ts";
 import type { OpFn } from "../types.ts";
 

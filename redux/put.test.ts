@@ -1,7 +1,7 @@
 import { describe, expect, it, setupReduxScope } from "../test.ts";
 import { sleep, spawn } from "../deps.ts";
 
-import { ActionContext, put, take } from "./index.ts";
+import { ActionContext, put, take } from "./mod.ts";
 
 const putTests = describe("put()");
 

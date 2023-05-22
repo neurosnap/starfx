@@ -1,4 +1,4 @@
-export * from "./fx/index.ts";
+export * from "./fx/mod.ts";
 export * from "./types.ts";
 export * from "./iter.ts";
 export * from "./context.ts";

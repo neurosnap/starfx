@@ -1,6 +1,7 @@
-import { call } from "../fx/index.ts";
+import { call } from "../fx/mod.ts";
 import { sleep } from "../deps.ts";
 import { compose } from "../compose.ts";
+
 import { noop } from "./util.ts";
 import type { FetchCtx, FetchJsonCtx, Next } from "./types.ts";
 

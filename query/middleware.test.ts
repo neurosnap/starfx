@@ -1,6 +1,5 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
-
-import { configureStore, put, takeLatest } from "../redux/index.ts";
+import { configureStore, put, takeLatest } from "../redux/mod.ts";
 import {
   createReducerMap,
   createTable,
@@ -8,6 +7,7 @@ import {
   sleep as delay,
 } from "../deps.ts";
 import type { MapEntity } from "../deps.ts";
+import { call } from "../fx/mod.ts";
 
 import { createApi } from "./api.ts";
 import {
@@ -28,7 +28,6 @@ import {
   LOADERS_NAME,
   selectDataById,
 } from "./slice.ts";
-import { call } from "../fx/index.ts";
 
 interface User {
   id: string;

@@ -1,5 +1,5 @@
-import { call, race } from "../fx/index.ts";
-import { put, select, take } from "../redux/index.ts";
+import { call, race } from "../fx/mod.ts";
+import { put, select, take } from "../redux/mod.ts";
 import { batchActions, sleep } from "../deps.ts";
 import { compose } from "../compose.ts";
 import type { OpFn } from "../types.ts";

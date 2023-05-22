@@ -1,7 +1,7 @@
-import { call } from "./fx/index.ts";
+import { call } from "./fx/mod.ts";
+import type { Next } from "./query/mod.ts";
 import type { Instruction, Operation, Result } from "./deps.ts";
 import { Err, Ok } from "./deps.ts";
-import type { Next } from "./query/index.ts";
 
 // deno-lint-ignore no-explicit-any
 export type BaseCtx = Record<string, any>;

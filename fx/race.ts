@@ -1,7 +1,7 @@
 import type { Operation, Task } from "../deps.ts";
 import { action, resource, spawn } from "../deps.ts";
-
 import type { OpFn } from "../types.ts";
+
 import { toOperation } from "./call.ts";
 
 interface OpMap<T = unknown> {

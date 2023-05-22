@@ -1,8 +1,8 @@
 import { describe, expect, it } from "../test.ts";
-import { cancel } from "../fx/index.ts";
+import { cancel } from "../fx/mod.ts";
 import type { AnyAction } from "../deps.ts";
 
-import { configureStore, take, takeEvery } from "./index.ts";
+import { configureStore, take, takeEvery } from "./mod.ts";
 const reducers = { init: () => null };
 
 const testEvery = describe("takeEvery()");

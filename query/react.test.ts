@@ -13,7 +13,7 @@ import {
   sleep as delay,
   useSelector,
 } from "../deps.ts";
-import { configureStore } from "../redux/index.ts";
+import { configureStore } from "../redux/mod.ts";
 
 import { createApi } from "./api.ts";
 import { requestMonitor } from "./middleware.ts";

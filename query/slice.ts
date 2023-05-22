@@ -1,9 +1,8 @@
 import { createLoaderTable, createReducerMap, createTable } from "../deps.ts";
 import type { LoadingItemState } from "../deps.ts";
+export { defaultLoader, defaultLoadingItem } from "../deps.ts";
 
 import { createKey } from "./create-key.ts";
-
-export { defaultLoader, defaultLoadingItem } from "../deps.ts";
 
 export interface QueryState {
   "@@saga-query/loaders": { [key: string]: LoadingItemState };

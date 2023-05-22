@@ -8,10 +8,7 @@ import {
   ReducersMapObject,
   Scope,
 } from "../deps.ts";
-
 import type { OpFn } from "../types.ts";
-import { ActionPattern, matcher } from "./matcher.ts";
-
 import {
   combineReducers,
   configureStore as reduxStore,
@@ -22,8 +19,10 @@ import {
   spawn,
 } from "../deps.ts";
 import { contextualize } from "../context.ts";
-import { call, cancel, emit, parallel } from "../fx/index.ts";
-import { reducers as queryReducers } from "../query/index.ts";
+import { call, cancel, emit, parallel } from "../fx/mod.ts";
+import { reducers as queryReducers } from "../query/mod.ts";
+
+import { ActionPattern, matcher } from "./matcher.ts";
 
 export interface ActionWPayload<P> {
   type: string;

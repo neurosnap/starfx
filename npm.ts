@@ -12,7 +12,7 @@ async function main() {
     entryPoints: [
       {
         name: ".",
-        path: "index.ts",
+        path: "mod.ts",
       },
       {
         name: "./react",
@@ -20,11 +20,11 @@ async function main() {
       },
       {
         name: "./redux",
-        path: "redux/index.ts",
+        path: "redux/mod.ts",
       },
       {
         name: "./query",
-        path: "./query/index.ts",
+        path: "./query/mod.ts",
       },
     ],
     mappings: {

@@ -1,6 +1,6 @@
 import { assertLike, asserts, describe, it } from "../test.ts";
-import { call } from "../fx/index.ts";
-import { configureStore, put } from "../redux/index.ts";
+import { call } from "../fx/mod.ts";
+import { configureStore, put } from "../redux/mod.ts";
 import { createReducerMap, createTable, sleep as delay } from "../deps.ts";
 import type { Action, MapEntity } from "../deps.ts";
 

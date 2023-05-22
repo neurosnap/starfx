@@ -1,8 +1,7 @@
 import { React } from "./deps.ts";
 const { createContext, createElement: h, useContext } = React;
-
 import type { Action, Operation, Scope } from "./deps.ts";
-import { ActionContext } from "./redux/index.ts";
+import { ActionContext } from "./redux/mod.ts";
 
 export * from "./query/react.ts";
 

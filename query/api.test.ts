@@ -1,7 +1,7 @@
 import { describe, expect, it } from "../test.ts";
 
-import { call } from "../fx/index.ts";
-import { configureStore, put, takeEvery } from "../redux/index.ts";
+import { call, keepAlive } from "../fx/mod.ts";
+import { configureStore, put, takeEvery } from "../redux/mod.ts";
 import { createAction, createReducerMap, createTable } from "../deps.ts";
 import type { MapEntity } from "../deps.ts";
 
@@ -11,7 +11,6 @@ import { sleep } from "./util.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
 import { poll } from "./supervisor.ts";
-import { keepAlive } from "../index.ts";
 
 interface User {
   id: string;

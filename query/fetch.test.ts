@@ -1,5 +1,5 @@
 import { describe, expect, install, it, mock } from "../test.ts";
-import { configureStore } from "../redux/index.ts";
+import { configureStore } from "../redux/mod.ts";
 
 import { fetcher, fetchRetry } from "./fetch.ts";
 import { createApi } from "./api.ts";

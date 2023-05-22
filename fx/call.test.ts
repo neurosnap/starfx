@@ -1,6 +1,6 @@
 import { describe, expect, it } from "../test.ts";
-
 import { run } from "../deps.ts";
+
 import { call } from "./call.ts";
 
 const tests = describe("call()");
