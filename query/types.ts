@@ -1,17 +1,7 @@
-import type {
-  LoadingItemState,
-  LoadingMapPayload,
-  LoadingState,
-  Operation,
-} from "../deps.ts";
-
-export type { LoadingItemState, LoadingState };
+import type { Operation } from "../deps.ts";
+import type { LoadingItemState, LoadingPayload, Payload } from "../types.ts";
 
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
-
-export interface Payload<P = any> {
-  payload: P;
-}
 
 export interface PipeCtx<P = any> extends Payload<P> {
   name: string;
@@ -65,7 +55,7 @@ export interface FetchJsonCtx<P = any, ApiSuccess = any, ApiError = any>
 export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   extends FetchJsonCtx<Payload, ApiSuccess, ApiError> {
   actions: Action[];
-  loader: LoadingMapPayload<Record<string, any>> | null;
+  loader: LoadingPayload | null;
   cache: boolean;
   cacheData: any;
 }

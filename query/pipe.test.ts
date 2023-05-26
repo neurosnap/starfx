@@ -1,21 +1,20 @@
 import { assertLike, asserts, describe, it } from "../test.ts";
 import { call } from "../fx/mod.ts";
-import { configureStore, put } from "../redux/mod.ts";
-import { createReducerMap, createTable, sleep as delay } from "../deps.ts";
-import type { Action, MapEntity } from "../deps.ts";
+import { configureStore, put } from "../store/mod.ts";
+import { sleep as delay } from "../deps.ts";
+import type { QueryState } from "../types.ts";
+import { createQueryState } from "../action.ts";
 
+import { sleep } from "../test.ts";
 import { createPipe } from "./pipe.ts";
 import type { Next, PipeCtx } from "./types.ts";
-import { sleep } from "./util.ts";
-import { createQueryState } from "./slice.ts";
-import { OpFn } from "../types.ts";
+import { updateStore } from "../store/fx.ts";
 
 // deno-lint-ignore no-explicit-any
 interface RoboCtx<D = Record<string, unknown>, P = any> extends PipeCtx<P> {
   url: string;
   request: { method: string; body?: Record<string, unknown> };
   response: D;
-  actions: Action[];
 }
 
 interface User {
@@ -55,9 +54,10 @@ const deserializeTicket = (u: TicketResponse): Ticket => {
   };
 };
 
-const users = createTable<User>({ name: "USER" });
-const tickets = createTable<Ticket>({ name: "TICKET" });
-const reducers = createReducerMap(users, tickets);
+interface TestState extends QueryState {
+  users: { [key: string]: User };
+  tickets: { [key: string]: Ticket };
+}
 
 const mockUser = { id: "1", name: "test", email_address: "test@test.com" };
 const mockTicket = { id: "2", name: "test-ticket" };
@@ -88,21 +88,18 @@ function* onFetchApi(ctx: RoboCtx, next: Next) {
   yield* next();
 }
 
-function* setupActionState(ctx: RoboCtx, next: Next) {
-  ctx.actions = [];
-  yield* next();
-}
-
 function* processUsers(ctx: RoboCtx<{ users?: UserResponse[] }>, next: Next) {
   if (!ctx.response.users) {
     yield* next();
     return;
   }
-  const curUsers = ctx.response.users.reduce<MapEntity<User>>((acc, u) => {
-    acc[u.id] = deserializeUser(u);
-    return acc;
-  }, {});
-  ctx.actions.push(users.actions.add(curUsers));
+  yield* updateStore<TestState>((state) => {
+    if (!ctx.response.users) return;
+    ctx.response.users.forEach((u) => {
+      state.users[u.id] = deserializeUser(u);
+    });
+  });
+
   yield* next();
 }
 
@@ -114,28 +111,14 @@ function* processTickets(
     yield* next();
     return;
   }
-  const curTickets = ctx.response.tickets.reduce<MapEntity<Ticket>>(
-    (acc, u) => {
-      acc[u.id] = deserializeTicket(u);
-      return acc;
-    },
-    {},
-  );
-  ctx.actions.push(tickets.actions.add(curTickets));
-  yield* next();
-}
+  yield* updateStore<TestState>((state) => {
+    if (!ctx.response.tickets) return;
+    ctx.response.tickets.forEach((u) => {
+      state.tickets[u.id] = deserializeTicket(u);
+    });
+  });
 
-function* saveToRedux(ctx: RoboCtx, next: Next) {
-  for (let i = 0; i < ctx.actions.length; i += 1) {
-    const action = ctx.actions[i];
-    yield* put(action);
-  }
   yield* next();
-}
-
-function setupStore(op: OpFn) {
-  const { store, fx } = configureStore({ reducers });
-  return { store, run: () => fx.run(op) };
 }
 
 const tests = describe("createPipe()");
@@ -143,42 +126,40 @@ const tests = describe("createPipe()");
 it(
   tests,
   "when create a query fetch pipeline - execute all middleware and save to redux",
-  () => {
+  async () => {
     const api = createPipe<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
     api.use(onFetchApi);
-    api.use(setupActionState);
     api.use(processUsers);
     api.use(processTickets);
-    api.use(saveToRedux);
     const fetchUsers = api.create(`/users`);
 
-    const { store, run } = setupStore(api.bootup);
-    run();
+    const store = await configureStore<TestState>({
+      initialState: { ...createQueryState(), users: {}, tickets: {} },
+    });
+    store.run(api.bootup);
 
     store.dispatch(fetchUsers());
 
     asserts.assertEquals(store.getState(), {
       ...createQueryState(),
-      [users.name]: { [mockUser.id]: deserializeUser(mockUser) },
-      [tickets.name]: {},
+      users: { [mockUser.id]: deserializeUser(mockUser) },
+      tickets: {},
     });
   },
 );
 
-it(
+it.only(
   tests,
   "when providing a generator the to api.create function - should call that generator before all other middleware",
-  () => {
+  async () => {
     const api = createPipe<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
     api.use(onFetchApi);
-    api.use(setupActionState);
     api.use(processUsers);
     api.use(processTickets);
-    api.use(saveToRedux);
     const fetchUsers = api.create(`/users`);
     const fetchTickets = api.create(`/ticket-wrong-url`, function* (ctx, next) {
       // before middleware has been triggered
@@ -187,28 +168,24 @@ it(
       // triggers all middleware
       yield* next();
 
-      // after middleware has been triggered
-      asserts.assertEquals(ctx.actions, [
-        tickets.actions.add({
-          [mockTicket.id]: deserializeTicket(mockTicket),
-        }),
-      ]);
       yield* put(fetchUsers());
     });
 
-    const { store, run } = setupStore(api.bootup);
-    run();
+    const store = await configureStore<TestState>({
+      initialState: { ...createQueryState(), users: {}, tickets: {} },
+    });
+    store.run(api.bootup);
 
     store.dispatch(fetchTickets());
     asserts.assertEquals(store.getState(), {
       ...createQueryState(),
-      [users.name]: { [mockUser.id]: deserializeUser(mockUser) },
-      [tickets.name]: { [mockTicket.id]: deserializeTicket(mockTicket) },
+      users: { [mockUser.id]: deserializeUser(mockUser) },
+      tickets: { [mockTicket.id]: deserializeTicket(mockTicket) },
     });
   },
 );
 
-it(tests, "error handling", () => {
+it(tests, "error handling", async () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   api.use(function* upstream(_, next) {
@@ -223,12 +200,13 @@ it(tests, "error handling", () => {
   });
 
   const action = api.create(`/error`);
-  const { store, run } = setupStore(api.bootup);
-  run();
+
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
   store.dispatch(action());
 });
 
-it(tests, "error handling inside create", () => {
+it(tests, "error handling inside create", async () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   api.use(function* fail() {
@@ -242,12 +220,12 @@ it(tests, "error handling inside create", () => {
       asserts.assert(true);
     }
   });
-  const { store, run } = setupStore(api.bootup);
-  run();
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
   store.dispatch(action());
 });
 
-it(tests, "error handling - error handler", () => {
+it(tests, "error handling - error handler", async () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   api.use(function* upstream() {
@@ -255,12 +233,13 @@ it(tests, "error handling - error handler", () => {
   });
 
   const action = api.create(`/error`);
-  const { store, run } = setupStore(api.bootup);
-  run();
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
+
   store.dispatch(action());
 });
 
-it(tests, "create fn is an array", () => {
+it(tests, "create fn is an array", async () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -285,12 +264,12 @@ it(tests, "create fn is an array", () => {
     },
   ]);
 
-  const { store, run } = setupStore(api.bootup);
-  run();
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
   store.dispatch(action());
 });
 
-it(tests, "run() on endpoint action - should run the effect", () => {
+it(tests, "run() on endpoint action - should run the effect", async () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   let acc = "";
@@ -316,8 +295,8 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     });
   });
 
-  const { store, run } = setupStore(api.bootup);
-  run();
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
   store.dispatch(action2());
 });
 
@@ -348,8 +327,8 @@ it(tests, "middleware order of execution", async () => {
     acc += "g";
   });
 
-  const { store, run } = setupStore(api.bootup);
-  run();
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
   store.dispatch(action());
 
   await sleep(150);
@@ -374,8 +353,8 @@ it.ignore(tests, "retry with actionFn", async () => {
     }
   });
 
-  const { store, run } = setupStore(api.bootup);
-  run();
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
   store.dispatch(action());
 
   await sleep(150);
@@ -400,8 +379,8 @@ it.ignore(tests, "retry with actionFn with payload", async () => {
     acc += "g";
   });
 
-  const { store, run } = setupStore(api.bootup);
-  const task = run();
+  const store = await configureStore({ initialState: {} });
+  const task = store.run(api.bootup);
   store.dispatch(action({ page: 1 }));
 
   await sleep(150);
@@ -409,7 +388,7 @@ it.ignore(tests, "retry with actionFn with payload", async () => {
   await task;
 });
 
-it.only(tests, "should only call thunk once", () => {
+it(tests, "should only call thunk once", async () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   let acc = "";
@@ -423,8 +402,8 @@ it.only(tests, "should only call thunk once", () => {
     yield* put(action1(1));
   });
 
-  const { store, run } = setupStore(api.bootup);
-  run();
+  const store = await configureStore({ initialState: {} });
+  store.run(api.bootup);
   store.dispatch(action2());
   asserts.assertEquals(acc, "a");
 });

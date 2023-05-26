@@ -2,7 +2,6 @@ import { describe, expect, it } from "../test.ts";
 
 import type { ActionWithPayload } from "./types.ts";
 import { createApi } from "./api.ts";
-import { poll } from "./supervisor.ts";
 
 const getKeyOf = (action: ActionWithPayload<{ key: string }>): string =>
   action.payload.key;
@@ -18,7 +17,6 @@ it(
     // no param
     const action0 = api.get(
       "/users",
-      { supervisor: poll(5 * 1000) }, // with poll middleware
       function* (ctx, next) {
         ctx.request = {
           method: "GET",
@@ -43,7 +41,6 @@ it(
       [key: string]: string | boolean | number | null | undefined;
     }>(
       "/users",
-      { supervisor: poll(5 * 1000) }, // with poll middleware
       function* (ctx, next) {
         ctx.request = {
           method: "GET",

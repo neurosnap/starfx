@@ -1,8 +1,9 @@
 export * from "./fx/mod.ts";
+export * from "./query/mod.ts";
 export * from "./types.ts";
 export * from "./iter.ts";
-export * from "./context.ts";
 export * from "./compose.ts";
+export * from "./action.ts";
 export {
   action,
   createChannel,

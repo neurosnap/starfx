@@ -1,9 +1,9 @@
-import type { LoadingState } from "../deps.ts";
+import type { LoadingState, QueryState } from "../types.ts";
 import { React, useDispatch, useSelector } from "../deps.ts";
 const { useState, useEffect } = React;
 
-import type { QueryState } from "./slice.ts";
-import { selectDataById, selectLoaderById } from "./slice.ts";
+// TODO: remove store deps
+import { selectDataById, selectLoaderById } from "../store/mod.ts";
 
 type ActionFn<P = any> = (p: P) => { toString: () => string };
 type ActionFnSimple = () => { toString: () => string };
@@ -102,7 +102,7 @@ export function useApi<P = any, A extends SagaAction = SagaAction<P>>(
 export function useApi<A extends SagaAction = SagaAction>(
   action: ActionFnSimple,
 ): UseApiSimpleProps;
-export function useApi(action: any) {
+export function useApi(action: any): any {
   const dispatch = useDispatch();
   const loader = useLoader(action);
   const trigger = (p: any) => {
@@ -166,7 +166,7 @@ export function useCache<D = any, A extends SagaAction = SagaAction>(
   action: A,
 ): UseCacheResult<D, A> {
   const id = action.payload.key;
-  const data = useSelector((s: any) => selectDataById(s, { id }));
+  const data: any = useSelector((s: any) => selectDataById(s, { id }));
   const query = useQuery(action);
   return { ...query, data: data || null };
 }

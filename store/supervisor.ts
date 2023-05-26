@@ -1,9 +1,9 @@
 import { call, race } from "../fx/mod.ts";
-import { ActionWPayload, take } from "../redux/mod.ts";
-import { Action, Operation, sleep, spawn, Task } from "../deps.ts";
+import { ActionWPayload, take } from "../store/mod.ts";
+import type { AnyAction } from "../store/types.ts";
+import { Operation, sleep, spawn, Task } from "../deps.ts";
 import type { OpFn } from "../types.ts";
-
-import type { CreateActionPayload } from "./types.ts";
+import type { CreateActionPayload } from "../query/types.ts";
 
 const MS = 1000;
 const SECONDS = 1 * MS;
@@ -12,7 +12,7 @@ const MINUTES = 60 * SECONDS;
 export function poll(parentTimer: number = 5 * 1000, cancelType?: string) {
   return function* poller<T>(
     actionType: string,
-    op: (action: Action) => Operation<T>,
+    op: (action: AnyAction) => Operation<T>,
   ): Operation<T> {
     const cancel = cancelType || actionType;
     function* fire(action: { type: string }, timer: number) {
@@ -43,7 +43,10 @@ export function poll(parentTimer: number = 5 * 1000, cancelType?: string) {
  * cache timer then the second call will not send an http request.
  */
 export function timer(timer: number = 5 * MINUTES) {
-  return function* onTimer(actionType: string, op: (action: Action) => OpFn) {
+  return function* onTimer(
+    actionType: string,
+    op: (action: AnyAction) => OpFn,
+  ) {
     const map: { [key: string]: Task<unknown> } = {};
 
     function* activate(action: ActionWPayload<CreateActionPayload>) {

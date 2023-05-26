@@ -7,13 +7,8 @@
 
 import { React } from "../deps.ts";
 import { asserts, beforeEach, describe, it } from "../test.ts";
-import {
-  createAssign,
-  Provider,
-  sleep as delay,
-  useSelector,
-} from "../deps.ts";
-import { configureStore } from "../redux/mod.ts";
+import { Provider, sleep as delay, useSelector } from "../deps.ts";
+import { configureStore, updateStore } from "../store/mod.ts";
 
 import { createApi } from "./api.ts";
 import { requestMonitor } from "./middleware.ts";
@@ -29,12 +24,13 @@ const jsonBlob = (data: any) => {
   return JSON.stringify(data);
 };
 
-const setupTest = () => {
-  const slice = createAssign({
-    name: "user",
-    initialState: { id: "", email: "" },
-  });
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
+const setupTest = async () => {
   const api = createApi();
   api.use(requestMonitor());
   api.use(api.routes());
@@ -49,11 +45,15 @@ const setupTest = () => {
     ctx.cache = true;
     yield next();
     if (!ctx.json.ok) return;
-    slice.actions.set(ctx.json.data);
+    yield* updateStore<{ user: User }>((state) => {
+      state.user = ctx.json.data;
+    });
   });
 
-  const { store, fx } = configureStore({ reducers: { user: slice.reducer } });
-  fx.run(api.bootup);
+  const store = await configureStore<{ user?: User }>({
+    initialState: {},
+  });
+  store.run(api.bootup);
 
   return { store, fetchUser, api };
 };
@@ -61,13 +61,13 @@ const setupTest = () => {
 describe.ignore("useApi()", () => {
   beforeEach(() => cleanup());
   it("with action", async () => {
-    const { fetchUser, store } = setupTest();
+    const { fetchUser, store } = await setupTest();
     const App = () => {
       const action = fetchUser({ id: "1" });
       const query = useApi(action);
       const user = useSelector((s: any) =>
         selectDataById(s, { id: action.payload.key })
-      );
+      ) as User;
 
       return h("div", null, [
         h("div", { key: "1" }, user?.email || ""),
@@ -91,13 +91,14 @@ describe.ignore("useApi()", () => {
   });
 
   it("with action creator", async () => {
-    const { fetchUser, store } = setupTest();
+    const { fetchUser, store } = await setupTest();
     const App = () => {
       const query = useApi(fetchUser);
       const user = useSelector((s: any) => {
         const id = createKey(`${fetchUser}`, { id: "1" });
         return selectDataById(s, { id });
-      });
+      }) as User;
+
       return h("div", null, [
         h("div", { key: "1" }, user?.email || "no user"),
         h(

@@ -1,38 +1,39 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
-import { configureStore, put, takeLatest } from "../redux/mod.ts";
-import {
-  createReducerMap,
-  createTable,
-  defaultLoadingItem,
-  sleep as delay,
-} from "../deps.ts";
-import type { MapEntity } from "../deps.ts";
+import { sleep as delay } from "../deps.ts";
 import { call } from "../fx/mod.ts";
-
-import { createApi } from "./api.ts";
 import {
+  createApi,
+  createKey,
   customKey,
   queryCtx,
   requestMonitor,
+  urlParser,
+} from "../query/mod.ts";
+import type { ApiCtx } from "../query/mod.ts";
+import { createQueryState } from "../action.ts";
+import type { QueryState } from "../types.ts";
+import { sleep } from "../test.ts";
+
+import type { UndoCtx } from "../store/mod.ts";
+import {
+  configureStore,
+  defaultLoader,
+  selectDataById,
+  storeMdw,
+  takeLatest,
   undo,
   undoer,
-  urlParser,
-} from "./middleware.ts";
-import type { UndoCtx } from "./middleware.ts";
-import type { ApiCtx } from "./types.ts";
-import { sleep } from "./util.ts";
-import { createKey } from "./create-key.ts";
-import {
-  createQueryState,
-  DATA_NAME,
-  LOADERS_NAME,
-  selectDataById,
-} from "./slice.ts";
+  updateStore,
+} from "../store/mod.ts";
 
 interface User {
   id: string;
   name: string;
   email: string;
+}
+
+interface UserState extends QueryState {
+  users: { [key: string]: User };
 }
 
 const mockUser: User = { id: "1", name: "test", email: "test@test.com" };
@@ -45,11 +46,8 @@ const jsonBlob = (data: any) => {
 
 const tests = describe("middleware");
 
-it(tests, "basic", () => {
-  const name = "users";
-  const cache = createTable<User>({ name });
+it(tests, "basic", async () => {
   const query = createApi<ApiCtx>();
-
   query.use(queryCtx);
   query.use(urlParser);
   query.use(query.routes());
@@ -72,11 +70,12 @@ it(tests, "basic", () => {
       yield* next();
       if (!ctx.json.ok) return;
       const { users } = ctx.json.data;
-      const curUsers = users.reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
-      yield* put(cache.actions.add(curUsers));
+
+      yield* updateStore<UserState>((state) => {
+        users.forEach((u) => {
+          state.users[u.id] = u;
+        });
+      });
     },
   );
 
@@ -90,14 +89,19 @@ it(tests, "basic", () => {
       yield* next();
       if (!ctx.json.ok) return;
       const curUser = ctx.json.data;
-      const curUsers = { [curUser.id]: curUser };
-      yield* put(cache.actions.add(curUsers));
+      yield* updateStore<UserState>((state) => {
+        state.users[curUser.id] = curUser;
+      });
     },
   );
 
-  const reducers = createReducerMap(cache);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
+  const store = await configureStore({
+    initialState: {
+      ...createQueryState(),
+      users: {},
+    },
+  });
+  store.run(query.bootup);
 
   store.dispatch(fetchUsers());
   expect(store.getState()).toEqual({
@@ -111,11 +115,10 @@ it(tests, "basic", () => {
   });
 });
 
-it(tests, "with loader", () => {
-  const users = createTable<User>({ name: "users" });
-
+it(tests, "with loader", async () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
+  api.use(storeMdw());
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
@@ -130,23 +133,24 @@ it(tests, "with loader", () => {
       if (!ctx.json.ok) return;
 
       const { data } = ctx.json;
-      const curUsers = data.users.reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
 
-      ctx.actions.push(users.actions.add(curUsers));
+      yield* updateStore<UserState>((state) => {
+        data.users.forEach((u) => {
+          state.users[u.id] = u;
+        });
+      });
     },
   );
 
-  const reducers = createReducerMap(users);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(api.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(api.bootup);
 
   store.dispatch(fetchUsers());
   assertLike(store.getState(), {
-    [users.name]: { [mockUser.id]: mockUser },
-    [LOADERS_NAME]: {
+    users: { [mockUser.id]: mockUser },
+    "@@starfx/loaders": {
       "/users": {
         status: "success",
       },
@@ -154,11 +158,10 @@ it(tests, "with loader", () => {
   });
 });
 
-it(tests, "with item loader", () => {
-  const users = createTable<User>({ name: "users" });
-
+it(tests, "with item loader", async () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
+  api.use(storeMdw());
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
@@ -173,24 +176,24 @@ it(tests, "with item loader", () => {
       if (!ctx.json.ok) return;
 
       const { data } = ctx.json;
-      const curUsers = data.users.reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
-
-      ctx.actions.push(users.actions.add(curUsers));
+      yield* updateStore<UserState>((state) => {
+        data.users.forEach((u) => {
+          state.users[u.id] = u;
+        });
+      });
     },
   );
 
-  const reducers = createReducerMap(users);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(api.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(api.bootup);
 
   const action = fetchUser({ id: mockUser.id });
   store.dispatch(action);
   assertLike(store.getState(), {
-    [users.name]: { [mockUser.id]: mockUser },
-    [LOADERS_NAME]: {
+    users: { [mockUser.id]: mockUser },
+    "@@starfx/loaders": {
       "/users/:id": {
         status: "success",
       },
@@ -201,11 +204,8 @@ it(tests, "with item loader", () => {
   });
 });
 
-it(tests, "with POST", () => {
-  const name = "users";
-  const cache = createTable<User>({ name });
+it(tests, "with POST", async () => {
   const query = createApi();
-
   query.use(queryCtx);
   query.use(urlParser);
   query.use(query.routes());
@@ -241,24 +241,26 @@ it(tests, "with POST", () => {
       if (!ctx.json.ok) return;
 
       const { users } = ctx.json.data;
-      const curUsers = users.reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
-      yield* put(cache.actions.add(curUsers));
+      yield* updateStore<UserState>((state) => {
+        users.forEach((u) => {
+          state.users[u.id] = u;
+        });
+      });
     },
   );
 
-  const reducers = createReducerMap(cache);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
-it(tests, "simpleCache", () => {
+it(tests, "simpleCache", async () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
+  api.use(storeMdw());
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
@@ -268,16 +270,18 @@ it(tests, "simpleCache", () => {
   });
 
   const fetchUsers = api.get("/users", api.cache());
-  const { store, fx } = configureStore({ reducers: { init: () => null } });
-  fx.run(api.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(api.bootup);
 
   const action = fetchUsers();
   store.dispatch(action);
   assertLike(store.getState(), {
-    [DATA_NAME]: {
+    "@@starfx/data": {
       [action.payload.key]: { users: [mockUser] },
     },
-    [LOADERS_NAME]: {
+    "@@starfx/loaders": {
       [`${fetchUsers}`]: {
         status: "success",
       },
@@ -285,11 +289,10 @@ it(tests, "simpleCache", () => {
   });
 });
 
-it(tests, "overriding default loader behavior", () => {
-  const users = createTable<User>({ name: "users" });
-
+it(tests, "overriding default loader behavior", async () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
+  api.use(storeMdw());
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
@@ -308,24 +311,24 @@ it(tests, "overriding default loader behavior", () => {
         return;
       }
       const { data } = ctx.json;
-      const curUsers = data.users.reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
-
       ctx.loader = { id, message: "yes", meta: { wow: true } };
-      ctx.actions.push(users.actions.add(curUsers));
+      yield* updateStore<UserState>((state) => {
+        data.users.forEach((u) => {
+          state.users[u.id] = u;
+        });
+      });
     },
   );
 
-  const reducers = createReducerMap(users);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(api.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(api.bootup);
 
   store.dispatch(fetchUsers());
   assertLike(store.getState(), {
-    [users.name]: { [mockUser.id]: mockUser },
-    [LOADERS_NAME]: {
+    users: { [mockUser.id]: mockUser },
+    "@@starfx/loaders": {
       [`${fetchUsers}`]: {
         status: "success",
         message: "yes",
@@ -335,9 +338,10 @@ it(tests, "overriding default loader behavior", () => {
   });
 });
 
-it(tests, "undo", () => {
+it(tests, "undo", async () => {
   const api = createApi<UndoCtx>();
   api.use(requestMonitor());
+  api.use(storeMdw());
   api.use(api.routes());
   api.use(undoer());
 
@@ -354,23 +358,25 @@ it(tests, "undo", () => {
     yield* next();
   });
 
-  const { store, fx } = configureStore({ reducers: { init: () => null } });
-  fx.run(api.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(api.bootup);
 
   const action = createUser();
   store.dispatch(action);
   store.dispatch(undo());
   assertLike(store.getState(), {
     ...createQueryState({
-      [LOADERS_NAME]: {
-        [`${createUser}`]: defaultLoadingItem(),
-        [action.payload.name]: defaultLoadingItem(),
+      "@@starfx/loaders": {
+        [`${createUser}`]: defaultLoader(),
+        [action.payload.name]: defaultLoader(),
       },
     }),
   });
 });
 
-it(tests, "requestMonitor - error handler", () => {
+it(tests, "requestMonitor - error handler", async () => {
   let err = false;
   console.error = (msg: string) => {
     if (err) return;
@@ -380,11 +386,10 @@ it(tests, "requestMonitor - error handler", () => {
     );
     err = true;
   };
-  const name = "users";
-  const cache = createTable<User>({ name });
   const query = createApi<ApiCtx>();
 
   query.use(requestMonitor());
+  query.use(storeMdw());
   query.use(query.routes());
   query.use(function* () {
     throw new Error("something happened");
@@ -392,9 +397,10 @@ it(tests, "requestMonitor - error handler", () => {
 
   const fetchUsers = query.create(`/users`);
 
-  const reducers = createReducerMap(cache);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(query.bootup);
 
   store.dispatch(fetchUsers());
 });
@@ -402,6 +408,7 @@ it(tests, "requestMonitor - error handler", () => {
 it(tests, "createApi with own key", async () => {
   const query = createApi();
   query.use(requestMonitor());
+  query.use(storeMdw());
   query.use(query.routes());
   query.use(customKey);
   query.use(function* fetchApi(ctx, next) {
@@ -431,10 +438,13 @@ it(tests, "createApi with own key", async () => {
       const result = new TextDecoder("utf-8").decode(buff.value);
       const { users } = JSON.parse(result);
       if (!users) return;
-      const curUsers = (users as User[]).reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
+      const curUsers = (users as User[]).reduce<Record<string, User>>(
+        (acc, u) => {
+          acc[u.id] = u;
+          return acc;
+        },
+        {},
+      );
       ctx.response = new Response();
       ctx.json = {
         ok: true,
@@ -443,9 +453,10 @@ it(tests, "createApi with own key", async () => {
     },
   );
   const newUEmail = mockUser.email + ".org";
-  const reducers = createReducerMap();
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(query.bootup);
 
   store.dispatch(createUserCustomKey({ email: newUEmail }));
   await sleep(150);
@@ -467,6 +478,7 @@ it(tests, "createApi with own key", async () => {
 it(tests, "createApi with custom key but no payload", async () => {
   const query = createApi();
   query.use(requestMonitor());
+  query.use(storeMdw());
   query.use(query.routes());
   query.use(customKey);
   query.use(function* fetchApi(ctx, next) {
@@ -496,10 +508,13 @@ it(tests, "createApi with custom key but no payload", async () => {
       const result = new TextDecoder("utf-8").decode(buff.value);
       const { users } = JSON.parse(result);
       if (!users) return;
-      const curUsers = (users as User[]).reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
+      const curUsers = (users as User[]).reduce<Record<string, User>>(
+        (acc, u) => {
+          acc[u.id] = u;
+          return acc;
+        },
+        {},
+      );
       ctx.response = new Response();
       ctx.json = {
         ok: true,
@@ -508,9 +523,10 @@ it(tests, "createApi with custom key but no payload", async () => {
     },
   );
 
-  const reducers = createReducerMap();
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
+  const store = await configureStore<UserState>({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(query.bootup);
 
   store.dispatch(getUsers());
   await sleep(150);
