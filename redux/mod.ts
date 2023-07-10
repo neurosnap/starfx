@@ -81,10 +81,8 @@ export function* takeEvery<T>(
   return yield* spawn(function* () {
     while (true) {
       const action = yield* take(pattern);
-      console.log(`${pattern} start`, action.payload);
       if (!action) continue;
       yield* spawn(() => op(action));
-      console.log(`${pattern} next`);
     }
   });
 }
@@ -126,10 +124,6 @@ export function* put(action: AnyAction | AnyAction[]) {
   } else {
     store.dispatch(action);
   }
-  yield* emit({
-    channel: ActionContext,
-    action,
-  });
 }
 
 function* send(action: AnyAction) {

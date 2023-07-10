@@ -15,6 +15,7 @@ export {
 
 import { contextualize } from "./context.ts";
 import { configureStore, createScope } from "./deps.ts";
+import { createFxMiddleware } from "./redux/mod.ts";
 
 export function isLikeSelector(selector: unknown) {
   return (
@@ -56,11 +57,13 @@ export function assertLike(
 
 export function setupReduxScope() {
   const scope = createScope();
+  const mdw = createFxMiddleware(scope);
   const store = configureStore({
     reducer: () => null,
+    middleware: [mdw.middleware],
   });
   scope.run(function* () {
     yield* contextualize("redux:store", store);
   });
-  return scope;
+  return { run: mdw.run };
 }
