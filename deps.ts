@@ -29,7 +29,7 @@ export function Err<T>(error: Error): Result<T> {
   return { ok: false, error };
 }
 
-import React from "https://esm.sh/react@18.2.0";
+import React from "https://esm.sh/react@18.2.0?pin=v122";
 export { React };
 export {
   Provider,
