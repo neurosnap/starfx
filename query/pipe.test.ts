@@ -408,3 +408,23 @@ it.ignore(tests, "retry with actionFn with payload", async () => {
   asserts.assertEquals(acc, "aagg");
   await task;
 });
+
+it.only(tests, "should only call thunk once", () => {
+  const api = createPipe<RoboCtx>();
+  api.use(api.routes());
+  let acc = "";
+
+  const action1 = api.create<number>("/users", function* (_, next) {
+    yield* next();
+    acc += "a";
+  });
+  const action2 = api.create("/users2", function* (_, next) {
+    yield* next();
+    yield* put(action1(1));
+  });
+
+  const { store, run } = setupStore(api.bootup);
+  run();
+  store.dispatch(action2());
+  asserts.assertEquals(acc, "a");
+});

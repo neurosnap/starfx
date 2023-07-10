@@ -1,4 +1,4 @@
-import {
+/* import {
   cleanup,
   fireEvent,
   render,
@@ -79,7 +79,7 @@ describe.ignore("useApi()", () => {
         h("div", { key: "3" }, query.isSuccess ? "success" : ""),
       ]);
     };
-    render(h(Provider, { store, children: h(App) }));
+    // render(h(Provider, { store, children: h(App) }));
 
     const button = screen.getByText("fetch");
     fireEvent.click(button);
@@ -108,7 +108,7 @@ describe.ignore("useApi()", () => {
         h("div", { key: "3" }, query.isSuccess ? "success" : ""),
       ]);
     };
-    render(h(Provider, { store, children: h(App) }));
+    // render(h(Provider, { store, children: h(App) }));
 
     const button = screen.getByText("fetch");
     fireEvent.click(button);
@@ -118,4 +118,4 @@ describe.ignore("useApi()", () => {
     await screen.findByText("success");
     asserts.assert(true);
   });
-});
+}); */

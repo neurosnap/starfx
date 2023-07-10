@@ -50,13 +50,13 @@ export function* once({
 }) {
   const { output } = yield* channel;
   const msgList = yield* output;
-  let next = yield* msgList;
+  let next = yield* msgList.next();
   while (!next.done) {
     const match = matcher(pattern);
     if (match(next.value)) {
       return next.value;
     }
-    next = yield* msgList;
+    next = yield* msgList.next();
   }
 }
 
@@ -124,10 +124,6 @@ export function* put(action: AnyAction | AnyAction[]) {
   } else {
     store.dispatch(action);
   }
-  yield* emit({
-    channel: ActionContext,
-    action,
-  });
 }
 
 function* send(action: AnyAction) {
