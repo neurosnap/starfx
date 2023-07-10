@@ -50,13 +50,13 @@ export function* once({
 }) {
   const { output } = yield* channel;
   const msgList = yield* output;
-  let next = yield* msgList;
+  let next = yield* msgList.next();
   while (!next.done) {
     const match = matcher(pattern);
     if (match(next.value)) {
       return next.value;
     }
-    next = yield* msgList;
+    next = yield* msgList.next();
   }
 }
 
@@ -81,8 +81,10 @@ export function* takeEvery<T>(
   return yield* spawn(function* () {
     while (true) {
       const action = yield* take(pattern);
+      console.log(`${pattern} start`, action.payload);
       if (!action) continue;
       yield* spawn(() => op(action));
+      console.log(`${pattern} next`);
     }
   });
 }

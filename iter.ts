@@ -6,7 +6,7 @@ export function* forEach<T>(
 ) {
   const msgList = yield* stream;
   while (true) {
-    const next = yield* msgList;
+    const next = yield* msgList.next();
     if (next.done) {
       return next.value;
     } else if (each) {

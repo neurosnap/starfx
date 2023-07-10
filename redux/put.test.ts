@@ -12,10 +12,10 @@ it(putTests, "should send actions through channel", async () => {
     yield* spawn(function* () {
       const actions = yield* ActionContext;
       const msgs = yield* actions.output;
-      let action = yield* msgs;
+      let action = yield* msgs.next();
       while (!action.done) {
         actual.push(action.value.type);
-        action = yield* msgs;
+        action = yield* msgs.next();
       }
     });
 
