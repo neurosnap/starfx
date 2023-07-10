@@ -184,7 +184,7 @@ export function createFxMiddleware(scope: Scope = createScope()) {
 interface SetupStoreProps<S = any> {
   reducers: ReducersMapObject<S>;
   middleware?: Middleware[];
-  enhancers?:  StoreEnhancer[]|ConfigureEnhancersCallback;
+  enhancers?: StoreEnhancer[] | ConfigureEnhancersCallback;
 }
 
 /**
@@ -210,14 +210,16 @@ interface SetupStoreProps<S = any> {
  * });
  * ```
  */
-export function configureStore({ reducers, middleware = [], enhancers = [] }: SetupStoreProps) {
+export function configureStore(
+  { reducers, middleware = [], enhancers = [] }: SetupStoreProps,
+) {
   const fx = createFxMiddleware();
   const rootReducer = combineReducers({ ...queryReducers, ...reducers });
   const store = reduxStore({
     reducer: enableBatching(rootReducer),
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat([fx.middleware, ...middleware]),
-    enhancers: enhancers
+    enhancers: enhancers,
   });
 
   return { store, fx };
