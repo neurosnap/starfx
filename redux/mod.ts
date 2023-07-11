@@ -3,10 +3,12 @@ import {
   AnyAction,
   BATCH,
   Channel,
+  ConfigureEnhancersCallback,
   Middleware,
   Operation,
   ReducersMapObject,
   Scope,
+  StoreEnhancer,
 } from "../deps.ts";
 import type { OpFn } from "../types.ts";
 import {
@@ -178,6 +180,7 @@ export function createFxMiddleware(scope: Scope = createScope()) {
 interface SetupStoreProps<S = any> {
   reducers: ReducersMapObject<S>;
   middleware?: Middleware[];
+  enhancers?: StoreEnhancer[] | ConfigureEnhancersCallback;
 }
 
 /**
@@ -203,13 +206,16 @@ interface SetupStoreProps<S = any> {
  * });
  * ```
  */
-export function configureStore({ reducers, middleware = [] }: SetupStoreProps) {
+export function configureStore(
+  { reducers, middleware = [], enhancers = [] }: SetupStoreProps,
+) {
   const fx = createFxMiddleware();
   const rootReducer = combineReducers({ ...queryReducers, ...reducers });
   const store = reduxStore({
     reducer: enableBatching(rootReducer),
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat([fx.middleware, ...middleware]),
+    enhancers: enhancers,
   });
 
   return { store, fx };
