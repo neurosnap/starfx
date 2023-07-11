@@ -69,11 +69,12 @@ async function main() {
     package: {
       name: "starfx",
       version,
-      description: "Async flow control and state management system for deno, node, and browser",
+      description:
+        "Async flow control and state management system for deno, node, and browser",
       license: "MIT",
       author: {
         name: "Eric Bower",
-        email: "me@erock.io"
+        email: "me@erock.io",
       },
       repository: {
         type: "git",
