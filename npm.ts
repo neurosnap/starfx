@@ -28,11 +28,11 @@ async function main() {
       },
     ],
     mappings: {
-      "https://deno.land/x/effection@3.0.0-alpha.7/mod.ts": {
+      "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts": {
         name: "effection",
-        version: "3.0.0-alpha.7",
+        version: "3.0.0-alpha.9",
       },
-      "https://esm.sh/react@18.2.0": {
+      "https://esm.sh/react@18.2.0?pin=v122": {
         name: "react",
         version: "^18.2.0",
         peerDependency: true,
@@ -60,19 +60,22 @@ async function main() {
       deno: false,
     },
     test: false,
-    typeCheck: true,
+    typeCheck: "both",
     compilerOptions: {
       target: "ES2020",
       sourceMap: true,
-      lib: ["dom", "dom.iterable", "esnext"],
+      lib: ["DOM", "DOM.Iterable", "ESNext"],
     },
     package: {
       name: "starfx",
       version,
-      description: "Supercharged async flow control library",
+      description: "Async flow control and state management system for deno, node, and browser",
       license: "MIT",
+      author: {
+        name: "Eric Bower",
+        email: "me@erock.io"
+      },
       repository: {
-        author: "me@erock.io",
         type: "git",
         url: "git+https://github.com/neurosnap/starfx.git",
       },
