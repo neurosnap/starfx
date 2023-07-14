@@ -10,8 +10,10 @@ Supercharged async flow control library.
 ## features
 
 - async flow control library for `deno`, `node`, and browser
-- side-effect system for `redux`
-- data synchronization and caching for `react` and `redux`
+- task tree side-effect management system
+- no fuss immutable data store
+- traceability throughout the entire system
+- data synchronization and caching for `react`
 
 ## example
 
