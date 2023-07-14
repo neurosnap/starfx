@@ -1,7 +1,8 @@
 import { describe, expect, it } from "../test.ts";
 import { sleep, spawn } from "../deps.ts";
 
-import { ActionContext, configureStore, put, take } from "./mod.ts";
+import { ActionContext, put, take } from "./mod.ts";
+import { configureStore } from "./store.ts";
 
 const putTests = describe("put()");
 
@@ -27,10 +28,8 @@ it(putTests, "should send actions through channel", async () => {
     });
   }
 
-  const store = configureStore({
-    reducers: { def: (s = null, _) => s },
-  });
-  await store.fx.run(() => genFn("arg"));
+  const store = await configureStore({ initialState: {} });
+  await store.run(() => genFn("arg"));
 
   const expected = ["arg", "2"];
   expect(actual).toEqual(expected);
@@ -59,10 +58,8 @@ it(putTests, "should handle nested puts", async () => {
     yield* spawn(genA);
   }
 
-  const store = configureStore({
-    reducers: { def: (s = null, _) => s },
-  });
-  await store.fx.run(root);
+  const store = await configureStore({ initialState: {} });
+  await store.run(() => root());
 
   const expected = ["put b", "put a"];
   expect(actual).toEqual(expected);
@@ -79,10 +76,8 @@ it(
       yield* sleep(0);
     }
 
-    const store = configureStore({
-      reducers: { def: (s = null, _) => s },
-    });
-    await store.fx.run(root);
+    const store = await configureStore({ initialState: {} });
+    await store.run(() => root());
     expect(true).toBe(true);
   },
 );
@@ -109,10 +104,8 @@ it(
       yield* tsk;
     }
 
-    const store = configureStore({
-      reducers: { def: (s = null, _) => s },
-    });
-    await store.fx.run(root);
+    const store = await configureStore({ initialState: {} });
+    await store.run(() => root());
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
   },

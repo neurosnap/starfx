@@ -1,8 +1,10 @@
 import { call } from "../fx/mod.ts";
-import { takeEvery } from "../redux/mod.ts";
 import { compose } from "../compose.ts";
-import type { OpFn } from "../types.ts";
+import type { OpFn, Payload } from "../types.ts";
 import { parallel } from "../mod.ts";
+
+// TODO: remove store deps
+import { takeEvery } from "../store/mod.ts";
 
 import { isFn, isObject } from "./util.ts";
 import { createKey } from "./create-key.ts";
@@ -14,11 +16,10 @@ import type {
   Middleware,
   MiddlewareCo,
   Next,
-  Payload,
   PipeCtx,
   Supervisor,
 } from "./types.ts";
-import { API_ACTION_PREFIX } from "./constant.ts";
+import { API_ACTION_PREFIX } from "../action.ts";
 
 export interface SagaApi<Ctx extends PipeCtx> {
   use: (fn: Middleware<Ctx>) => void;
@@ -213,8 +214,8 @@ export function createPipe<Ctx extends PipeCtx = PipeCtx<any>>(
   }
 
   function* bootup() {
-    const results = yield* parallel(Object.values(visors));
-    yield* results;
+    const group = yield* parallel(Object.values(visors));
+    return yield* group;
   }
 
   function routes() {

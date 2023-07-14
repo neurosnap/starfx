@@ -1,16 +1,19 @@
 import { describe, expect, it } from "../test.ts";
 
 import { call, keepAlive } from "../fx/mod.ts";
-import { configureStore, put, takeEvery } from "../redux/mod.ts";
-import { createAction, createReducerMap, createTable } from "../deps.ts";
-import type { MapEntity } from "../deps.ts";
+import {
+  configureStore,
+  storeMdw,
+  takeEvery,
+  updateStore,
+} from "../store/mod.ts";
+import { createQueryState } from "../action.ts";
 
 import { queryCtx, requestMonitor, urlParser } from "./middleware.ts";
 import { createApi } from "./api.ts";
-import { sleep } from "./util.ts";
+import { sleep } from "../test.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
-import { poll } from "./supervisor.ts";
 
 interface User {
   id: string;
@@ -24,13 +27,9 @@ const jsonBlob = (data: unknown) => {
   return JSON.stringify(data);
 };
 
-const reducers = { init: () => null };
-
 const tests = describe("createApi()");
 
 it(tests, "createApi - POST", async () => {
-  const name = "users";
-  const cache = createTable<User>({ name });
   const query = createApi();
 
   query.use(queryCtx);
@@ -74,17 +73,17 @@ it(tests, "createApi - POST", async () => {
       const result = new TextDecoder("utf-8").decode(buff.value);
       const { users } = JSON.parse(result);
       if (!users) return;
-      const curUsers = (users as User[]).reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
-      yield* put(cache.actions.add(curUsers));
+
+      yield* updateStore<{ users: { [key: string]: User } }>((state) => {
+        (users as User[]).forEach((u) => {
+          state.users[u.id] = u;
+        });
+      });
     },
   );
 
-  const reducers = createReducerMap(cache);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
   await sleep(150);
@@ -93,11 +92,8 @@ it(tests, "createApi - POST", async () => {
   });
 });
 
-it(tests, "POST with uri", () => {
-  const name = "users";
-  const cache = createTable<User>({ name });
+it(tests, "POST with uri", async () => {
   const query = createApi();
-
   query.use(queryCtx);
   query.use(urlParser);
   query.use(query.routes());
@@ -128,21 +124,19 @@ it(tests, "POST with uri", () => {
     yield* next();
     if (!ctx.json.ok) return;
     const { users } = ctx.json.data;
-    const curUsers = users.reduce<MapEntity<User>>((acc, u) => {
-      acc[u.id] = u;
-      return acc;
-    }, {});
-    yield* put(cache.actions.add(curUsers));
+    yield* updateStore<{ users: { [key: string]: User } }>((state) => {
+      users.forEach((u) => {
+        state.users[u.id] = u;
+      });
+    });
   });
 
-  const reducers = createReducerMap(cache);
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
-
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(query.bootup);
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
-it(tests, "middleware - with request fn", () => {
+it(tests, "middleware - with request fn", async () => {
   const query = createApi();
   query.use(queryCtx);
   query.use(urlParser);
@@ -153,13 +147,12 @@ it(tests, "middleware - with request fn", () => {
     yield* next();
   });
   const createUser = query.create("/users", query.request({ method: "POST" }));
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
-
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(query.bootup);
   store.dispatch(createUser());
 });
 
-it(tests, "run() on endpoint action - should run the effect", () => {
+it(tests, "run() on endpoint action - should run the effect", async () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   let acc = "";
@@ -177,13 +170,12 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     expect(acc).toEqual("ab");
   });
 
-  const { store, fx } = configureStore({ reducers });
-  fx.run(api.bootup);
-
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(api.bootup);
   store.dispatch(action2());
 });
 
-it(tests, "run() from a normal saga", () => {
+it(tests, "run() from a normal saga", async () => {
   const api = createApi();
   api.use(api.routes());
   let acc = "";
@@ -191,7 +183,7 @@ it(tests, "run() from a normal saga", () => {
     yield* next();
     acc += "a";
   });
-  const action2 = createAction("ACTION");
+  const action2 = () => ({ type: "ACTION" });
   function* onAction() {
     const ctx = yield* call(() => action1.run(action1({ id: "1" })));
     if (!ctx.ok) {
@@ -211,15 +203,15 @@ it(tests, "run() from a normal saga", () => {
     yield* task;
   }
 
-  const { store, fx } = configureStore({ reducers });
-  fx.run(() => keepAlive([api.bootup, watchAction]));
-
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(() => keepAlive([api.bootup, watchAction]));
   store.dispatch(action2());
 });
 
 it(tests, "createApi with hash key on a large post", async () => {
   const query = createApi();
   query.use(requestMonitor());
+  query.use(storeMdw());
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const data = {
@@ -246,10 +238,13 @@ it(tests, "createApi with hash key on a large post", async () => {
       const result = new TextDecoder("utf-8").decode(buff.value);
       const { users } = JSON.parse(result);
       if (!users) return;
-      const curUsers = (users as User[]).reduce<MapEntity<User>>((acc, u) => {
-        acc[u.id] = u;
-        return acc;
-      }, {});
+      const curUsers = (users as User[]).reduce<Record<string, User>>(
+        (acc, u) => {
+          acc[u.id] = u;
+          return acc;
+        },
+        {},
+      );
       ctx.response = new Response();
       ctx.json = {
         ok: true,
@@ -260,13 +255,15 @@ it(tests, "createApi with hash key on a large post", async () => {
 
   const email = mockUser.email + "9";
   const largetext = "abc-def-ghi-jkl-mno-pqr".repeat(100);
-  const reducers = createReducerMap();
 
-  const { store, fx } = configureStore({ reducers });
-  fx.run(query.bootup);
-
+  const store = await configureStore({
+    initialState: { ...createQueryState(), users: {} },
+  });
+  store.run(query.bootup);
   store.dispatch(createUserDefaultKey({ email, largetext }));
+
   await sleep(150);
+
   const s = store.getState();
   const expectedKey = createKey(`${createUserDefaultKey}`, {
     email,
@@ -274,8 +271,7 @@ it(tests, "createApi with hash key on a large post", async () => {
   });
 
   expect([8, 9].includes(expectedKey.split("|")[1].length)).toBeTruthy();
-
-  expect(s["@@saga-query/data"][expectedKey]).toEqual({
+  expect(s["@@starfx/data"][expectedKey]).toEqual({
     "1": { id: "1", name: "test", email: email, largetext: largetext },
   });
 });
@@ -284,6 +280,7 @@ it(tests, "createApi - two identical endpoints", async () => {
   const actual: string[] = [];
   const api = createApi();
   api.use(requestMonitor());
+  api.use(storeMdw());
   api.use(api.routes());
 
   const first = api.get("/health", function* (ctx, next) {
@@ -293,23 +290,18 @@ it(tests, "createApi - two identical endpoints", async () => {
 
   const second = api.get(
     ["/health", "poll"],
-    { supervisor: poll(1 * 1000) },
     function* (ctx, next) {
       actual.push(ctx.req().url);
       yield* next();
     },
   );
 
-  const { store, fx } = configureStore({ reducers });
-  fx.run(api.bootup);
-
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(api.bootup);
   store.dispatch(first());
   store.dispatch(second());
 
   await sleep(150);
-
-  // stop poll
-  store.dispatch(second());
 
   expect(actual).toEqual(["/health", "/health"]);
 });
@@ -319,7 +311,7 @@ interface TestCtx<P = any, S = any, E = any> extends ApiCtx<P, S, E> {
 }
 
 // this is strictly for testing types
-it(tests, "ensure types for get() endpoint", () => {
+it(tests, "ensure types for get() endpoint", async () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -342,8 +334,8 @@ it(tests, "ensure types for get() endpoint", () => {
     },
   );
 
-  const { store, fx } = configureStore({ reducers });
-  fx.run(api.bootup);
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(api.bootup);
 
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
@@ -355,7 +347,7 @@ interface FetchUserProps {
 type FetchUserCtx = TestCtx<FetchUserProps>;
 
 // this is strictly for testing types
-it(tests, "ensure ability to cast `ctx` in function definition", () => {
+it(tests, "ensure ability to cast `ctx` in function definition", async () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -378,9 +370,8 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
     },
   );
 
-  const { store, fx } = configureStore({ reducers });
-  fx.run(api.bootup);
-
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(api.bootup);
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
 });
@@ -391,7 +382,7 @@ type FetchUserSecondCtx = TestCtx<any, { result: string }>;
 it(
   tests,
   "ensure ability to cast `ctx` in function definition with no props",
-  () => {
+  async () => {
     const api = createApi<TestCtx>();
     api.use(api.routes());
     api.use(function* (ctx, next) {
@@ -413,9 +404,8 @@ it(
       },
     );
 
-    const { store, fx } = configureStore({ reducers });
-    fx.run(api.bootup);
-
+    const store = await configureStore({ initialState: { users: {} } });
+    store.run(api.bootup);
     store.dispatch(action1());
     expect(acc).toEqual(["wow"]);
   },

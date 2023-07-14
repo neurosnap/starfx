@@ -10,9 +10,9 @@ import type {
   FetchJson,
   MiddlewareApiCo,
   Next,
-  Payload,
   Supervisor,
 } from "./types.ts";
+import type { Payload } from "../types.ts";
 
 export type ApiName = string | string[];
 
