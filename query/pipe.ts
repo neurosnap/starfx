@@ -4,7 +4,7 @@ import type { OpFn, Payload } from "../types.ts";
 import { parallel } from "../mod.ts";
 
 // TODO: remove store deps
-import { takeEvery } from "../store/mod.ts";
+import { takeEvery } from "../redux/mod.ts";
 
 import { isFn, isObject } from "./util.ts";
 import { createKey } from "./create-key.ts";

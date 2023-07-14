@@ -3,7 +3,7 @@ import { React, useDispatch, useSelector } from "../deps.ts";
 const { useState, useEffect } = React;
 
 // TODO: remove store deps
-import { selectDataById, selectLoaderById } from "../store/mod.ts";
+import { selectDataById, selectLoaderById } from "../redux/mod.ts";
 
 type ActionFn<P = any> = (p: P) => { toString: () => string };
 type ActionFnSimple = () => { toString: () => string };

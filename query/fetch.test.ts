@@ -1,5 +1,5 @@
 import { describe, expect, install, it, mock } from "../test.ts";
-import { configureStore, storeMdw } from "../store/mod.ts";
+import { configureStore, storeMdw, takeEvery } from "../store/mod.ts";
 import { createQueryState } from "../action.ts";
 import type { QueryState } from "../types.ts";
 
@@ -33,20 +33,24 @@ it(
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
-    const fetchUsers = api.get("/users", function* (ctx, next) {
-      ctx.cache = true;
-      yield* next();
+    const fetchUsers = api.get(
+      "/users",
+      { supervisor: takeEvery },
+      function* (ctx, next) {
+        ctx.cache = true;
+        yield* next();
 
-      expect(ctx.request).toEqual({
-        url: `${baseUrl}/users`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+        expect(ctx.request).toEqual({
+          url: `${baseUrl}/users`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      expect(ctx.json).toEqual({ ok: true, data: mockUser });
-    });
+        expect(ctx.json).toEqual({ ok: true, data: mockUser });
+      },
+    );
 
     const store = await configureStore<QueryState>({
       initialState: createQueryState(),
@@ -77,12 +81,16 @@ it(
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
-    const fetchUsers = api.get("/users", function* (ctx, next) {
-      ctx.cache = true;
-      ctx.bodyType = "text";
-      yield next();
-      expect(ctx.json).toEqual({ ok: true, data: "this is some text" });
-    });
+    const fetchUsers = api.get(
+      "/users",
+      { supervisor: takeEvery },
+      function* (ctx, next) {
+        ctx.cache = true;
+        ctx.bodyType = "text";
+        yield next();
+        expect(ctx.json).toEqual({ ok: true, data: "this is some text" });
+      },
+    );
 
     const store = await configureStore<QueryState>({
       initialState: createQueryState(),
@@ -113,12 +121,16 @@ it(tests, "fetch - error handling", async () => {
   });
   api.use(fetcher());
 
-  const fetchUsers = api.get("/users", function* (ctx, next) {
-    ctx.cache = true;
-    yield* next();
+  const fetchUsers = api.get(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.cache = true;
+      yield* next();
 
-    expect(ctx.json).toEqual({ ok: false, data: errMsg });
-  });
+      expect(ctx.json).toEqual({ ok: false, data: errMsg });
+    },
+  );
 
   const store = await configureStore<QueryState>({
     initialState: createQueryState(),
@@ -150,12 +162,16 @@ it(tests, "fetch - status 204", async () => {
   });
   api.use(fetcher());
 
-  const fetchUsers = api.get("/users", function* (ctx, next) {
-    ctx.cache = true;
-    yield* next();
+  const fetchUsers = api.get(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.cache = true;
+      yield* next();
 
-    expect(ctx.json).toEqual({ ok: true, data: {} });
-  });
+      expect(ctx.json).toEqual({ ok: true, data: {} });
+    },
+  );
 
   const store = await configureStore<QueryState>({
     initialState: createQueryState(),
@@ -187,18 +203,22 @@ it(tests, "fetch - malformed json", async () => {
   });
   api.use(fetcher());
 
-  const fetchUsers = api.get("/users", function* (ctx, next) {
-    ctx.cache = true;
-    yield* next();
+  const fetchUsers = api.get(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.cache = true;
+      yield* next();
 
-    expect(ctx.json).toEqual({
-      ok: false,
-      data: {
-        message:
-          "invalid json response body at https://saga-query.com/users reason: Unexpected token o in JSON at position 1",
-      },
-    });
-  });
+      expect(ctx.json).toEqual({
+        ok: false,
+        data: {
+          message:
+            "invalid json response body at https://saga-query.com/users reason: Unexpected token o in JSON at position 1",
+        },
+      });
+    },
+  );
 
   const store = await configureStore<QueryState>({
     initialState: createQueryState(),
@@ -221,22 +241,26 @@ it(tests, "fetch - POST", async () => {
   api.use(api.routes());
   api.use(fetcher({ baseUrl }));
 
-  const fetchUsers = api.post("/users", function* (ctx, next) {
-    ctx.cache = true;
-    ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
-    yield* next();
+  const fetchUsers = api.post(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.cache = true;
+      ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
+      yield* next();
 
-    expect(ctx.req()).toEqual({
-      url: `${baseUrl}/users`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(mockUser),
-    });
+      expect(ctx.req()).toEqual({
+        url: `${baseUrl}/users`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(mockUser),
+      });
 
-    expect(ctx.json).toEqual({ ok: true, data: mockUser });
-  });
+      expect(ctx.json).toEqual({ ok: true, data: mockUser });
+    },
+  );
 
   const store = await configureStore<QueryState>({
     initialState: createQueryState(),
@@ -261,6 +285,7 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
 
   const fetchUsers = api.post<{ id: string }>(
     "/users/:id/something",
+    { supervisor: takeEvery },
     function* (ctx, next) {
       ctx.cache = true;
       ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
@@ -322,6 +347,7 @@ it(
 
     const fetchUsers = api.post<{ id: string }>(
       "/users/:id",
+      { supervisor: takeEvery },
       function* (ctx, next) {
         ctx.cache = true;
         ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
@@ -368,7 +394,7 @@ it(
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
-    const fetchUsers = api.get("/users", [
+    const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
       function* (ctx, next) {
         ctx.cache = true;
         yield* next();
@@ -413,7 +439,7 @@ it.ignore(
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
-    const fetchUsers = api.get("/users", [
+    const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
       function* (ctx, next) {
         ctx.cache = true;
         yield* next();

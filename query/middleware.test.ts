@@ -20,6 +20,7 @@ import {
   defaultLoader,
   selectDataById,
   storeMdw,
+  takeEvery,
   takeLatest,
   undo,
   undoer,
@@ -66,6 +67,7 @@ it(tests, "basic", async () => {
 
   const fetchUsers = query.create(
     `/users`,
+    { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
@@ -128,6 +130,7 @@ it(tests, "with loader", async () => {
 
   const fetchUsers = api.create(
     `/users`,
+    { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
@@ -171,6 +174,7 @@ it(tests, "with item loader", async () => {
 
   const fetchUser = api.create<{ id: string }>(
     `/users/:id`,
+    { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
@@ -227,6 +231,7 @@ it(tests, "with POST", async () => {
 
   const createUser = query.create<{ email: string }>(
     `/users [POST]`,
+    { supervisor: takeEvery },
     function* processUsers(
       ctx: ApiCtx<{ email: string }, { users: User[] }>,
       next,
@@ -269,7 +274,7 @@ it(tests, "simpleCache", async () => {
     yield* next();
   });
 
-  const fetchUsers = api.get("/users", api.cache());
+  const fetchUsers = api.get("/users", { supervisor: takeEvery }, api.cache());
   const store = await configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
@@ -303,6 +308,7 @@ it(tests, "overriding default loader behavior", async () => {
 
   const fetchUsers = api.create(
     `/users`,
+    { supervisor: takeEvery },
     function* (ctx: ApiCtx<unknown, { users: User[] }>, next) {
       const id = ctx.name;
       yield* next();
@@ -353,10 +359,14 @@ it(tests, "undo", async () => {
     yield* next();
   });
 
-  const createUser = api.post("/users", function* (ctx, next) {
-    ctx.undoable = true;
-    yield* next();
-  });
+  const createUser = api.post(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.undoable = true;
+      yield* next();
+    },
+  );
 
   const store = await configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
@@ -395,7 +405,7 @@ it(tests, "requestMonitor - error handler", async () => {
     throw new Error("something happened");
   });
 
-  const fetchUsers = query.create(`/users`);
+  const fetchUsers = query.create(`/users`, { supervisor: takeEvery });
 
   const store = await configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
@@ -423,6 +433,7 @@ it(tests, "createApi with own key", async () => {
 
   const createUserCustomKey = query.post<{ email: string }>(
     `/users`,
+    { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx, next) {
       ctx.cache = true;
       ctx.key = theTestKey; // or some calculated key //
@@ -493,6 +504,7 @@ it(tests, "createApi with custom key but no payload", async () => {
 
   const getUsers = query.get(
     `/users`,
+    { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx, next) {
       ctx.cache = true;
       ctx.key = theTestKey; // or some calculated key //

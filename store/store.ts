@@ -116,7 +116,7 @@ export function createStore<S extends AnyState>({
     const result = yield* mdw(ctx);
     // TODO: dev mode only?
     if (!result.ok) {
-      console.error(result.error);
+      console.error(result);
     }
     return result;
   }
@@ -160,9 +160,8 @@ export function register<S extends AnyState>(store: FxStore<S>) {
   });
 }
 
-const defaultScope = createScope();
 export async function configureStore<S extends AnyState>({
-  scope = defaultScope,
+  scope = createScope(),
   ...props
 }: CreateStore<S>): Promise<FxStore<S>> {
   const store = createStore<S>({ scope, ...props });

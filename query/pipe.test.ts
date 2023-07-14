@@ -1,6 +1,6 @@
 import { assertLike, asserts, describe, it } from "../test.ts";
 import { call } from "../fx/mod.ts";
-import { configureStore, put } from "../store/mod.ts";
+import { configureStore, put, takeEvery } from "../store/mod.ts";
 import { sleep as delay } from "../deps.ts";
 import type { QueryState } from "../types.ts";
 import { createQueryState } from "../action.ts";
@@ -133,7 +133,7 @@ it(
     api.use(onFetchApi);
     api.use(processUsers);
     api.use(processTickets);
-    const fetchUsers = api.create(`/users`);
+    const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
 
     const store = await configureStore<TestState>({
       initialState: { ...createQueryState(), users: {}, tickets: {} },
@@ -150,7 +150,7 @@ it(
   },
 );
 
-it.only(
+it(
   tests,
   "when providing a generator the to api.create function - should call that generator before all other middleware",
   async () => {
@@ -160,8 +160,10 @@ it.only(
     api.use(onFetchApi);
     api.use(processUsers);
     api.use(processTickets);
-    const fetchUsers = api.create(`/users`);
-    const fetchTickets = api.create(`/ticket-wrong-url`, function* (ctx, next) {
+    const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
+    const fetchTickets = api.create(`/ticket-wrong-url`, {
+      supervisor: takeEvery,
+    }, function* (ctx, next) {
       // before middleware has been triggered
       ctx.url = "/tickets";
 
@@ -199,7 +201,7 @@ it(tests, "error handling", async () => {
     throw new Error("some error");
   });
 
-  const action = api.create(`/error`);
+  const action = api.create(`/error`, { supervisor: takeEvery });
 
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
@@ -213,13 +215,17 @@ it(tests, "error handling inside create", async () => {
     throw new Error("some error");
   });
 
-  const action = api.create(`/error`, function* (_, next) {
-    try {
-      yield* next();
-    } catch (_) {
-      asserts.assert(true);
-    }
-  });
+  const action = api.create(
+    `/error`,
+    { supervisor: takeEvery },
+    function* (_, next) {
+      try {
+        yield* next();
+      } catch (_) {
+        asserts.assert(true);
+      }
+    },
+  );
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
@@ -232,7 +238,7 @@ it(tests, "error handling - error handler", async () => {
     throw new Error("failure");
   });
 
-  const action = api.create(`/error`);
+  const action = api.create(`/error`, { supervisor: takeEvery });
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
 
@@ -251,7 +257,7 @@ it(tests, "create fn is an array", async () => {
     });
     yield* next();
   });
-  const action = api.create("/users", [
+  const action = api.create("/users", { supervisor: takeEvery }, [
     function* (ctx, next) {
       ctx.request = {
         method: "POST",
@@ -273,27 +279,35 @@ it(tests, "run() on endpoint action - should run the effect", async () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   let acc = "";
-  const action1 = api.create("/users", function* (ctx, next) {
-    yield* next();
-    ctx.request = { method: "expect this" };
-    acc += "a";
-  });
-  const action2 = api.create("/users2", function* (_, next) {
-    yield* next();
-    const curCtx = yield* call(() => action1.run(action1()));
-    acc += "b";
-    asserts.assert(acc === "ab");
-    assertLike(curCtx, {
-      action: {
-        type: `@@saga-query${action1}`,
-        payload: {
-          name: "/users",
+  const action1 = api.create(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      yield* next();
+      ctx.request = { method: "expect this" };
+      acc += "a";
+    },
+  );
+  const action2 = api.create(
+    "/users2",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      yield* next();
+      const curCtx = yield* call(() => action1.run(action1()));
+      acc += "b";
+      asserts.assert(acc === "ab");
+      assertLike(curCtx, {
+        action: {
+          type: `@@saga-query${action1}`,
+          payload: {
+            name: "/users",
+          },
         },
-      },
-      name: "/users",
-      request: { method: "expect this" },
-    });
-  });
+        name: "/users",
+        request: { method: "expect this" },
+      });
+    },
+  );
 
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
@@ -321,11 +335,15 @@ it(tests, "middleware order of execution", async () => {
     acc += "e";
   });
 
-  const action = api.create("/api", function* (_, next) {
-    acc += "a";
-    yield* next();
-    acc += "g";
-  });
+  const action = api.create(
+    "/api",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      acc += "a";
+      yield* next();
+      acc += "g";
+    },
+  );
 
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
@@ -342,16 +360,20 @@ it.ignore(tests, "retry with actionFn", async () => {
   const api = createPipe();
   api.use(api.routes());
 
-  const action = api.create("/api", function* (ctx, next) {
-    acc += "a";
-    yield* next();
-    acc += "g";
+  const action = api.create(
+    "/api",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      acc += "a";
+      yield* next();
+      acc += "g";
 
-    if (!called) {
-      called = true;
-      yield* put(ctx.actionFn());
-    }
-  });
+      if (!called) {
+        called = true;
+        yield* put(ctx.actionFn());
+      }
+    },
+  );
 
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
@@ -373,11 +395,15 @@ it.ignore(tests, "retry with actionFn with payload", async () => {
     }
   });
 
-  const action = api.create<{ page: number }>("/api", function* (_, next) {
-    acc += "a";
-    yield* next();
-    acc += "g";
-  });
+  const action = api.create<{ page: number }>(
+    "/api",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      acc += "a";
+      yield* next();
+      acc += "g";
+    },
+  );
 
   const store = await configureStore({ initialState: {} });
   const task = store.run(api.bootup);
@@ -393,14 +419,22 @@ it(tests, "should only call thunk once", async () => {
   api.use(api.routes());
   let acc = "";
 
-  const action1 = api.create<number>("/users", function* (_, next) {
-    yield* next();
-    acc += "a";
-  });
-  const action2 = api.create("/users2", function* (_, next) {
-    yield* next();
-    yield* put(action1(1));
-  });
+  const action1 = api.create<number>(
+    "/users",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      yield* next();
+      acc += "a";
+    },
+  );
+  const action2 = api.create(
+    "/users2",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      yield* next();
+      yield* put(action1(1));
+    },
+  );
 
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);

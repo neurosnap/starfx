@@ -53,6 +53,7 @@ it(tests, "createApi - POST", async () => {
 
   const createUser = query.post<{ email: string }, { users: User[] }>(
     `/users`,
+    { supervisor: takeEvery },
     function* processUsers(ctx, next) {
       ctx.request = ctx.req({
         method: "POST",
@@ -113,23 +114,26 @@ it(tests, "POST with uri", async () => {
   });
 
   const userApi = query.uri("/users");
-  const createUser = userApi.post<{ email: string }>(function* processUsers(
-    ctx: ApiCtx<{ email: string }, { users: User[] }>,
-    next,
-  ) {
-    ctx.request = ctx.req({
-      body: JSON.stringify({ email: ctx.payload.email }),
-    });
-
-    yield* next();
-    if (!ctx.json.ok) return;
-    const { users } = ctx.json.data;
-    yield* updateStore<{ users: { [key: string]: User } }>((state) => {
-      users.forEach((u) => {
-        state.users[u.id] = u;
+  const createUser = userApi.post<{ email: string }>(
+    { supervisor: takeEvery },
+    function* processUsers(
+      ctx: ApiCtx<{ email: string }, { users: User[] }>,
+      next,
+    ) {
+      ctx.request = ctx.req({
+        body: JSON.stringify({ email: ctx.payload.email }),
       });
-    });
-  });
+
+      yield* next();
+      if (!ctx.json.ok) return;
+      const { users } = ctx.json.data;
+      yield* updateStore<{ users: { [key: string]: User } }>((state) => {
+        users.forEach((u) => {
+          state.users[u.id] = u;
+        });
+      });
+    },
+  );
 
   const store = await configureStore({ initialState: { users: {} } });
   store.run(query.bootup);
@@ -146,7 +150,11 @@ it(tests, "middleware - with request fn", async () => {
     expect(ctx.req().url).toEqual("/users");
     yield* next();
   });
-  const createUser = query.create("/users", query.request({ method: "POST" }));
+  const createUser = query.create(
+    "/users",
+    { supervisor: takeEvery },
+    query.request({ method: "POST" }),
+  );
   const store = await configureStore({ initialState: { users: {} } });
   store.run(query.bootup);
   store.dispatch(createUser());
@@ -158,6 +166,7 @@ it(tests, "run() on endpoint action - should run the effect", async () => {
   let acc = "";
   const action1 = api.get<{ id: string }, { result: boolean }>(
     "/users/:id",
+    { supervisor: takeEvery },
     function* (_, next) {
       yield* next();
       acc += "a";
@@ -179,7 +188,9 @@ it(tests, "run() from a normal saga", async () => {
   const api = createApi();
   api.use(api.routes());
   let acc = "";
-  const action1 = api.get<{ id: string }>("/users/:id", function* (_, next) {
+  const action1 = api.get<{ id: string }>("/users/:id", {
+    supervisor: takeEvery,
+  }, function* (_, next) {
     yield* next();
     acc += "a";
   });
@@ -222,6 +233,7 @@ it(tests, "createApi with hash key on a large post", async () => {
   });
   const createUserDefaultKey = query.post<{ email: string; largetext: string }>(
     `/users`,
+    { supervisor: takeEvery },
     function* processUsers(ctx, next) {
       ctx.cache = true;
       yield* next();
@@ -283,13 +295,18 @@ it(tests, "createApi - two identical endpoints", async () => {
   api.use(storeMdw());
   api.use(api.routes());
 
-  const first = api.get("/health", function* (ctx, next) {
-    actual.push(ctx.req().url);
-    yield* next();
-  });
+  const first = api.get(
+    "/health",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      actual.push(ctx.req().url);
+      yield* next();
+    },
+  );
 
   const second = api.get(
     ["/health", "poll"],
+    { supervisor: takeEvery },
     function* (ctx, next) {
       actual.push(ctx.req().url);
       yield* next();
@@ -322,6 +339,7 @@ it(tests, "ensure types for get() endpoint", async () => {
   const acc: string[] = [];
   const action1 = api.get<{ id: string }, { result: string }>(
     "/users/:id",
+    { supervisor: takeEvery },
     function* (ctx, next) {
       ctx.something = false;
       acc.push(ctx.payload.id);
@@ -358,6 +376,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", async () => {
   const acc: string[] = [];
   const action1 = api.get<FetchUserProps>(
     "/users/:id",
+    { supervisor: takeEvery },
     function* (ctx: FetchUserCtx, next) {
       ctx.something = false;
       acc.push(ctx.payload.id);
@@ -393,6 +412,7 @@ it(
     const acc: string[] = [];
     const action1 = api.get<never, { result: string }>(
       "/users",
+      { supervisor: takeEvery },
       function* (ctx: FetchUserSecondCtx, next) {
         ctx.something = false;
 
