@@ -16,7 +16,7 @@ Supercharged async flow control library.
 ## example
 
 ```ts
-import { run, parallel, request, json } from 'starfx';
+import { json, parallel, request, run } from "starfx";
 
 function* fetchMovie(title: string) {
   const response = yield* request(`/movies/${title}`);
@@ -24,9 +24,10 @@ function* fetchMovie(title: string) {
   return data;
 }
 
-const task = run(function*() {
-  const movies = ['titanic', 'avatar', 'good will hunting'];
+const task = run(function* () {
+  const movies = ["titanic", "avatar", "good will hunting"];
   const ops = movies.map((title) => () => fetchMovie(title));
+  // parallel returns a list of `Result` type
   const group = yield* parallel(ops);
   const results = yield* group;
   return results;
