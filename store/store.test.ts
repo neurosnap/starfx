@@ -1,4 +1,4 @@
-import { createScope } from "../deps.ts";
+import { createScope, Operation, Result } from "../deps.ts";
 import { parallel } from "../fx/mod.ts";
 import { asserts, describe, it } from "../test.ts";
 
@@ -61,7 +61,7 @@ it(
     const store = createStore({ scope, initialState });
     await register(store);
 
-    await scope.run(function* (): any {
+    await scope.run(function* (): Operation<Result<void>[]> {
       const result = yield* parallel([
         function* () {
           const store = yield* StoreContext;
@@ -122,9 +122,9 @@ it(tests, "emit Action and update store", async () => {
   const store = createStore({ scope, initialState });
   await register(store);
 
-  await scope.run(function* (): any {
+  await scope.run(function* (): Operation<void> {
     const result = yield* parallel([
-      function* (): any {
+      function* (): Operation<void> {
         const action = yield* take<UpdateUserProps>("UPDATE_USER");
         yield* updateStore(updateUser(action.payload));
       },
