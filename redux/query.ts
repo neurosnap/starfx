@@ -1,7 +1,7 @@
 import { createLoaderTable, createReducerMap, createTable } from "../deps.ts";
 import { compose } from "../compose.ts";
 export { defaultLoader } from "../store/mod.ts";
-import { dispatchActions } from "../store/mod.ts";
+import type { AnyAction } from "../store/mod.ts";
 import { ApiCtx, createKey, Next } from "../query/mod.ts";
 import { put, select } from "./mod.ts";
 import type { QueryState } from "../types.ts";
@@ -43,6 +43,21 @@ export const selectDataByName = (
 };
 
 export const reducers = createReducerMap(loaders, data);
+
+/**
+ * This middleware will take the result of `ctx.actions` and dispatch them
+ * as a single batch.
+ *
+ * @remarks This is useful because sometimes there are a lot of actions that need dispatched
+ * within the pipeline of the middleware and instead of dispatching them serially this
+ * improves performance by only hitting the reducers once.
+ */
+export function* dispatchActions(ctx: { actions: AnyAction[] }, next: Next) {
+  if (!ctx.actions) ctx.actions = [];
+  yield* next();
+  if (ctx.actions.length === 0) return;
+  yield* put(ctx.actions);
+}
 
 /**
  * This middleware will automatically cache any data found inside `ctx.json`

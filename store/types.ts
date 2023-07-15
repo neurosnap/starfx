@@ -34,7 +34,7 @@ export interface FxStore<S extends AnyState> {
   subscribe: (fn: Listener) => () => void;
   update: (u: StoreUpdater<S>) => Operation<Result<UpdaterCtx<S>>>;
   run: <T>(op: OpFn<T>) => Task<Result<T>>;
-  dispatch: (a: AnyAction) => Task<any>;
+  dispatch: (a: AnyAction) => any;
   replaceReducer: (r: (s: S, a: AnyAction) => S) => void;
   [Symbol.observable]: () => any;
 }
