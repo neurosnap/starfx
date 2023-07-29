@@ -9,7 +9,7 @@ import {
   requestMonitor,
   urlParser,
 } from "../query/mod.ts";
-import type { ApiCtx } from "../query/mod.ts";
+import type { ApiCtx, PipeCtx, Next } from "../query/mod.ts";
 import { createQueryState } from "../action.ts";
 import type { QueryState } from "../types.ts";
 import { sleep } from "../test.ts";
@@ -555,4 +555,66 @@ it(tests, "createApi with custom key but no payload", async () => {
     expectedKey.split("|")[1] === theTestKey,
     "the keypart should match the input",
   );
+});
+
+it(tests, "check error", async () => {
+  let a =0;
+  const query = createApi<ApiCtx>();
+  query.use( function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
+    ctx: Ctx,
+    next: Next,
+  ) {
+    try {
+      a=1;
+      yield* next();
+    } catch (err) {
+      a=2;
+      console.error(
+        `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
+        ctx,
+      );
+      throw err;
+    }});
+
+  query.use(queryCtx);
+  query.use(urlParser);
+  query.use(query.routes());
+  query.use(function* fetchApi(ctx, next) {
+    if (`${ctx.req().url}`.startsWith("/users/")) {
+      ctx.json = { ok: true, data: mockUser2 };
+      yield* next();
+      return;
+    }
+    const data = {
+      users: [mockUser],
+    };
+    ctx.json = { ok: true, data };
+    yield* next();
+  });
+
+  const fetchUsers = query.create(
+    `/users`,
+    { supervisor: takeEvery },
+    function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
+       throw new Error("some error");
+       yield* next();
+    },
+  );
+  
+
+  const store = await configureStore({
+    initialState: {
+      ...createQueryState(),
+      users: {},
+    },
+  });
+  store.run(query.bootup);
+
+  store.dispatch(fetchUsers());
+  expect(store.getState()).toEqual({
+    ...createQueryState(),
+    users: {},
+  });
+  
+  expect(a).toEqual(2);
 });
