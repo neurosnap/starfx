@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
 import { sleep as delay } from "../deps.ts";
 import {
@@ -8,7 +9,7 @@ import {
   requestMonitor,
   urlParser,
 } from "../query/mod.ts";
-import type { ApiCtx } from "../query/mod.ts";
+import type { ApiCtx, Next, PipeCtx } from "../query/mod.ts";
 import { createQueryState } from "../action.ts";
 import type { QueryState } from "../types.ts";
 import { sleep } from "../test.ts";
@@ -555,4 +556,64 @@ it(tests, "createApi with custom key but no payload", async () => {
     expectedKey.split("|")[1] === theTestKey,
     "the keypart should match the input",
   );
+});
+
+it(tests, "errorHandler", async () => {
+  let a = 0;
+  const query = createApi<ApiCtx>();
+  query.use(function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
+    ctx: Ctx,
+    next: Next,
+  ) {
+    a = 1;
+    yield* next();
+    a = 2;
+    if (!ctx.result.ok) {
+      console.error(
+        `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,
+        ctx,
+      );
+      console.error(ctx.result.error);
+    }
+  });
+  query.use(queryCtx);
+  query.use(urlParser);
+  query.use(query.routes());
+  query.use(function* fetchApi(ctx, next) {
+    if (`${ctx.req().url}`.startsWith("/users/")) {
+      ctx.json = { ok: true, data: mockUser2 };
+      yield* next();
+      return;
+    }
+    const data = {
+      users: [mockUser],
+    };
+    ctx.json = { ok: true, data };
+    yield* next();
+  });
+
+  const fetchUsers = query.create(
+    `/users`,
+    { supervisor: takeEvery },
+    // deno-lint-ignore no-unused-vars
+    function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
+      // throw new Error("some error");
+      // deno-lint-ignore no-unreachable
+      yield* next();
+    },
+  );
+
+  const store = await configureStore({
+    initialState: {
+      ...createQueryState(),
+      users: {},
+    },
+  });
+  store.run(query.bootup);
+  store.dispatch(fetchUsers());
+  expect(store.getState()).toEqual({
+    ...createQueryState(),
+    users: {},
+  });
+  expect(a).toEqual(2);
 });
