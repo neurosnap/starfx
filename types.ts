@@ -11,16 +11,16 @@ export type OpFn<T = unknown> =
   | (() => T);
 
 export interface QueryState {
-  "@@starfx/loaders": Record<IdProp, LoadingItemState>;
+  "@@starfx/loaders": Record<string, LoaderItemState>;
   "@@starfx/data": Record<string, unknown>;
 }
 
 export type IdProp = string | number;
 export type LoadingStatus = "loading" | "success" | "error" | "idle";
-export interface LoadingItemState<
-  M extends Record<IdProp, unknown> = Record<IdProp, unknown>,
+export interface LoaderItemState<
+  M extends Record<string, unknown> = Record<IdProp, unknown>,
 > {
-  id: IdProp;
+  id: string;
   status: LoadingStatus;
   message: string;
   lastRun: number;
@@ -28,9 +28,9 @@ export interface LoadingItemState<
   meta: M;
 }
 
-export interface LoadingState<
-  M extends Record<IdProp, unknown> = Record<IdProp, unknown>,
-> extends LoadingItemState<M> {
+export interface LoaderState<
+  M extends AnyState = AnyState,
+> extends LoaderItemState<M> {
   isIdle: boolean;
   isLoading: boolean;
   isError: boolean;
@@ -38,9 +38,9 @@ export interface LoadingState<
   isInitialLoading: boolean;
 }
 
-export type LoadingPayload =
-  & Pick<LoadingItemState, "id">
-  & Partial<Pick<LoadingItemState, "message" | "meta">>;
+export type LoaderPayload<M extends AnyState> =
+  & Pick<LoaderItemState<M>, "id">
+  & Partial<Pick<LoaderItemState<M>, "message" | "meta">>;
 
 // deno-lint-ignore no-explicit-any
 export type AnyState = Record<string, any>;

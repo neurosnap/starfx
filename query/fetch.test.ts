@@ -1,7 +1,11 @@
 import { describe, expect, install, it, mock } from "../test.ts";
-import { configureStore, storeMdw, takeEvery } from "../store/mod.ts";
-import { createQueryState } from "../action.ts";
-import type { QueryState } from "../types.ts";
+import {
+  configureStore,
+  createSchema,
+  slice,
+  storeMdw,
+  takeEvery,
+} from "../store/mod.ts";
 
 import { fetcher, fetchRetry } from "./fetch.ts";
 import { createApi } from "./api.ts";
@@ -17,6 +21,15 @@ const delay = (n = 200) =>
     setTimeout(resolve, n);
   });
 
+const testStore = () => {
+  const schema = createSchema({
+    loaders: slice.loader(),
+    data: slice.table({ empty: {} }),
+  });
+  const store = configureStore(schema);
+  return { schema, store };
+};
+
 const tests = describe("fetcher()");
 
 it(
@@ -27,9 +40,10 @@ it(
       return new Response(JSON.stringify(mockUser));
     });
 
+    const { store, schema } = testStore();
     const api = createApi();
     api.use(requestMonitor());
-    api.use(storeMdw());
+    api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -46,9 +60,6 @@ it(
       },
     );
 
-    const store = configureStore<QueryState>({
-      initialState: createQueryState(),
-    });
     store.run(api.bootup);
 
     const action = fetchUsers();
@@ -57,7 +68,7 @@ it(
     await delay();
 
     const state = store.getState();
-    expect(state["@@starfx/data"][action.payload.key]).toEqual(mockUser);
+    expect(state.data[action.payload.key]).toEqual(mockUser);
 
     expect(actual).toEqual([{
       url: `${baseUrl}/users`,
@@ -77,9 +88,10 @@ it(
       return new Response("this is some text");
     });
 
+    const { store, schema } = testStore();
     const api = createApi();
     api.use(requestMonitor());
-    api.use(storeMdw());
+    api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -95,9 +107,6 @@ it(
       },
     );
 
-    const store = configureStore<QueryState>({
-      initialState: createQueryState(),
-    });
     store.run(api.bootup);
 
     const action = fetchUsers();
@@ -114,9 +123,10 @@ it(tests, "fetch - error handling", async () => {
     return new Response(JSON.stringify(errMsg), { status: 500 });
   });
 
+  const { schema, store } = testStore();
   const api = createApi();
   api.use(requestMonitor());
-  api.use(storeMdw());
+  api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -137,9 +147,6 @@ it(tests, "fetch - error handling", async () => {
     },
   );
 
-  const store = configureStore<QueryState>({
-    initialState: createQueryState(),
-  });
   store.run(api.bootup);
 
   const action = fetchUsers();
@@ -148,7 +155,7 @@ it(tests, "fetch - error handling", async () => {
   await delay();
 
   const state = store.getState();
-  expect(state["@@starfx/data"][action.payload.key]).toEqual(errMsg);
+  expect(state.data[action.payload.key]).toEqual(errMsg);
   expect(actual).toEqual({ ok: false, data: errMsg });
 });
 
@@ -157,9 +164,10 @@ it(tests, "fetch - status 204", async () => {
     return new Response(null, { status: 204 });
   });
 
+  const { schema, store } = testStore();
   const api = createApi();
   api.use(requestMonitor());
-  api.use(storeMdw());
+  api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -179,9 +187,6 @@ it(tests, "fetch - status 204", async () => {
     },
   );
 
-  const store = configureStore<QueryState>({
-    initialState: createQueryState(),
-  });
   store.run(api.bootup);
 
   const action = fetchUsers();
@@ -190,7 +195,7 @@ it(tests, "fetch - status 204", async () => {
   await delay();
 
   const state = store.getState();
-  expect(state["@@starfx/data"][action.payload.key]).toEqual({});
+  expect(state.data[action.payload.key]).toEqual({});
   expect(actual).toEqual({ ok: true, data: {} });
 });
 
@@ -199,9 +204,10 @@ it(tests, "fetch - malformed json", async () => {
     return new Response("not json", { status: 200 });
   });
 
+  const { schema, store } = testStore();
   const api = createApi();
   api.use(requestMonitor());
-  api.use(storeMdw());
+  api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -222,9 +228,6 @@ it(tests, "fetch - malformed json", async () => {
     },
   );
 
-  const store = configureStore<QueryState>({
-    initialState: createQueryState(),
-  });
   store.run(api.bootup);
   const action = fetchUsers();
   store.dispatch(action);
@@ -244,9 +247,10 @@ it(tests, "fetch - POST", async () => {
     return new Response(JSON.stringify(mockUser));
   });
 
+  const { schema, store } = testStore();
   const api = createApi();
   api.use(requestMonitor());
-  api.use(storeMdw());
+  api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(fetcher({ baseUrl }));
 
@@ -271,9 +275,6 @@ it(tests, "fetch - POST", async () => {
     },
   );
 
-  const store = configureStore<QueryState>({
-    initialState: createQueryState(),
-  });
   store.run(api.bootup);
   const action = fetchUsers();
   store.dispatch(action);
@@ -286,9 +287,10 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
     return new Response(JSON.stringify(mockUser));
   });
 
+  const { store, schema } = testStore();
   const api = createApi();
   api.use(requestMonitor());
-  api.use(storeMdw());
+  api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(fetcher({ baseUrl }));
 
@@ -333,9 +335,6 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
     },
   );
 
-  const store = configureStore<QueryState>({
-    initialState: createQueryState(),
-  });
   store.run(api.bootup);
 
   store.dispatch(fetchUsers({ id: "1" }));
@@ -348,9 +347,10 @@ it(
   tests,
   "fetch - slug in url but payload has empty string for slug value",
   async () => {
+    const { store, schema } = testStore();
     const api = createApi();
     api.use(requestMonitor());
-    api.use(storeMdw());
+    api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -371,9 +371,6 @@ it(
       },
     );
 
-    const store = configureStore<QueryState>({
-      initialState: createQueryState(),
-    });
     store.run(api.bootup);
     const action = fetchUsers({ id: "" });
     store.dispatch(action);
@@ -397,9 +394,10 @@ it(
       });
     });
 
+    const { schema, store } = testStore();
     const api = createApi();
     api.use(requestMonitor());
-    api.use(storeMdw());
+    api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -418,9 +416,6 @@ it(
       fetchRetry((n) => (n > 4 ? -1 : 10)),
     ]);
 
-    const store = configureStore<QueryState>({
-      initialState: createQueryState(),
-    });
     store.run(api.bootup);
 
     const action = fetchUsers();
@@ -429,7 +424,7 @@ it(
     await delay();
 
     const state = store.getState();
-    expect(state["@@starfx/data"][action.payload.key]).toEqual(mockUser);
+    expect(state.data[action.payload.key]).toEqual(mockUser);
     expect(actual).toEqual({ ok: true, data: mockUser });
   },
 );
@@ -444,10 +439,11 @@ it(
       });
     });
 
+    const { schema, store } = testStore();
     let actual = null;
     const api = createApi();
     api.use(requestMonitor());
-    api.use(storeMdw());
+    api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -460,9 +456,6 @@ it(
       fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);
 
-    const store = configureStore<QueryState>({
-      initialState: createQueryState(),
-    });
     store.run(api.bootup);
     const action = fetchUsers();
     store.dispatch(action);

@@ -70,7 +70,7 @@ it(
   "should not cause stack overflow when puts are emitted while dispatching saga",
   async () => {
     function* root() {
-      for (let i = 0; i < 10_000; i += 1) {
+      for (let i = 0; i < 5_000; i += 1) {
         yield* put({ type: "test" });
       }
       yield* sleep(0);

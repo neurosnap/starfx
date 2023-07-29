@@ -138,6 +138,9 @@ export function createStore<S extends AnyState>({
     });
   }
 
+  function getInitialState() {
+    return initialState;
+  }
   return {
     getScope,
     getState,
@@ -154,6 +157,7 @@ export function createStore<S extends AnyState>({
     ): void {
       throw new Error(stubMsg);
     },
+    getInitialState,
     [Symbol.observable]: observable,
   };
 }
