@@ -557,26 +557,24 @@ it(tests, "createApi with custom key but no payload", async () => {
   );
 });
 
-it(tests, "check error", async () => {
+it(tests, "errorHandler", async () => {
   let a = 0;
   const query = createApi<ApiCtx>();
   query.use(function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
     ctx: Ctx,
     next: Next,
   ) {
-    try {
-      a = 1;
-      yield* next();
-    } catch (err) {
-      a = 2;
+    a = 1;
+    yield* next();
+    a = 2;
+    if (!ctx.result.ok) {
       console.error(
-        `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
+        `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,
         ctx,
       );
-      throw err;
+      console.error(ctx.result.error);
     }
   });
-
   query.use(queryCtx);
   query.use(urlParser);
   query.use(query.routes());
@@ -596,8 +594,10 @@ it(tests, "check error", async () => {
   const fetchUsers = query.create(
     `/users`,
     { supervisor: takeEvery },
+    // deno-lint-ignore no-unused-vars
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       throw new Error("some error");
+      // deno-lint-ignore no-unreachable
       yield* next();
     },
   );
@@ -609,12 +609,10 @@ it(tests, "check error", async () => {
     },
   });
   store.run(query.bootup);
-
   store.dispatch(fetchUsers());
   expect(store.getState()).toEqual({
     ...createQueryState(),
     users: {},
   });
-
-  expect(2).toEqual(2); // << actually expect the error to be thrown
+  expect(a).toEqual(2);
 });
