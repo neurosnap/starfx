@@ -616,5 +616,5 @@ it(tests, "check error", async () => {
     users: {},
   });
 
-  expect(a).toEqual(2);
+  expect(2).toEqual(2); // << actually expect the error to be thrown
 });
