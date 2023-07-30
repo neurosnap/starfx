@@ -265,6 +265,8 @@
     "https://esm.sh/v128/@types/prop-types@15.7.5/index.d.ts": "6a386ff939f180ae8ef064699d8b7b6e62bc2731a62d7fbf5e02589383838dea",
     "https://esm.sh/v128/@types/react@18.2.14/global.d.ts": "549df62b64a71004aee17685b445a8289013daf96246ce4d9b087d13d7a27a61",
     "https://esm.sh/v128/@types/react@18.2.14/index.d.ts": "9aac3002309f46089b251d57e7b16c20bb0e8be711867bd308009fb33562b46c",
+    "https://esm.sh/v128/@types/react@18.2.15/global.d.ts": "549df62b64a71004aee17685b445a8289013daf96246ce4d9b087d13d7a27a61",
+    "https://esm.sh/v128/@types/react@18.2.15/index.d.ts": "f55ede57bc191e4c9c326fc86393abaa7b20ea3b34199e4c0b118a703a4481b6",
     "https://esm.sh/v128/@types/scheduler@0.16.3/tracing.d.ts": "f5a8b384f182b3851cec3596ccc96cb7464f8d3469f48c74bf2befb782a19de5",
     "https://esm.sh/v128/csstype@3.1.2/index.d.ts": "4c68749a564a6facdf675416d75789ee5a557afda8960e0803cf6711fa569288"
   },

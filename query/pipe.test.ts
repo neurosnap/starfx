@@ -188,13 +188,13 @@ it(
 );
 
 it(tests, "error handling", async () => {
+  let called = false;
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
-  api.use(function* upstream(_, next) {
-    try {
-      yield* next();
-    } catch (_) {
-      asserts.assert(true);
+  api.use(function* upstream(ctx, next) {
+    yield* next();
+    if (!ctx.result.ok) {
+      called = true;
     }
   });
   api.use(function* fail() {
@@ -206,9 +206,11 @@ it(tests, "error handling", async () => {
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
+  asserts.assertStrictEquals(called, true);
 });
 
 it(tests, "error handling inside create", async () => {
+  let called = false;
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   api.use(function* fail() {
@@ -218,31 +220,48 @@ it(tests, "error handling inside create", async () => {
   const action = api.create(
     `/error`,
     { supervisor: takeEvery },
-    function* (_, next) {
-      try {
-        yield* next();
-      } catch (_) {
-        asserts.assert(true);
+    function* (ctx, next) {
+      yield* next();
+      if (!ctx.result.ok) {
+        called = true;
       }
     },
   );
   const store = await configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
+  asserts.assertStrictEquals(called, true);
 });
 
-it(tests, "error handling - error handler", async () => {
-  const api = createPipe<RoboCtx>();
-  api.use(api.routes());
-  api.use(function* upstream() {
-    throw new Error("failure");
+it(tests, "error inside endpoint mdw", async () => {
+  let called = false;
+  const query = createPipe();
+  query.use(function* (ctx, next) {
+    yield* next();
+    if (!ctx.result.ok) {
+      called = true;
+    }
   });
 
-  const action = api.create(`/error`, { supervisor: takeEvery });
-  const store = await configureStore({ initialState: {} });
-  store.run(api.bootup);
+  query.use(query.routes());
 
-  store.dispatch(action());
+  const fetchUsers = query.create(
+    `/users`,
+    { supervisor: takeEvery },
+    function* processUsers() {
+      throw new Error("some error");
+    },
+  );
+
+  const store = await configureStore({
+    initialState: {
+      ...createQueryState(),
+      users: {},
+    },
+  });
+  store.run(query.bootup);
+  store.dispatch(fetchUsers());
+  asserts.assertEquals(called, true);
 });
 
 it(tests, "create fn is an array", async () => {

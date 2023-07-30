@@ -1,4 +1,3 @@
-import { call } from "../fx/mod.ts";
 import { compose } from "../compose.ts";
 import type { OpFn, Payload } from "../types.ts";
 import { parallel } from "../mod.ts";
@@ -20,6 +19,7 @@ import type {
   Supervisor,
 } from "./types.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
+import { Ok } from "../deps.ts";
 
 export interface SagaApi<Ctx extends PipeCtx> {
   use: (fn: Middleware<Ctx>) => void;
@@ -149,9 +149,10 @@ export function createPipe<Ctx extends PipeCtx = PipeCtx<any>>(
       key,
       payload: options,
       actionFn,
+      result: Ok(undefined),
     } as unknown as Ctx;
     const fn = compose(middleware);
-    yield* call(() => fn(ctx));
+    yield* fn(ctx);
     return ctx;
   }
 
@@ -226,7 +227,8 @@ export function createPipe<Ctx extends PipeCtx = PipeCtx<any>>(
         return;
       }
 
-      yield* call(() => match(ctx, next));
+      const result = yield* match(ctx, next);
+      return result;
     }
 
     return router;
