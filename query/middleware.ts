@@ -20,14 +20,14 @@ export function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
   ctx: Ctx,
   next: Next,
 ) {
-  try {
-    yield* next();
-  } catch (err) {
+  yield* next();
+
+  if (!ctx.result.ok) {
     console.error(
-      `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
+      `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,
       ctx,
     );
-    throw err;
+    console.error(ctx.result.error);
   }
 }
 
