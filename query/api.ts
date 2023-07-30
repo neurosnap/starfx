@@ -70,13 +70,13 @@ export function createApi<Ctx extends ApiCtx = ApiCtx>(
     cache: () => {
       return function* onCache(ctx: Ctx, next: Next) {
         ctx.cache = true;
-        yield next();
+        yield* next();
       };
     },
     request: (req: ApiRequest) => {
       return function* onRequest(ctx: Ctx, next: Next) {
         ctx.request = ctx.req(req);
-        yield next();
+        yield* next();
       };
     },
     uri,

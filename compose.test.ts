@@ -6,7 +6,7 @@ import { compose } from "./compose.ts";
 const tests = describe("compose()");
 
 it(tests, "should compose middleware", async () => {
-  const mdw = compose<{ one: string; three: string; result: Result<any[]> }>([
+  const mdw = compose<{ one: string; three: string; result: Result<void> }>([
     function* (ctx, next) {
       ctx.one = "two";
       yield* next();
@@ -17,7 +17,7 @@ it(tests, "should compose middleware", async () => {
     },
   ]);
   const actual = await run(function* () {
-    const ctx = { one: "", three: "", result: Ok([]) };
+    const ctx = { one: "", three: "", result: Ok(void 0) };
     yield* mdw(ctx);
     return ctx;
   });
@@ -26,13 +26,13 @@ it(tests, "should compose middleware", async () => {
     // we should see the mutation
     one: "two",
     three: "four",
-    result: Ok([undefined, undefined]),
+    result: Ok(void 0),
   };
   expect(actual).toEqual(expected);
 });
 
 it(tests, "order of execution", async () => {
-  const mdw = compose<{ actual: string; result: Result<any[]> }>([
+  const mdw = compose<{ actual: string; result: Result<void> }>([
     function* (ctx, next) {
       ctx.actual += "a";
       yield* next();
@@ -55,55 +55,31 @@ it(tests, "order of execution", async () => {
   ]);
 
   const actual = await run(function* () {
-    const ctx = { actual: "", result: Ok([]) };
+    const ctx = { actual: "", result: Ok(void 0) };
     yield* mdw(ctx);
     return ctx;
   });
   const expected = {
     actual: "abcdefg",
-    result: Ok([undefined, undefined, undefined]),
+    result: Ok(void 0),
   };
-  expect(actual).toEqual(expected);
-});
-
-it(tests, "result of each mdw is aggregated to `ctx.result`", async () => {
-  const mdw = compose<{ result: Result<any[]> }>([
-    function* (_, next) {
-      yield* next();
-      return "two";
-    },
-    function* (_, next) {
-      yield* next();
-      return "one";
-    },
-  ]);
-  const actual = await run(function* () {
-    const ctx = { result: Ok([]) };
-    yield* mdw(ctx);
-    return ctx;
-  });
-
-  const expected = {
-    result: Ok(["one", "two"]),
-  };
-
   expect(actual).toEqual(expected);
 });
 
 it(tests, "when error is discovered return in `ctx.result`", async () => {
   const err = new Error("boom");
-  const mdw = compose<{ result: Result<any[]> }>([
-    function* (_, next) {
-      yield* next();
-      throw err;
-    },
+  const mdw = compose<{ result: Result<void> }>([
     function* (_, next) {
       yield* next();
       asserts.fail();
     },
+    function* (_, next) {
+      yield* next();
+      throw err;
+    },
   ]);
   const actual = await run(function* () {
-    const ctx = { result: Ok([]) };
+    const ctx = { result: Ok(undefined) };
     yield* mdw(ctx);
     return ctx;
   });

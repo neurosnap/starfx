@@ -1,13 +1,11 @@
 import { call } from "./fx/mod.ts";
 import type { Next } from "./query/mod.ts";
-import { Err, Instruction, Operation, Result } from "./deps.ts";
-import { resultAll } from "./result.ts";
+import { Instruction, Operation, Result } from "./deps.ts";
 
-// deno-lint-ignore no-explicit-any
-export interface BaseCtx<T extends any[] = any[]> {
+export interface BaseCtx {
   // deno-lint-ignore no-explicit-any
   [key: string]: any;
-  result: Result<T>;
+  result: Result<void>;
 }
 
 export type BaseMiddleware<Ctx extends BaseCtx = BaseCtx, T = unknown> = (
@@ -29,15 +27,12 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
   }
 
   return function* composeFn(context: Ctx, mdw?: BaseMiddleware<Ctx, T>) {
-    // deno-lint-ignore no-explicit-any
-    const results: Result<any>[] = [];
     // last called middleware #
     let index = -1;
 
     function* dispatch(i: number): Generator<Instruction, void, void> {
       if (i <= index) {
-        results.push(Err(new Error("next() called multiple times")));
-        return;
+        throw new Error("next() called multiple times");
       }
       index = i;
       let fn: BaseMiddleware<Ctx, T> | undefined = middleware[i];
@@ -48,22 +43,18 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
         return;
       }
       const nxt = dispatch.bind(null, i + 1);
-      // wrap mdw in a safe call
-      const result = yield* call(() =>
-        (fn as BaseMiddleware<Ctx, T>)(context, nxt)
-      );
-
-      // exit early if an error is discovered
-      if (!result.ok) {
+      const result = yield* call(function* () {
+        if (!fn) return;
+        return yield* fn(context, nxt);
+      });
+      if (!result.ok && context.result.ok) {
         context.result = result;
-        return;
       }
-
-      results.push(result);
-      // aggregate results on each pass of the mdw
-      context.result = resultAll(results);
     }
 
-    yield* dispatch(0);
+    const result = yield* call(() => dispatch(0));
+    if (context.result.ok) {
+      context.result = result;
+    }
   };
 }

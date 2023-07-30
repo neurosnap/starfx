@@ -114,7 +114,7 @@ export function createStore<S extends AnyState>({
     const ctx = {
       updater,
       patches: [],
-      result: Ok([]),
+      result: Ok(undefined),
     };
     yield* mdw(ctx);
     // TODO: dev mode only?

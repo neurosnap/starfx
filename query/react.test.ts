@@ -38,12 +38,12 @@ const setupTest = async () => {
     yield* delay(10);
     ctx.json = { ok: true, data: mockUser };
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
-    yield next();
+    yield* next();
   });
 
   const fetchUser = api.get<{ id: string }>("/user/:id", function* (ctx, next) {
     ctx.cache = true;
-    yield next();
+    yield* next();
     if (!ctx.json.ok) return;
     yield* updateStore<{ user: User }>((state) => {
       state.user = ctx.json.data;

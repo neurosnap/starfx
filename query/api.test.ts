@@ -430,3 +430,33 @@ it(
     expect(acc).toEqual(["wow"]);
   },
 );
+
+it(tests, "should bubble up error", async () => {
+  let error: any = null;
+  const api = createApi();
+  api.use(function* (ctx, next) {
+    yield* next();
+    if (!ctx.result.ok) {
+      error = ctx.result.error;
+    }
+  });
+  api.use(queryCtx);
+  api.use(storeMdw());
+  api.use(api.routes());
+
+  const fetchUser = api.get(
+    "/users/8",
+    { supervisor: takeEvery },
+    function* (ctx, _) {
+      (ctx.loader as any).meta = { key: ctx.payload.thisKeyDoesNotExist };
+      throw new Error("GENERATING AN ERROR");
+    },
+  );
+
+  const store = await configureStore({ initialState: { users: {} } });
+  store.run(api.bootup);
+  store.dispatch(fetchUser());
+  expect(error.message).toBe(
+    "Cannot read properties of undefined (reading 'thisKeyDoesNotExist')",
+  );
+});
