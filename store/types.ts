@@ -35,7 +35,7 @@ export interface FxStore<S extends AnyState> {
   getScope: () => Scope;
   getState: () => S;
   subscribe: (fn: Listener) => () => void;
-  update: (u: StoreUpdater<S>) => Operation<UpdaterCtx<S>>;
+  update: (u: StoreUpdater<S> | StoreUpdater<S>[]) => Operation<UpdaterCtx<S>>;
   run: <T>(op: OpFn<T>) => Task<Result<T>>;
   // deno-lint-ignore no-explicit-any
   dispatch: (a: AnyAction) => any;

@@ -372,7 +372,7 @@ it(tests, "middleware order of execution", async () => {
   asserts.assert(acc === "abcdefg");
 });
 
-it.ignore(tests, "retry with actionFn", async () => {
+it(tests, "retry with actionFn", async () => {
   let acc = "";
   let called = false;
 
@@ -402,7 +402,7 @@ it.ignore(tests, "retry with actionFn", async () => {
   asserts.assertEquals(acc, "agag");
 });
 
-it.ignore(tests, "retry with actionFn with payload", async () => {
+it(tests, "retry with actionFn with payload", async () => {
   let acc = "";
   const api = createPipe();
   api.use(api.routes());
@@ -425,12 +425,11 @@ it.ignore(tests, "retry with actionFn with payload", async () => {
   );
 
   const store = await configureStore({ initialState: {} });
-  const task = store.run(api.bootup);
+  store.run(api.bootup);
   store.dispatch(action({ page: 1 }));
 
   await sleep(150);
-  asserts.assertEquals(acc, "aagg");
-  await task;
+  asserts.assertEquals(acc, "agag");
 });
 
 it(tests, "should only call thunk once", async () => {
