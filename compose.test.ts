@@ -1,6 +1,6 @@
-import { describe, expect, it } from "./test.ts";
+import { asserts, describe, expect, it } from "./test.ts";
 
-import { Ok, Result, run, sleep } from "./deps.ts";
+import { Err, Ok, Result, run, sleep } from "./deps.ts";
 import { compose } from "./compose.ts";
 
 const tests = describe("compose()");
@@ -63,5 +63,54 @@ it(tests, "order of execution", async () => {
     actual: "abcdefg",
     result: Ok([undefined, undefined, undefined]),
   };
+  expect(actual).toEqual(expected);
+});
+
+it(tests, "result of each mdw is aggregated to `ctx.result`", async () => {
+  const mdw = compose<{ result: Result<any[]> }>([
+    function* (_, next) {
+      yield* next();
+      return "two";
+    },
+    function* (_, next) {
+      yield* next();
+      return "one";
+    },
+  ]);
+  const actual = await run(function* () {
+    const ctx = { result: Ok([]) };
+    yield* mdw(ctx);
+    return ctx;
+  });
+
+  const expected = {
+    result: Ok(["one", "two"]),
+  };
+
+  expect(actual).toEqual(expected);
+});
+
+it(tests, "when error is discovered return in `ctx.result`", async () => {
+  const err = new Error("boom");
+  const mdw = compose<{ result: Result<any[]> }>([
+    function* (_, next) {
+      yield* next();
+      throw err;
+    },
+    function* (_, next) {
+      yield* next();
+      asserts.fail();
+    },
+  ]);
+  const actual = await run(function* () {
+    const ctx = { result: Ok([]) };
+    yield* mdw(ctx);
+    return ctx;
+  });
+
+  const expected = {
+    result: Err(err),
+  };
+
   expect(actual).toEqual(expected);
 });

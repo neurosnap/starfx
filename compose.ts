@@ -13,7 +13,7 @@ export interface BaseCtx<T extends any[] = any[]> {
 export type BaseMiddleware<Ctx extends BaseCtx = BaseCtx, T = unknown> = (
   ctx: Ctx,
   next: Next,
-) => Operation<T>;
+) => Operation<T | undefined>;
 
 export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
   middleware: BaseMiddleware<Ctx, T>[],
@@ -48,12 +48,19 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
         return;
       }
       const nxt = dispatch.bind(null, i + 1);
-      const result = yield* call(() => {
-        if (!fn) return;
-        // deno-lint-ignore no-explicit-any
-        return fn(context, nxt) as any;
-      });
+      // wrap mdw in a safe call
+      const result = yield* call(() =>
+        (fn as BaseMiddleware<Ctx, T>)(context, nxt)
+      );
+
+      // exit early if an error is discovered
+      if (!result.ok) {
+        context.result = result;
+        return;
+      }
+
       results.push(result);
+      // aggregate results on each pass of the mdw
       context.result = resultAll(results);
     }
 
