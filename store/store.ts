@@ -1,6 +1,7 @@
 import {
   createScope,
   enablePatches,
+  Ok,
   produceWithPatches,
   Result,
   Scope,
@@ -75,6 +76,7 @@ export function createStore<S extends AnyState>({
 
     const [nextState, patches, _] = produceWithPatches(getState(), (draft) => {
       // TODO: check for return value inside updater
+      // deno-lint-ignore no-explicit-any
       upds.forEach((updater) => updater(draft as any));
     });
     ctx.patches = patches;
@@ -112,15 +114,17 @@ export function createStore<S extends AnyState>({
     const ctx = {
       updater,
       patches: [],
+      result: Ok([]),
     };
-    const result = yield* mdw(ctx);
+    yield* mdw(ctx);
     // TODO: dev mode only?
-    if (!result.ok) {
-      console.error(result);
+    if (!ctx.result.ok) {
+      console.error(ctx.result);
     }
-    return result;
+    return ctx;
   }
 
+  // deno-lint-ignore no-explicit-any
   function dispatch(action: AnyAction | AnyAction[]): Task<any> {
     return scope.run(function* () {
       yield* put(action);
@@ -143,6 +147,7 @@ export function createStore<S extends AnyState>({
     // refer to pieces of business logic -- that can also mutate state
     dispatch,
     // stubs so `react-redux` is happy
+    // deno-lint-ignore no-explicit-any
     replaceReducer<S = any>(
       _nextReducer: (_s: S, _a: AnyAction) => void,
     ): void {
@@ -156,6 +161,7 @@ export function register<S extends AnyState>(store: FxStore<S>) {
   const scope = store.getScope();
   return scope.run(function* () {
     // TODO: fix type
+    // deno-lint-ignore no-explicit-any
     yield* StoreContext.set(store as any);
   });
 }

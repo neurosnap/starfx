@@ -1,14 +1,19 @@
 import { call } from "./fx/mod.ts";
 import type { Next } from "./query/mod.ts";
-import type { Instruction, Operation } from "./deps.ts";
-import { Ok } from "./deps.ts";
+import { Err, Instruction, Operation, Result } from "./deps.ts";
+import { resultAll } from "./result.ts";
 
 // deno-lint-ignore no-explicit-any
-export type BaseCtx = Record<string, any>;
+export interface BaseCtx<T extends any[] = any[]> {
+  // deno-lint-ignore no-explicit-any
+  [key: string]: any;
+  result: Result<T>;
+}
+
 export type BaseMiddleware<Ctx extends BaseCtx = BaseCtx, T = unknown> = (
   ctx: Ctx,
   next: Next,
-) => Operation<T>;
+) => Operation<T | undefined>;
 
 export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
   middleware: BaseMiddleware<Ctx, T>[],
@@ -24,12 +29,15 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
   }
 
   return function* composeFn(context: Ctx, mdw?: BaseMiddleware<Ctx, T>) {
+    // deno-lint-ignore no-explicit-any
+    const results: Result<any>[] = [];
     // last called middleware #
     let index = -1;
 
-    function* dispatch(i: number): Generator<Instruction, T | undefined, void> {
+    function* dispatch(i: number): Generator<Instruction, void, void> {
       if (i <= index) {
-        throw new Error("next() called multiple times");
+        results.push(Err(new Error("next() called multiple times")));
+        return;
       }
       index = i;
       let fn: BaseMiddleware<Ctx, T> | undefined = middleware[i];
@@ -40,15 +48,22 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
         return;
       }
       const nxt = dispatch.bind(null, i + 1);
-      const result = yield* fn(context, nxt);
-      return result;
+      // wrap mdw in a safe call
+      const result = yield* call(() =>
+        (fn as BaseMiddleware<Ctx, T>)(context, nxt)
+      );
+
+      // exit early if an error is discovered
+      if (!result.ok) {
+        context.result = result;
+        return;
+      }
+
+      results.push(result);
+      // aggregate results on each pass of the mdw
+      context.result = resultAll(results);
     }
 
-    const result = yield* call(() => dispatch(0));
-    if (result.ok) {
-      return Ok(context);
-    } else {
-      return result;
-    }
+    yield* dispatch(0);
   };
 }
