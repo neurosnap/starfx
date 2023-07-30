@@ -12,8 +12,11 @@ export {
   createChannel,
   createContext,
   createScope,
+  Err,
   expect,
+  filter,
   getframe,
+  Ok,
   resource,
   run,
   sleep,
@@ -22,12 +25,6 @@ export {
 } from "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts";
 
 export type { Result };
-export function Ok<T>(value: T): Result<T> {
-  return { ok: true, value };
-}
-export function Err<T>(error: Error): Result<T> {
-  return { ok: false, error };
-}
 
 import React from "https://esm.sh/react@18.2.0?pin=v122";
 export { React };

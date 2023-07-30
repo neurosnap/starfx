@@ -1,4 +1,4 @@
-import { Channel, Operation, spawn, Task } from "../deps.ts";
+import { Channel, filter, Operation, spawn, Stream, Task } from "../deps.ts";
 import { call, parallel } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 
@@ -6,6 +6,7 @@ import type {
   ActionWPayload,
   AnyAction,
   AnyState,
+  FxStore,
   StoreUpdater,
   UpdaterCtx,
 } from "./types.ts";
@@ -15,9 +16,10 @@ export function* updateStore<S extends AnyState>(
   updater: StoreUpdater<S> | StoreUpdater<S>[],
 ): Operation<UpdaterCtx<S>> {
   const store = yield* StoreContext;
-  const ctx = yield* store.update(updater as any);
-  // TODO: fix type
-  return ctx as any;
+  // had to cast the store since StoreContext has a generic store type
+  const st = store as FxStore<S>;
+  const ctx = yield* st.update(updater);
+  return ctx;
 }
 
 export function* emit({
@@ -32,28 +34,12 @@ export function* emit({
     if (action.length === 0) {
       return;
     }
-    yield* parallel(action.map((a) => () => input.send(a)));
+    const group = yield* parallel(
+      action.map((a) => () => input.send(a)),
+    );
+    yield* group;
   } else {
     yield* input.send(action);
-  }
-}
-
-export function* once({
-  channel,
-  pattern,
-}: {
-  channel: Operation<Channel<AnyAction, void>>;
-  pattern: ActionPattern;
-}) {
-  const { output } = yield* channel;
-  const msgList = yield* output;
-  let next = yield* msgList.next();
-  while (!next.done) {
-    const match = matcher(pattern);
-    if (match(next.value)) {
-      return next.value;
-    }
-    next = yield* msgList.next();
   }
 }
 
@@ -69,24 +55,35 @@ export function* put(action: AnyAction | AnyAction[]) {
   });
 }
 
-export function take<P>(pattern: ActionPattern): Operation<ActionWPayload<P>>;
-export function* take(pattern: ActionPattern): Operation<AnyAction> {
-  const action = yield* once({
-    channel: ActionContext,
-    pattern,
-  });
-  return action as AnyAction;
+export function* useActions(pattern: ActionPattern): Stream<AnyAction, void> {
+  const match = matcher(pattern);
+  const { output } = yield* ActionContext;
+  // deno-lint-ignore require-yield
+  function* fn(a: AnyAction) {
+    return match(a);
+  }
+  // return a subscription to the filtered actions.
+  const result = yield* filter(fn)(output);
+  return result;
 }
 
-export function* takeEvery<T>(
+export function take<P>(pattern: ActionPattern): Operation<ActionWPayload<P>>;
+export function* take(pattern: ActionPattern): Operation<AnyAction> {
+  const actions = yield* useActions(pattern);
+  const first = yield* actions.next();
+  return first.value as AnyAction;
+}
+
+export function takeEvery<T>(
   pattern: ActionPattern,
   op: (action: AnyAction) => Operation<T>,
 ): Operation<Task<void>> {
-  return yield* spawn(function* () {
-    while (true) {
-      const action = yield* take(pattern);
-      if (!action) continue;
-      yield* spawn(() => op(action));
+  return spawn(function* () {
+    const actions = yield* useActions(pattern);
+    let next = yield* actions.next();
+    while (!next.done) {
+      yield* spawn(() => op(next.value as AnyAction));
+      next = yield* actions.next();
     }
   });
 }
@@ -96,14 +93,18 @@ export function* takeLatest<T>(
   op: (action: AnyAction) => Operation<T>,
 ): Operation<Task<void>> {
   return yield* spawn(function* () {
-    let lastTask;
+    const actions = yield* useActions(pattern);
+
+    let lastTask: Task<T> | undefined;
     while (true) {
-      const action = yield* take(pattern);
+      const action = yield* actions.next();
+      if (action.done) {
+        return;
+      }
       if (lastTask) {
         yield* lastTask.halt();
       }
-      if (!action) continue;
-      lastTask = yield* spawn(() => op(action));
+      lastTask = yield* spawn(() => op(action.value));
     }
   });
 }
@@ -112,7 +113,7 @@ export function* takeLeading<T>(
   pattern: ActionPattern,
   op: (action: AnyAction) => Operation<T>,
 ): Operation<Task<void>> {
-  return yield* spawn(function* () {
+  return yield* spawn(function* (): Operation<void> {
     while (true) {
       const action = yield* take(pattern);
       if (!action) continue;

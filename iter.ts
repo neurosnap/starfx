@@ -14,14 +14,3 @@ export function* forEach<T>(
     }
   }
 }
-
-export function* map<T, R>(
-  values: T[],
-  each: (value: T) => Operation<R>,
-): Operation<R[]> {
-  const results: R[] = [];
-  for (const value of values) {
-    results.push(yield* each(value));
-  }
-  return results;
-}
