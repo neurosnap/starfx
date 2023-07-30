@@ -1,4 +1,4 @@
-import type { Operation } from "../deps.ts";
+import type { Operation, Result } from "../deps.ts";
 import type { LoadingItemState, LoadingPayload, Payload } from "../types.ts";
 
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
@@ -12,6 +12,7 @@ export interface PipeCtx<P = any> extends Payload<P> {
     CreateAction<PipeCtx>,
     CreateActionWithPayload<PipeCtx<P>, P>
   >;
+  result: Result<unknown[]>;
 }
 
 export interface LoaderCtx<P = unknown> extends PipeCtx<P> {

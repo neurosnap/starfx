@@ -1,17 +1,19 @@
 import type { Operation, Patch, Result, Scope, Task } from "../deps.ts";
+import { BaseCtx } from "../mod.ts";
 import type { OpFn } from "../types.ts";
 
 export type StoreUpdater<S extends AnyState> = (s: S) => S | void;
 
 export type Listener = () => void;
 
-export interface UpdaterCtx<S extends AnyState> {
+export interface UpdaterCtx<S extends AnyState> extends BaseCtx {
   updater: StoreUpdater<S> | StoreUpdater<S>[];
   patches: Patch[];
 }
 
 export interface AnyAction {
   type: string;
+  // deno-lint-ignore no-explicit-any
   [key: string]: any;
 }
 
@@ -20,6 +22,7 @@ export interface ActionWPayload<P> {
   payload: P;
 }
 
+// deno-lint-ignore no-explicit-any
 export type AnyState = Record<string, any>;
 
 declare global {
@@ -32,9 +35,11 @@ export interface FxStore<S extends AnyState> {
   getScope: () => Scope;
   getState: () => S;
   subscribe: (fn: Listener) => () => void;
-  update: (u: StoreUpdater<S>) => Operation<Result<UpdaterCtx<S>>>;
+  update: (u: StoreUpdater<S>) => Operation<UpdaterCtx<S>>;
   run: <T>(op: OpFn<T>) => Task<Result<T>>;
+  // deno-lint-ignore no-explicit-any
   dispatch: (a: AnyAction) => any;
   replaceReducer: (r: (s: S, a: AnyAction) => S) => void;
+  // deno-lint-ignore no-explicit-any
   [Symbol.observable]: () => any;
 }
