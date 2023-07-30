@@ -72,7 +72,8 @@ export function* simpleCache<Ctx extends ApiCtx = ApiCtx>(
   );
   yield* next();
   if (!ctx.cache) return;
-  const { data } = ctx.json;
+  if (!ctx.json.ok) return;
+  const data = ctx.json.value;
   yield* put(addData({ [ctx.key]: data }));
   ctx.cacheData = data;
 }
@@ -81,7 +82,10 @@ export function* simpleCache<Ctx extends ApiCtx = ApiCtx>(
  * This middleware will track the status of a fetch request.
  */
 export function loadingMonitor<Ctx extends ApiCtx = ApiCtx>(
-  errorFn: (ctx: Ctx) => string = (ctx) => ctx.json?.data?.message || "",
+  errorFn: (ctx: Ctx) => string = (ctx) => {
+    if (ctx.json.ok) return "";
+    return ctx.json.error.message;
+  }
 ) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     yield* put([

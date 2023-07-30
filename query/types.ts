@@ -19,20 +19,6 @@ export interface LoaderCtx<P = unknown> extends PipeCtx<P> {
   loader: Partial<LoadingItemState> | null;
 }
 
-export interface ApiFetchSuccess<ApiSuccess = any> {
-  ok: true;
-  data: ApiSuccess;
-}
-
-export interface ApiFetchError<ApiError = any> {
-  ok: false;
-  data: ApiError;
-}
-
-export type ApiFetchResponse<ApiSuccess = any, ApiError = any> =
-  | ApiFetchSuccess<ApiSuccess>
-  | ApiFetchError<ApiError>;
-
 export type ApiRequest = Partial<{ url: string } & RequestInit>;
 export type RequiredApiRequest = {
   url: string;
@@ -46,15 +32,15 @@ export interface FetchCtx<P = any> extends PipeCtx<P> {
   bodyType: "arrayBuffer" | "blob" | "formData" | "json" | "text";
 }
 
-export interface FetchJson<ApiSuccess = any, ApiError = any> {
-  json: ApiFetchResponse<ApiSuccess, ApiError>;
+export interface FetchJson<ApiSuccess = any> {
+  json: Result<ApiSuccess>;
 }
 
-export interface FetchJsonCtx<P = any, ApiSuccess = any, ApiError = any>
-  extends FetchCtx<P>, FetchJson<ApiSuccess, ApiError> {}
+export interface FetchJsonCtx<P = any, ApiSuccess = any>
+  extends FetchCtx<P>, FetchJson<ApiSuccess> {}
 
-export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
-  extends FetchJsonCtx<Payload, ApiSuccess, ApiError> {
+export interface ApiCtx<Payload = any, ApiSuccess = any>
+  extends FetchJsonCtx<Payload, ApiSuccess> {
   actions: Action[];
   loader: LoadingPayload | null;
   cache: boolean;

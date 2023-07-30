@@ -35,7 +35,8 @@ export function* simpleCache<Ctx extends ApiCtx = ApiCtx>(
   );
   yield* next();
   if (!ctx.cache) return;
-  const { data } = ctx.json;
+  if (!ctx.json.ok) return;
+  const data = ctx.json.value;
   yield* updateStore(addData({ [ctx.key]: data }));
   ctx.cacheData = data;
 }
@@ -92,7 +93,7 @@ export function* optimistic<Ctx extends OptimisticCtx = OptimisticCtx>(
   }
 }
 
-export interface UndoCtx<P = any, S = any, E = any> extends ApiCtx<P, S, E> {
+export interface UndoCtx<P = any, S = any> extends ApiCtx<P, S> {
   undoable: boolean;
 }
 
@@ -156,7 +157,10 @@ export function* loadingMonitorSimple<Ctx extends LoaderCtx = LoaderCtx>(
  * This middleware will track the status of a fetch request.
  */
 export function loadingMonitor<Ctx extends ApiCtx = ApiCtx>(
-  errorFn: (ctx: Ctx) => string = (ctx) => ctx.json?.data?.message || "",
+  errorFn: (ctx: Ctx) => string = (ctx) => {
+    if (ctx.json.ok) return "";
+    return ctx.json.error.message;
+  },
 ) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     yield* updateStore([

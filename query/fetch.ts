@@ -1,5 +1,5 @@
 import { call } from "../fx/mod.ts";
-import { sleep } from "../deps.ts";
+import { Err, Ok, sleep } from "../deps.ts";
 import { compose } from "../compose.ts";
 
 import { noop } from "./util.ts";
@@ -51,10 +51,7 @@ export function* jsonMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   }
 
   if (ctx.response.status === 204) {
-    ctx.json = {
-      ok: ctx.response.ok,
-      data: {},
-    };
+    ctx.json = Ok({});
     yield* next();
     return;
   }
@@ -66,15 +63,9 @@ export function* jsonMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   });
 
   if (data.ok) {
-    ctx.json = {
-      ok: ctx.response.ok,
-      data: data.value,
-    };
+    ctx.json = Ok(data.value);
   } else {
-    ctx.json = {
-      ok: false,
-      data: { message: data.error.message },
-    };
+    ctx.json = Err(data.error);
   }
 
   yield* next();
@@ -124,11 +115,9 @@ export function* payloadMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 
     const val = payload[key];
     if (!val) {
-      ctx.json = {
-        ok: false,
-        data:
-          `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`,
-      };
+      const msg =
+        `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`;
+      ctx.json = Err(new Error(msg));
       return;
     }
   }
@@ -212,7 +201,7 @@ export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     let waitFor = backoff(attempt);
     while (waitFor >= 1) {
       yield* sleep(waitFor);
-      yield* call(() => fetchMdw(ctx, noop));
+      yield* fetchMdw(ctx, noop);
       yield* call(() => jsonMdw(ctx, noop));
 
       if (ctx.response.ok) {

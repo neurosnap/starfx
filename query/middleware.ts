@@ -11,6 +11,7 @@ import type {
   RequiredApiRequest,
 } from "./types.ts";
 import { isObject, mergeRequest } from "./util.ts";
+import { Err } from "../deps.ts";
 
 /**
  * This middleware will catch any errors in the pipeline
@@ -20,14 +21,13 @@ export function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
   ctx: Ctx,
   next: Next,
 ) {
-  try {
-    yield* next();
-  } catch (err) {
+  yield* next();
+
+  if (!ctx.result.ok) {
     console.error(
-      `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
+      `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,
       ctx,
     );
-    throw err;
   }
 }
 
@@ -42,7 +42,7 @@ export function* queryCtx<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
   }
   if (!ctx.request) ctx.request = ctx.req();
   if (!ctx.response) ctx.response = null;
-  if (!ctx.json) ctx.json = { ok: false, data: {} };
+  if (!ctx.json) ctx.json = Err(new Error("not evaluated"));
   if (!ctx.actions) ctx.actions = [];
   if (!ctx.bodyType) ctx.bodyType = "json";
   yield* next();
