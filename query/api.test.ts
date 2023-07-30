@@ -14,6 +14,7 @@ import { createApi } from "./api.ts";
 import { sleep } from "../test.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
+import { Ok } from "../deps.ts";
 
 interface User {
   id: string;
@@ -126,7 +127,7 @@ it(tests, "POST with uri", async () => {
 
       yield* next();
       if (!ctx.json.ok) return;
-      const { users } = ctx.json.data;
+      const { users } = ctx.json.value;
       yield* updateStore<{ users: { [key: string]: User } }>((state) => {
         users.forEach((u) => {
           state.users[u.id] = u;
@@ -258,10 +259,7 @@ it(tests, "createApi with hash key on a large post", async () => {
         {},
       );
       ctx.response = new Response();
-      ctx.json = {
-        ok: true,
-        data: curUsers,
-      };
+      ctx.json = Ok(curUsers);
     },
   );
 
@@ -323,7 +321,7 @@ it(tests, "createApi - two identical endpoints", async () => {
   expect(actual).toEqual(["/health", "/health"]);
 });
 
-interface TestCtx<P = any, S = any, E = any> extends ApiCtx<P, S, E> {
+interface TestCtx<P = any, S = any> extends ApiCtx<P, S> {
   something: boolean;
 }
 
@@ -333,7 +331,7 @@ it(tests, "ensure types for get() endpoint", async () => {
   api.use(api.routes());
   api.use(function* (ctx, next) {
     yield* next();
-    ctx.json = { ok: true, data: { result: "wow" } };
+    ctx.json = Ok({ result: "wow" });
   });
 
   const acc: string[] = [];
@@ -347,7 +345,7 @@ it(tests, "ensure types for get() endpoint", async () => {
       yield* next();
 
       if (ctx.json.ok) {
-        acc.push(ctx.json.data.result);
+        acc.push(ctx.json.value.result);
       }
     },
   );
@@ -370,7 +368,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", async () => {
   api.use(api.routes());
   api.use(function* (ctx, next) {
     yield* next();
-    ctx.json = { ok: true, data: { result: "wow" } };
+    ctx.json = Ok({ result: "wow" });
   });
 
   const acc: string[] = [];
@@ -384,7 +382,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", async () => {
       yield* next();
 
       if (ctx.json.ok) {
-        acc.push(ctx.json.data.result);
+        acc.push(ctx.json.value.result);
       }
     },
   );
@@ -406,7 +404,7 @@ it(
     api.use(api.routes());
     api.use(function* (ctx, next) {
       yield* next();
-      ctx.json = { ok: true, data: { result: "wow" } };
+      ctx.json = Ok({ result: "wow" });
     });
 
     const acc: string[] = [];
@@ -419,7 +417,7 @@ it(
         yield* next();
 
         if (ctx.json.ok) {
-          acc.push(ctx.json.data.result);
+          acc.push(ctx.json.value.result);
         }
       },
     );

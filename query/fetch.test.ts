@@ -6,6 +6,7 @@ import type { QueryState } from "../types.ts";
 import { fetcher, fetchRetry } from "./fetch.ts";
 import { createApi } from "./api.ts";
 import { requestMonitor } from "./middleware.ts";
+import { Err, Ok } from "../deps.ts";
 
 install();
 
@@ -18,54 +19,6 @@ const delay = (n = 200) =>
   });
 
 const tests = describe("fetcher()");
-
-it(
-  tests,
-  "should be able to fetch a resource and save automatically",
-  async () => {
-    mock(`GET@/users`, () => {
-      return new Response(JSON.stringify(mockUser));
-    });
-
-    const api = createApi();
-    api.use(requestMonitor());
-    api.use(storeMdw());
-    api.use(api.routes());
-    api.use(fetcher({ baseUrl }));
-
-    const fetchUsers = api.get(
-      "/users",
-      { supervisor: takeEvery },
-      function* (ctx, next) {
-        ctx.cache = true;
-        yield* next();
-
-        expect(ctx.request).toEqual({
-          url: `${baseUrl}/users`,
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        expect(ctx.json).toEqual({ ok: true, data: mockUser });
-      },
-    );
-
-    const store = await configureStore<QueryState>({
-      initialState: createQueryState(),
-    });
-    store.run(api.bootup);
-
-    const action = fetchUsers();
-    store.dispatch(action);
-
-    await delay();
-
-    const state = store.getState();
-    expect(state["@@starfx/data"][action.payload.key]).toEqual(mockUser);
-  },
-);
 
 it(
   tests,
@@ -85,10 +38,9 @@ it(
       "/users",
       { supervisor: takeEvery },
       function* (ctx, next) {
-        ctx.cache = true;
         ctx.bodyType = "text";
         yield next();
-        expect(ctx.json).toEqual({ ok: true, data: "this is some text" });
+        expect(ctx.json).toEqual(Ok("this is some text"));
       },
     );
 
@@ -125,10 +77,9 @@ it(tests, "fetch - error handling", async () => {
     "/users",
     { supervisor: takeEvery },
     function* (ctx, next) {
-      ctx.cache = true;
       yield* next();
 
-      expect(ctx.json).toEqual({ ok: false, data: errMsg });
+      expect(ctx.json).toEqual(Err(new Error(errMsg.message)));
     },
   );
 
@@ -141,9 +92,6 @@ it(tests, "fetch - error handling", async () => {
   store.dispatch(action);
 
   await delay();
-
-  const state = store.getState();
-  expect(state["@@starfx/data"][action.payload.key]).toEqual(errMsg);
 });
 
 it(tests, "fetch - status 204", async () => {
@@ -166,10 +114,9 @@ it(tests, "fetch - status 204", async () => {
     "/users",
     { supervisor: takeEvery },
     function* (ctx, next) {
-      ctx.cache = true;
       yield* next();
 
-      expect(ctx.json).toEqual({ ok: true, data: {} });
+      expect(ctx.json).toEqual(Ok({}));
     },
   );
 
@@ -182,9 +129,6 @@ it(tests, "fetch - status 204", async () => {
   store.dispatch(action);
 
   await delay();
-
-  const state = store.getState();
-  expect(state["@@starfx/data"][action.payload.key]).toEqual({});
 });
 
 it(tests, "fetch - malformed json", async () => {
@@ -207,16 +151,15 @@ it(tests, "fetch - malformed json", async () => {
     "/users",
     { supervisor: takeEvery },
     function* (ctx, next) {
-      ctx.cache = true;
       yield* next();
 
-      expect(ctx.json).toEqual({
-        ok: false,
-        data: {
-          message:
+      expect(ctx.json).toEqual(
+        Err(
+          new Error(
             "invalid json response body at https://saga-query.com/users reason: Unexpected token o in JSON at position 1",
-        },
-      });
+          ),
+        ),
+      );
     },
   );
 
@@ -245,7 +188,6 @@ it(tests, "fetch - POST", async () => {
     "/users",
     { supervisor: takeEvery },
     function* (ctx, next) {
-      ctx.cache = true;
       ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
       yield* next();
 
@@ -258,7 +200,7 @@ it(tests, "fetch - POST", async () => {
         body: JSON.stringify(mockUser),
       });
 
-      expect(ctx.json).toEqual({ ok: true, data: mockUser });
+      expect(ctx.json).toEqual(Ok(mockUser));
     },
   );
 
@@ -287,7 +229,6 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
     "/users/:id/something",
     { supervisor: takeEvery },
     function* (ctx, next) {
-      ctx.cache = true;
       ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
       yield* next();
 
@@ -300,14 +241,13 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
         body: JSON.stringify(mockUser),
       });
 
-      expect(ctx.json).toEqual({ ok: true, data: mockUser });
+      expect(ctx.json).toEqual(Ok(mockUser));
     },
   );
 
   const fetchUsersSecond = api.post<{ id: string }>(
     ["/users/:id/something", "next"],
     function* (ctx, next) {
-      ctx.cache = true;
       ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
       yield* next();
 
@@ -320,7 +260,7 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
         body: JSON.stringify(mockUser),
       });
 
-      expect(ctx.json).toEqual({ ok: true, data: mockUser });
+      expect(ctx.json).toEqual(Ok(mockUser));
     },
   );
 
@@ -349,16 +289,17 @@ it(
       "/users/:id",
       { supervisor: takeEvery },
       function* (ctx, next) {
-        ctx.cache = true;
         ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
 
         yield* next();
 
-        expect(ctx.json).toEqual({
-          ok: false,
-          data:
-            "found :id in endpoint name (/users/:id [POST]) but payload has falsy value ()",
-        });
+        expect(ctx.json).toEqual(
+          Err(
+            new Error(
+              "found :id in endpoint name (/users/:id [POST]) but payload has falsy value ()",
+            ),
+          ),
+        );
       },
     );
 
@@ -396,14 +337,13 @@ it(
 
     const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
       function* (ctx, next) {
-        ctx.cache = true;
         yield* next();
 
         if (!ctx.json.ok) {
           expect(true).toBe(false);
         }
 
-        expect(ctx.json).toEqual({ ok: true, data: mockUser });
+        expect(ctx.json).toEqual(Ok(mockUser));
       },
       fetchRetry((n) => (n > 4 ? -1 : 10)),
     ]);
@@ -417,13 +357,10 @@ it(
     store.dispatch(action);
 
     await delay();
-
-    const state = store.getState();
-    expect(state["@@starfx/data"][action.payload.key]).toEqual(mockUser);
   },
 );
 
-it.ignore(
+it(
   tests,
   "fetch retry - with failure - should keep retrying and then quit",
   async () => {
@@ -441,9 +378,8 @@ it.ignore(
 
     const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
       function* (ctx, next) {
-        ctx.cache = true;
         yield* next();
-        expect(ctx.json).toEqual({ ok: false, data: { message: "error" } });
+        expect(ctx.json).toEqual(Err(new Error("error")));
       },
       fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);

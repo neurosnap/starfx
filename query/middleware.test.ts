@@ -1,5 +1,5 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
-import { sleep as delay } from "../deps.ts";
+import { Ok, sleep as delay } from "../deps.ts";
 import { call } from "../fx/mod.ts";
 import {
   createApi,
@@ -54,14 +54,14 @@ it(tests, "basic", async () => {
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     if (`${ctx.req().url}`.startsWith("/users/")) {
-      ctx.json = { ok: true, data: mockUser2 };
+      ctx.json = Ok(mockUser2);
       yield* next();
       return;
     }
     const data = {
       users: [mockUser],
     };
-    ctx.json = { ok: true, data };
+    ctx.json = Ok(data);
     yield* next();
   });
 
@@ -71,7 +71,7 @@ it(tests, "basic", async () => {
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
-      const { users } = ctx.json.data;
+      const { users } = ctx.json.value;
 
       yield* updateStore<UserState>((state) => {
         users.forEach((u) => {
@@ -90,7 +90,7 @@ it(tests, "basic", async () => {
       ctx.request = ctx.req({ method: "POST" });
       yield* next();
       if (!ctx.json.ok) return;
-      const curUser = ctx.json.data;
+      const curUser = ctx.json.value;
       yield* updateStore<UserState>((state) => {
         state.users[curUser.id] = curUser;
       });
@@ -124,7 +124,7 @@ it(tests, "with loader", async () => {
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
-    ctx.json = { ok: true, data: { users: [mockUser] } };
+    ctx.json = Ok({ users: [mockUser] });
     yield* next();
   });
 
@@ -134,8 +134,7 @@ it(tests, "with loader", async () => {
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
-
-      const { data } = ctx.json;
+      const data = ctx.json.value;
 
       yield* updateStore<UserState>((state) => {
         data.users.forEach((u) => {
@@ -168,7 +167,7 @@ it(tests, "with item loader", async () => {
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
-    ctx.json = { ok: true, data: { users: [mockUser] } };
+    ctx.json = Ok({ users: [mockUser] });
     yield* next();
   });
 
@@ -179,7 +178,7 @@ it(tests, "with item loader", async () => {
       yield* next();
       if (!ctx.json.ok) return;
 
-      const { data } = ctx.json;
+      const data = ctx.json.value;
       yield* updateStore<UserState>((state) => {
         data.users.forEach((u) => {
           state.users[u.id] = u;
@@ -245,7 +244,7 @@ it(tests, "with POST", async () => {
 
       if (!ctx.json.ok) return;
 
-      const { users } = ctx.json.data;
+      const { users } = ctx.json.value;
       yield* updateStore<UserState>((state) => {
         users.forEach((u) => {
           state.users[u.id] = u;
@@ -270,7 +269,7 @@ it(tests, "simpleCache", async () => {
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
     ctx.response = new Response(jsonBlob(data));
-    ctx.json = { ok: true, data };
+    ctx.json = Ok(data);
     yield* next();
   });
 
@@ -302,7 +301,7 @@ it(tests, "overriding default loader behavior", async () => {
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
     ctx.response = new Response(jsonBlob(data));
-    ctx.json = { ok: true, data };
+    ctx.json = Ok(data);
     yield* next();
   });
 
@@ -316,7 +315,7 @@ it(tests, "overriding default loader behavior", async () => {
       if (!ctx.json.ok) {
         return;
       }
-      const { data } = ctx.json;
+      const data = ctx.json.value;
       ctx.loader = { id, message: "yes", meta: { wow: true } };
       yield* updateStore<UserState>((state) => {
         data.users.forEach((u) => {
@@ -457,10 +456,7 @@ it(tests, "createApi with own key", async () => {
         {},
       );
       ctx.response = new Response();
-      ctx.json = {
-        ok: true,
-        data: curUsers,
-      };
+      ctx.json = Ok(curUsers);
     },
   );
   const newUEmail = mockUser.email + ".org";
@@ -528,10 +524,7 @@ it(tests, "createApi with custom key but no payload", async () => {
         {},
       );
       ctx.response = new Response();
-      ctx.json = {
-        ok: true,
-        data: curUsers,
-      };
+      ctx.json = Ok(curUsers);
     },
   );
 

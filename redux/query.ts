@@ -85,7 +85,7 @@ export function loadingMonitor<Ctx extends ApiCtx = ApiCtx>(
   errorFn: (ctx: Ctx) => string = (ctx) => {
     if (ctx.json.ok) return "";
     return ctx.json.error.message;
-  }
+  },
 ) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     yield* put([
