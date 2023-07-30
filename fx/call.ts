@@ -1,6 +1,6 @@
 import type { OpFn } from "../types.ts";
-import type { Operation, Result, Task } from "../deps.ts";
-import { action, Err, expect, Ok, spawn } from "../deps.ts";
+import type { Operation, Result } from "../deps.ts";
+import { action, Err, expect, Ok } from "../deps.ts";
 
 export const isFunc = (f: unknown) => typeof f === "function";
 export const isPromise = (p: unknown) =>
@@ -37,11 +37,4 @@ export function* call<T>(opFn: OpFn<T>): Operation<Result<T>> {
   } catch (error) {
     return Err(error);
   }
-}
-
-export function* go<T>(op: OpFn<T>): Operation<Task<Result<T>>> {
-  return yield* spawn(function* () {
-    const result = yield* call(op);
-    return result;
-  });
 }

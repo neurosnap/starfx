@@ -33,6 +33,7 @@ it(
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
+    const actual: any[] = [];
     const fetchUsers = api.get(
       "/users",
       { supervisor: takeEvery },
@@ -40,15 +41,8 @@ it(
         ctx.cache = true;
         yield* next();
 
-        expect(ctx.request).toEqual({
-          url: `${baseUrl}/users`,
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        expect(ctx.json).toEqual({ ok: true, data: mockUser });
+        actual.push(ctx.request);
+        actual.push(ctx.json);
       },
     );
 
@@ -64,6 +58,14 @@ it(
 
     const state = store.getState();
     expect(state["@@starfx/data"][action.payload.key]).toEqual(mockUser);
+
+    expect(actual).toEqual([{
+      url: `${baseUrl}/users`,
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }, { ok: true, data: mockUser }]);
   },
 );
 
@@ -81,14 +83,15 @@ it(
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
+    let actual = null;
     const fetchUsers = api.get(
       "/users",
       { supervisor: takeEvery },
       function* (ctx, next) {
         ctx.cache = true;
         ctx.bodyType = "text";
-        yield next();
-        expect(ctx.json).toEqual({ ok: true, data: "this is some text" });
+        yield* next();
+        actual = ctx.json;
       },
     );
 
@@ -101,6 +104,7 @@ it(
     store.dispatch(action);
 
     await delay();
+    expect(actual).toEqual({ ok: true, data: "this is some text" });
   },
 );
 
@@ -121,6 +125,7 @@ it(tests, "fetch - error handling", async () => {
   });
   api.use(fetcher());
 
+  let actual = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -128,7 +133,7 @@ it(tests, "fetch - error handling", async () => {
       ctx.cache = true;
       yield* next();
 
-      expect(ctx.json).toEqual({ ok: false, data: errMsg });
+      actual = ctx.json;
     },
   );
 
@@ -144,11 +149,12 @@ it(tests, "fetch - error handling", async () => {
 
   const state = store.getState();
   expect(state["@@starfx/data"][action.payload.key]).toEqual(errMsg);
+  expect(actual).toEqual({ ok: false, data: errMsg });
 });
 
 it(tests, "fetch - status 204", async () => {
   mock(`GET@/users`, () => {
-    return new Response("", { status: 204 });
+    return new Response(null, { status: 204 });
   });
 
   const api = createApi();
@@ -162,14 +168,14 @@ it(tests, "fetch - status 204", async () => {
   });
   api.use(fetcher());
 
+  let actual = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
     function* (ctx, next) {
       ctx.cache = true;
       yield* next();
-
-      expect(ctx.json).toEqual({ ok: true, data: {} });
+      actual = ctx.json;
     },
   );
 
@@ -185,6 +191,7 @@ it(tests, "fetch - status 204", async () => {
 
   const state = store.getState();
   expect(state["@@starfx/data"][action.payload.key]).toEqual({});
+  expect(actual).toEqual({ ok: true, data: {} });
 });
 
 it(tests, "fetch - malformed json", async () => {
@@ -203,6 +210,7 @@ it(tests, "fetch - malformed json", async () => {
   });
   api.use(fetcher());
 
+  let actual = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -210,13 +218,7 @@ it(tests, "fetch - malformed json", async () => {
       ctx.cache = true;
       yield* next();
 
-      expect(ctx.json).toEqual({
-        ok: false,
-        data: {
-          message:
-            "invalid json response body at https://saga-query.com/users reason: Unexpected token o in JSON at position 1",
-        },
-      });
+      actual = ctx.json;
     },
   );
 
@@ -228,6 +230,13 @@ it(tests, "fetch - malformed json", async () => {
   store.dispatch(action);
 
   await delay();
+
+  expect(actual).toEqual({
+    ok: false,
+    data: {
+      message: "Unexpected token 'o', \"not json\" is not valid JSON",
+    },
+  });
 });
 
 it(tests, "fetch - POST", async () => {
@@ -394,16 +403,17 @@ it(
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
+    let actual = null;
     const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
       function* (ctx, next) {
         ctx.cache = true;
         yield* next();
 
         if (!ctx.json.ok) {
-          expect(true).toBe(false);
+          return;
         }
 
-        expect(ctx.json).toEqual({ ok: true, data: mockUser });
+        actual = ctx.json;
       },
       fetchRetry((n) => (n > 4 ? -1 : 10)),
     ]);
@@ -420,10 +430,11 @@ it(
 
     const state = store.getState();
     expect(state["@@starfx/data"][action.payload.key]).toEqual(mockUser);
+    expect(actual).toEqual({ ok: true, data: mockUser });
   },
 );
 
-it.ignore(
+it(
   tests,
   "fetch retry - with failure - should keep retrying and then quit",
   async () => {
@@ -433,6 +444,7 @@ it.ignore(
       });
     });
 
+    let actual = null;
     const api = createApi();
     api.use(requestMonitor());
     api.use(storeMdw());
@@ -443,7 +455,7 @@ it.ignore(
       function* (ctx, next) {
         ctx.cache = true;
         yield* next();
-        expect(ctx.json).toEqual({ ok: false, data: { message: "error" } });
+        actual = ctx.json;
       },
       fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);
@@ -456,5 +468,6 @@ it.ignore(
     store.dispatch(action);
 
     await delay();
+    expect(actual).toEqual({ ok: false, data: { message: "error" } });
   },
 );

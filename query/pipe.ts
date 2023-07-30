@@ -99,14 +99,14 @@ export interface SagaApi<Ctx extends PipeCtx> {
  * const thunk = createPipe();
  * thunk.use(function* (ctx, next) {
  *   console.log('beginning');
- *   yield next();
+ *   yield* next();
  *   console.log('end');
  * });
  * thunks.use(thunks.routes());
  *
  * const doit = thunk.create('do-something', function*(ctx, next) {
  *   console.log('middle');
- *   yield next();
+ *   yield* next();
  *   console.log('middle end');
  * });
  *

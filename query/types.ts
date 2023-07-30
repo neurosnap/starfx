@@ -12,7 +12,7 @@ export interface PipeCtx<P = any> extends Payload<P> {
     CreateAction<PipeCtx>,
     CreateActionWithPayload<PipeCtx<P>, P>
   >;
-  result: Result<unknown[]>;
+  result: Result<void>;
 }
 
 export interface LoaderCtx<P = unknown> extends PipeCtx<P> {
