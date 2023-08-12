@@ -12,11 +12,7 @@ it(tests, "should call the generator function", async () => {
 
   await run(function* () {
     const result = yield* call(me);
-    if (!result.ok) {
-      expect(true).toBe(false);
-      return;
-    }
-    expect(result.value).toBe("valid");
+    expect(result).toBe("valid");
   });
 });
 
@@ -27,9 +23,10 @@ it(tests, "should return an Err()", async () => {
   }
 
   await run(function* () {
-    const result = yield* call(me);
-    if (!result.ok) {
-      expect(result.error).toEqual(err);
+    try {
+      yield* call(me);
+    } catch (err) {
+      expect(err).toEqual(err);
     }
   });
 });
@@ -41,11 +38,7 @@ it(tests, "should call a normal function with no params", async () => {
 
   await run(function* () {
     const result = yield* call(me);
-    if (!result.ok) {
-      expect(true).toBe(false);
-      return;
-    }
-    expect(result.value).toBe("valid");
+    expect(result).toEqual("valid");
   });
 });
 
@@ -56,17 +49,13 @@ it(tests, "should call a normal function with params", async () => {
 
   await run(function* () {
     const result = yield* call(() => me("fn"));
-    if (!result.ok) {
-      expect(true).toBe(false);
-      return;
-    }
-    expect(result.value).toBe("valid fn");
+    expect(result).toEqual("valid fn");
   });
 });
 
 it(tests, "should call a promise", async () => {
   const me = () =>
-    new Promise((resolve) => {
+    new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve("valid");
       }, 10);
@@ -74,10 +63,6 @@ it(tests, "should call a promise", async () => {
 
   await run(function* () {
     const result = yield* call(me);
-    if (!result.ok) {
-      expect(true).toBe(false);
-      return;
-    }
-    expect(result.value).toBe("valid");
+    expect(result).toEqual("valid");
   });
 });

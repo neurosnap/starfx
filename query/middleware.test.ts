@@ -1,6 +1,5 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
 import { sleep as delay } from "../deps.ts";
-import { call } from "../fx/mod.ts";
 import {
   createApi,
   createKey,
@@ -26,6 +25,7 @@ import {
   undoer,
   updateStore,
 } from "../store/mod.ts";
+import { safe } from "../mod.ts";
 
 interface User {
   id: string;
@@ -438,7 +438,7 @@ it(tests, "createApi with own key", async () => {
       ctx.cache = true;
       ctx.key = theTestKey; // or some calculated key //
       yield* next();
-      const buff = yield* call(() => {
+      const buff = yield* safe(() => {
         if (!ctx.response) throw new Error("no response");
         return ctx.response.arrayBuffer();
       });
@@ -509,7 +509,7 @@ it(tests, "createApi with custom key but no payload", async () => {
       ctx.cache = true;
       ctx.key = theTestKey; // or some calculated key //
       yield* next();
-      const buff = yield* call(() => {
+      const buff = yield* safe(() => {
         if (!ctx.response) throw new Error("no response");
         return ctx.response?.arrayBuffer();
       });

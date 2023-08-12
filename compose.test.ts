@@ -2,6 +2,7 @@ import { asserts, describe, expect, it } from "./test.ts";
 
 import { Err, Ok, Result, run, sleep } from "./deps.ts";
 import { compose } from "./compose.ts";
+import { safe } from "./mod.ts";
 
 const tests = describe("compose()");
 
@@ -66,9 +67,9 @@ it(tests, "order of execution", async () => {
   expect(actual).toEqual(expected);
 });
 
-it(tests, "when error is discovered return in `ctx.result`", async () => {
+it(tests, "when error is discovered, it should throw", async () => {
   const err = new Error("boom");
-  const mdw = compose<{ result: Result<void> }>([
+  const mdw = compose([
     function* (_, next) {
       yield* next();
       asserts.fail();
@@ -79,14 +80,11 @@ it(tests, "when error is discovered return in `ctx.result`", async () => {
     },
   ]);
   const actual = await run(function* () {
-    const ctx = { result: Ok(undefined) };
-    yield* mdw(ctx);
-    return ctx;
+    const ctx = {};
+    const result = yield* safe(() => mdw(ctx));
+    return result;
   });
 
-  const expected = {
-    result: Err(err),
-  };
-
+  const expected = Err(err);
   expect(actual).toEqual(expected);
 });

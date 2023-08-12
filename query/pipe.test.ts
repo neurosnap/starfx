@@ -188,12 +188,13 @@ it(
 );
 
 it(tests, "error handling", async () => {
-  let called = false;
+  let called;
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
-  api.use(function* upstream(ctx, next) {
-    yield* next();
-    if (!ctx.result.ok) {
+  api.use(function* upstream(_, next) {
+    try {
+      yield* next();
+    } catch (_) {
       called = true;
     }
   });
@@ -220,9 +221,10 @@ it(tests, "error handling inside create", async () => {
   const action = api.create(
     `/error`,
     { supervisor: takeEvery },
-    function* (ctx, next) {
-      yield* next();
-      if (!ctx.result.ok) {
+    function* (_, next) {
+      try {
+        yield* next();
+      } catch (_) {
         called = true;
       }
     },
@@ -236,9 +238,10 @@ it(tests, "error handling inside create", async () => {
 it(tests, "error inside endpoint mdw", async () => {
   let called = false;
   const query = createPipe();
-  query.use(function* (ctx, next) {
-    yield* next();
-    if (!ctx.result.ok) {
+  query.use(function* (_, next) {
+    try {
+      yield* next();
+    } catch (_) {
       called = true;
     }
   });

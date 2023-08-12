@@ -8,10 +8,11 @@ import {
   updateStore,
 } from "../store/mod.ts";
 import { createQueryState } from "../action.ts";
+import { sleep } from "../test.ts";
+import { safe } from "../mod.ts";
 
 import { queryCtx, requestMonitor, urlParser } from "./middleware.ts";
 import { createApi } from "./api.ts";
-import { sleep } from "../test.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
 
@@ -61,7 +62,7 @@ it(tests, "createApi - POST", async () => {
       });
       yield* next();
 
-      const buff = yield* call(() => {
+      const buff = yield* safe(() => {
         if (!ctx.response) throw new Error("no response");
         const res = ctx.response.arrayBuffer();
         return res;
@@ -196,7 +197,7 @@ it(tests, "run() from a normal saga", async () => {
   });
   const action2 = () => ({ type: "ACTION" });
   function* onAction() {
-    const ctx = yield* call(() => action1.run(action1({ id: "1" })));
+    const ctx = yield* safe(() => action1.run(action1({ id: "1" })));
     if (!ctx.ok) {
       throw new Error("no ctx");
     }
@@ -237,7 +238,7 @@ it(tests, "createApi with hash key on a large post", async () => {
     function* processUsers(ctx, next) {
       ctx.cache = true;
       yield* next();
-      const buff = yield* call(() => {
+      const buff = yield* safe(() => {
         if (!ctx.response) {
           throw new Error("no response");
         }
@@ -434,10 +435,11 @@ it(
 it(tests, "should bubble up error", async () => {
   let error: any = null;
   const api = createApi();
-  api.use(function* (ctx, next) {
-    yield* next();
-    if (!ctx.result.ok) {
-      error = ctx.result.error;
+  api.use(function* (_, next) {
+    try {
+      yield* next();
+    } catch (err) {
+      error = err;
     }
   });
   api.use(queryCtx);

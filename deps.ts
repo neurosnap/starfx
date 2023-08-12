@@ -1,4 +1,4 @@
-import type { Result } from "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts";
+import type { Result } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export type {
   Channel,
   Instruction,
@@ -6,7 +6,7 @@ export type {
   Scope,
   Stream,
   Task,
-} from "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export {
   action,
   createChannel,
@@ -21,8 +21,9 @@ export {
   run,
   sleep,
   spawn,
+  suspend,
   useAbortSignal,
-} from "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 
 export type { Result };
 

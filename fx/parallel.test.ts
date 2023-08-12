@@ -8,20 +8,20 @@ import { parallel } from "./parallel.ts";
 const test = describe("parallel()");
 
 interface Defer<T> {
-  promise: Operation<T>;
+  promise: Promise<T>;
   resolve: (t: T) => void;
   reject: (t: Error) => void;
 }
 
 function defer<T>(): Defer<T> {
-  let resolve;
-  let reject;
+  let resolve: (t: T) => void = () => {};
+  let reject: (t: Error) => void = () => {};
   const promise = new Promise<T>((res, rej) => {
     resolve = res;
     reject = rej;
   });
 
-  return { resolve, reject, promise } as any;
+  return { resolve, reject, promise };
 }
 
 it(
@@ -108,7 +108,7 @@ it(
 
 it(test, "should return empty array", async () => {
   let actual;
-  await run(function* () {
+  await run(function* (): Operation<void> {
     const results = yield* parallel([]);
     actual = yield* results;
   });

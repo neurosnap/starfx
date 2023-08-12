@@ -4,7 +4,7 @@ import { asserts, describe, it } from "../test.ts";
 
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { put, take, updateStore } from "./fx.ts";
-import { createStore, register } from "./store.ts";
+import { configureStore, createStore } from "./store.ts";
 
 const tests = describe("store");
 
@@ -53,13 +53,12 @@ it(
   tests,
   "update store and receives update from channel `StoreUpdateContext`",
   async () => {
-    const scope = createScope();
+    const [scope] = createScope();
     const initialState: Partial<State> = {
       users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
       dev: false,
     };
-    const store = createStore({ scope, initialState });
-    await register(store);
+    createStore({ scope, initialState });
 
     await scope.run(function* (): Operation<Result<void>[]> {
       const result = yield* parallel([
@@ -87,42 +86,38 @@ it(
 );
 
 it(tests, "update store and receives update from `subscribe()`", async () => {
-  const scope = createScope();
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
     dev: false,
     theme: "",
     token: "",
   };
-  const store = createStore({ scope, initialState });
-  await register(store);
+  const store = configureStore({ initialState });
 
   store.subscribe(() => {
     asserts.assertEquals(store.getState(), {
       users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
+      dev: true,
       theme: "",
       token: "",
-      dev: true,
     });
   });
 
-  await scope.run(function* () {
+  await store.run(function* () {
     yield* updateStore(updateUser({ id: "1", name: "eric" }));
   });
 });
 
 it(tests, "emit Action and update store", async () => {
-  const scope = createScope();
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
     dev: false,
     theme: "",
     token: "",
   };
-  const store = createStore({ scope, initialState });
-  await register(store);
+  const store = configureStore({ initialState });
 
-  await scope.run(function* (): Operation<void> {
+  await store.run(function* (): Operation<void> {
     const result = yield* parallel([
       function* (): Operation<void> {
         const action = yield* take<UpdateUserProps>("UPDATE_USER");

@@ -75,7 +75,7 @@ export function* takeEvery<T>(
   pattern: ActionPattern,
   op: (action: Action) => Operation<T>,
 ) {
-  return yield* spawn(function* () {
+  return yield* spawn(function* (): Operation<void> {
     while (true) {
       const action = yield* take(pattern);
       if (!action) continue;
@@ -88,7 +88,7 @@ export function* takeLatest<T>(
   pattern: ActionPattern,
   op: (action: Action) => Operation<T>,
 ) {
-  return yield* spawn(function* () {
+  return yield* spawn(function* (): Operation<void> {
     let lastTask;
     while (true) {
       const action = yield* take(pattern);
@@ -105,7 +105,7 @@ export function* takeLeading<T>(
   pattern: ActionPattern,
   op: (action: Action) => Operation<T>,
 ) {
-  return yield* spawn(function* () {
+  return yield* spawn(function* (): Operation<void> {
     while (true) {
       const action = yield* take(pattern);
       if (!action) continue;
