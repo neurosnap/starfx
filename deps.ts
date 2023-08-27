@@ -3,6 +3,8 @@ export type {
   Channel,
   Instruction,
   Operation,
+  Subscription,
+  Port,
   Scope,
   Stream,
   Task,
