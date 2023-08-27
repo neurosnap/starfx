@@ -1,7 +1,6 @@
 import { describe, expect, it } from "../test.ts";
 import type { Operation, Result } from "../deps.ts";
-import { Err, Ok, run, sleep, spawn } from "../deps.ts";
-import { forEach } from "../iter.ts";
+import { each, Err, Ok, run, sleep, spawn } from "../deps.ts";
 
 import { parallel } from "./parallel.ts";
 
@@ -41,9 +40,10 @@ it(
       ]);
 
       const res: Result<string>[] = [];
-      yield* forEach(results.immediate.output, function* (val) {
+      for (const val of yield* each(results.immediate.output)) {
         res.push(val);
-      });
+        yield* each.next;
+      }
 
       yield* results;
       return res;
@@ -71,9 +71,10 @@ it(
 
       const res: Result<string>[] = [];
       const { output } = results.sequence;
-      yield* forEach(output, function* (val) {
+      for (const val of yield* each(output)) {
         res.push(val);
-      });
+        yield* each.next;
+      }
 
       yield* results;
       return res;

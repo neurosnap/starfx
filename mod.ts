@@ -1,7 +1,6 @@
 export * from "./fx/mod.ts";
 export * from "./query/mod.ts";
 export * from "./types.ts";
-export * from "./iter.ts";
 export * from "./compose.ts";
 export * from "./action.ts";
 export {
@@ -9,6 +8,7 @@ export {
   createChannel,
   createContext,
   createScope,
+  each,
   Err,
   getframe,
   Ok,
@@ -16,12 +16,16 @@ export {
   run,
   sleep,
   spawn,
+  useAbortSignal,
 } from "./deps.ts";
 export type {
   Channel,
   Instruction,
   Operation,
+  Port,
   Result,
   Scope,
+  Stream,
+  Subscription,
   Task,
 } from "./deps.ts";

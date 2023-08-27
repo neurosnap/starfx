@@ -14,6 +14,7 @@ export {
   createChannel,
   createContext,
   createScope,
+  each,
   Err,
   expect,
   filter,
