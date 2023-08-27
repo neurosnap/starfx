@@ -1,11 +1,9 @@
-import { call } from "./fx/mod.ts";
 import type { Next } from "./query/mod.ts";
-import { Instruction, Operation, Result } from "./deps.ts";
+import { Instruction, Operation } from "./deps.ts";
 
 export interface BaseCtx {
   // deno-lint-ignore no-explicit-any
   [key: string]: any;
-  result: Result<void>;
 }
 
 export type BaseMiddleware<Ctx extends BaseCtx = BaseCtx, T = unknown> = (
@@ -43,18 +41,9 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
         return;
       }
       const nxt = dispatch.bind(null, i + 1);
-      const result = yield* call(function* () {
-        if (!fn) return;
-        return yield* fn(context, nxt);
-      });
-      if (!result.ok && context.result.ok) {
-        context.result = result;
-      }
+      yield* fn(context, nxt);
     }
 
-    const result = yield* call(() => dispatch(0));
-    if (context.result.ok) {
-      context.result = result;
-    }
+    yield* dispatch(0);
   };
 }

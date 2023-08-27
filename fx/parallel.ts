@@ -2,7 +2,7 @@ import type { Channel, Operation, Result } from "../deps.ts";
 import type { Computation, OpFn } from "../types.ts";
 import { createChannel, resource, spawn } from "../deps.ts";
 
-import { call } from "./call.ts";
+import { safe } from "./call.ts";
 
 export interface ParallelRet<T> extends Computation<Result<T>[]> {
   sequence: Channel<Result<T>, void>;
@@ -20,7 +20,7 @@ export function parallel<T>(operations: OpFn<T>[]) {
       for (const op of operations) {
         tasks.push(
           yield* spawn(function* () {
-            const result = yield* call(op);
+            const result = yield* safe(op);
             yield* immediate.input.send(result);
             return result;
           }),

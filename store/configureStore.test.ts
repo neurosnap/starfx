@@ -11,19 +11,21 @@ interface TestState {
 }
 
 it(tests, "should be able to grab values from store", async () => {
-  const store = await configureStore({ initialState: { user: { id: "1" } } });
+  let actual;
+  const store = configureStore({ initialState: { user: { id: "1" } } });
   await store.run(function* () {
-    const actual = yield* select((s: TestState) => s.user);
-    expect(actual).toEqual({ id: "1" });
+    actual = yield* select((s: TestState) => s.user);
   });
+  expect(actual).toEqual({ id: "1" });
 });
 
 it(tests, "should be able to grab store from a nested call", async () => {
-  const store = await configureStore({ initialState: { user: { id: "2" } } });
+  let actual;
+  const store = configureStore({ initialState: { user: { id: "2" } } });
   await store.run(function* () {
-    const actual = yield* call(function* () {
+    actual = yield* call(function* () {
       return yield* select((s: TestState) => s.user);
     });
-    expect(actual).toEqual({ id: "2" });
   });
+  expect(actual).toEqual({ id: "2" });
 });

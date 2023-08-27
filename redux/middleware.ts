@@ -14,8 +14,7 @@ import {
   createScope,
   enableBatching,
 } from "../deps.ts";
-import type { OpFn } from "../types.ts";
-import { call, parallel } from "../fx/mod.ts";
+import { parallel } from "../fx/mod.ts";
 
 import { ActionContext, emit, StoreContext, StoreLike } from "./fx.ts";
 import { reducers as queryReducers } from "./query.ts";
@@ -43,19 +42,17 @@ function* send(action: AnyAction) {
   }
 }
 
-export function createFxMiddleware(scope: Scope = createScope()) {
-  function run<T>(op: OpFn<T>) {
-    const task = scope.run(function* runner() {
-      return yield* call(op);
-    });
-
-    return task;
+export function createFxMiddleware(initScope?: Scope) {
+  let scope: Scope;
+  if (initScope) {
+    scope = initScope;
+  } else {
+    const tuple = createScope();
+    scope = tuple[0];
   }
 
   function middleware<S = unknown, T = unknown>(store: StoreLike<S>) {
-    scope.run(function* () {
-      yield* StoreContext.set(store);
-    });
+    scope.set(StoreContext, store);
 
     return (next: (a: Action) => T) => (action: Action) => {
       const result = next(action); // hit reducers
@@ -66,7 +63,7 @@ export function createFxMiddleware(scope: Scope = createScope()) {
     };
   }
 
-  return { run, scope, middleware };
+  return { scope, middleware, run: scope.run };
 }
 
 // deno-lint-ignore no-explicit-any

@@ -11,7 +11,7 @@ Supercharged async flow control library.
 
 - async flow control library for `deno`, `node`, and browser
 - task tree side-effect management system
-- no fuss immutable data store
+- simple immutable data store
 - traceability throughout the entire system
 - data synchronization and caching for `react`
 

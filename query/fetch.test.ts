@@ -46,7 +46,7 @@ it(
       },
     );
 
-    const store = await configureStore<QueryState>({
+    const store = configureStore<QueryState>({
       initialState: createQueryState(),
     });
     store.run(api.bootup);
@@ -95,7 +95,7 @@ it(
       },
     );
 
-    const store = await configureStore<QueryState>({
+    const store = configureStore<QueryState>({
       initialState: createQueryState(),
     });
     store.run(api.bootup);
@@ -137,7 +137,7 @@ it(tests, "fetch - error handling", async () => {
     },
   );
 
-  const store = await configureStore<QueryState>({
+  const store = configureStore<QueryState>({
     initialState: createQueryState(),
   });
   store.run(api.bootup);
@@ -179,7 +179,7 @@ it(tests, "fetch - status 204", async () => {
     },
   );
 
-  const store = await configureStore<QueryState>({
+  const store = configureStore<QueryState>({
     initialState: createQueryState(),
   });
   store.run(api.bootup);
@@ -222,7 +222,7 @@ it(tests, "fetch - malformed json", async () => {
     },
   );
 
-  const store = await configureStore<QueryState>({
+  const store = configureStore<QueryState>({
     initialState: createQueryState(),
   });
   store.run(api.bootup);
@@ -271,7 +271,7 @@ it(tests, "fetch - POST", async () => {
     },
   );
 
-  const store = await configureStore<QueryState>({
+  const store = configureStore<QueryState>({
     initialState: createQueryState(),
   });
   store.run(api.bootup);
@@ -333,7 +333,7 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
     },
   );
 
-  const store = await configureStore<QueryState>({
+  const store = configureStore<QueryState>({
     initialState: createQueryState(),
   });
   store.run(api.bootup);
@@ -371,7 +371,7 @@ it(
       },
     );
 
-    const store = await configureStore<QueryState>({
+    const store = configureStore<QueryState>({
       initialState: createQueryState(),
     });
     store.run(api.bootup);
@@ -418,7 +418,7 @@ it(
       fetchRetry((n) => (n > 4 ? -1 : 10)),
     ]);
 
-    const store = await configureStore<QueryState>({
+    const store = configureStore<QueryState>({
       initialState: createQueryState(),
     });
     store.run(api.bootup);
@@ -460,7 +460,7 @@ it(
       fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);
 
-    const store = await configureStore<QueryState>({
+    const store = configureStore<QueryState>({
       initialState: createQueryState(),
     });
     store.run(api.bootup);

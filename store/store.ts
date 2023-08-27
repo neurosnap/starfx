@@ -9,7 +9,8 @@ import {
 } from "../deps.ts";
 import { BaseMiddleware, compose } from "../compose.ts";
 import type { OpFn } from "../types.ts";
-import { call } from "../fx/mod.ts";
+import { safe } from "../fx/mod.ts";
+import { Next } from "../query/types.ts";
 
 import type {
   AnyAction,
@@ -21,7 +22,6 @@ import type {
 } from "./types.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { put } from "./fx.ts";
-import { Next } from "../query/types.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
 
@@ -45,9 +45,17 @@ export interface CreateStore<S extends AnyState> {
 
 export function createStore<S extends AnyState>({
   initialState,
-  scope = createScope(),
+  scope: initScope,
   middleware = [],
 }: CreateStore<S>): FxStore<S> {
+  let scope: Scope;
+  if (initScope) {
+    scope = initScope;
+  } else {
+    const tuple = createScope();
+    scope = tuple[0];
+  }
+
   let state = initialState;
   const listeners = new Set<Listener>();
   enablePatches();
@@ -133,7 +141,7 @@ export function createStore<S extends AnyState>({
 
   function run<T>(op: OpFn<T>): Task<Result<T>> {
     return scope.run(function* () {
-      return yield* call(op);
+      return yield* safe(op);
     });
   }
 
@@ -157,20 +165,11 @@ export function createStore<S extends AnyState>({
   };
 }
 
-export function register<S extends AnyState>(store: FxStore<S>) {
-  const scope = store.getScope();
-  return scope.run(function* () {
-    // TODO: fix type
-    // deno-lint-ignore no-explicit-any
-    yield* StoreContext.set(store as any);
-  });
-}
-
-export async function configureStore<S extends AnyState>({
-  scope = createScope(),
-  ...props
-}: CreateStore<S>): Promise<FxStore<S>> {
-  const store = createStore<S>({ scope, ...props });
-  await register(store);
+export function configureStore<S extends AnyState>(
+  props: CreateStore<S>,
+): FxStore<S> {
+  const store = createStore<S>(props);
+  // deno-lint-ignore no-explicit-any
+  store.getScope().set(StoreContext, store as any);
   return store;
 }

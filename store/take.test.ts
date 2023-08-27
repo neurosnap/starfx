@@ -26,7 +26,7 @@ it(
       actual.push(yield* take("action-1"));
     }
 
-    const store = await configureStore({ initialState: {} });
+    const store = configureStore({ initialState: {} });
     await store.run(root);
 
     expect(actual).toEqual([
@@ -86,7 +86,7 @@ it(takeTests, "take from default channel", async () => {
     }
   }
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   await store.run(genFn);
 
   const expected = [

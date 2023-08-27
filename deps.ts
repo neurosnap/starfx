@@ -1,28 +1,33 @@
-import type { Result } from "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts";
+import type { Result } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export type {
   Channel,
   Instruction,
   Operation,
+  Port,
   Scope,
   Stream,
+  Subscription,
   Task,
-} from "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export {
   action,
   createChannel,
   createContext,
   createScope,
+  each,
   Err,
   expect,
   filter,
   getframe,
+  main,
   Ok,
   resource,
   run,
   sleep,
   spawn,
+  suspend,
   useAbortSignal,
-} from "https://deno.land/x/effection@3.0.0-alpha.9/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 
 export type { Result };
 
@@ -54,8 +59,6 @@ export type {
 export {
   combineReducers,
   configureStore,
-  createImmutableStateInvariantMiddleware,
-  createSerializableStateInvariantMiddleware,
   getDefaultMiddleware,
 } from "https://esm.sh/@reduxjs/toolkit@1.9.5?pin=v122";
 export {
