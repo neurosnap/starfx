@@ -23,7 +23,7 @@ it(testLatest, "should cancel previous tasks and only use latest", async () => {
     yield* take("CANCEL_WATCHER");
     yield* task.halt();
   }
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   const task = store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
@@ -50,7 +50,7 @@ it(testLeading, "should keep first action and discard the rest", async () => {
     yield* sleep(150);
     yield* task.halt();
   }
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   const task = store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
@@ -81,7 +81,7 @@ it(testEvery, "should receive all actions", async () => {
     actual.push([arg1, arg2, action.payload]);
   }
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   const task = store.run(root);
 
   for (let i = 1; i <= loop / 2; i += 1) {

@@ -11,6 +11,7 @@ export {
   each,
   Err,
   getframe,
+  main,
   Ok,
   resource,
   run,

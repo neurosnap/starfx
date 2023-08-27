@@ -126,7 +126,7 @@ const tests = describe("createPipe()");
 it(
   tests,
   "when create a query fetch pipeline - execute all middleware and save to redux",
-  async () => {
+  () => {
     const api = createPipe<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
@@ -135,7 +135,7 @@ it(
     api.use(processTickets);
     const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
 
-    const store = await configureStore<TestState>({
+    const store = configureStore<TestState>({
       initialState: { ...createQueryState(), users: {}, tickets: {} },
     });
     store.run(api.bootup);
@@ -153,7 +153,7 @@ it(
 it(
   tests,
   "when providing a generator the to api.create function - should call that generator before all other middleware",
-  async () => {
+  () => {
     const api = createPipe<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
@@ -173,7 +173,7 @@ it(
       yield* put(fetchUsers());
     });
 
-    const store = await configureStore<TestState>({
+    const store = configureStore<TestState>({
       initialState: { ...createQueryState(), users: {}, tickets: {} },
     });
     store.run(api.bootup);
@@ -187,7 +187,7 @@ it(
   },
 );
 
-it(tests, "error handling", async () => {
+it(tests, "error handling", () => {
   let called;
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
@@ -204,13 +204,13 @@ it(tests, "error handling", async () => {
 
   const action = api.create(`/error`, { supervisor: takeEvery });
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
   asserts.assertStrictEquals(called, true);
 });
 
-it(tests, "error handling inside create", async () => {
+it(tests, "error handling inside create", () => {
   let called = false;
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
@@ -229,13 +229,13 @@ it(tests, "error handling inside create", async () => {
       }
     },
   );
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
   asserts.assertStrictEquals(called, true);
 });
 
-it(tests, "error inside endpoint mdw", async () => {
+it(tests, "error inside endpoint mdw", () => {
   let called = false;
   const query = createPipe();
   query.use(function* (_, next) {
@@ -256,7 +256,7 @@ it(tests, "error inside endpoint mdw", async () => {
     },
   );
 
-  const store = await configureStore({
+  const store = configureStore({
     initialState: {
       ...createQueryState(),
       users: {},
@@ -267,7 +267,7 @@ it(tests, "error inside endpoint mdw", async () => {
   asserts.assertEquals(called, true);
 });
 
-it(tests, "create fn is an array", async () => {
+it(tests, "create fn is an array", () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -292,12 +292,12 @@ it(tests, "create fn is an array", async () => {
     },
   ]);
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
 });
 
-it(tests, "run() on endpoint action - should run the effect", async () => {
+it(tests, "run() on endpoint action - should run the effect", () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   let acc = "";
@@ -331,7 +331,7 @@ it(tests, "run() on endpoint action - should run the effect", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action2());
 });
@@ -367,7 +367,7 @@ it(tests, "middleware order of execution", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
 
@@ -397,7 +397,7 @@ it(tests, "retry with actionFn", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
 
@@ -427,7 +427,7 @@ it(tests, "retry with actionFn with payload", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action({ page: 1 }));
 
@@ -435,7 +435,7 @@ it(tests, "retry with actionFn with payload", async () => {
   asserts.assertEquals(acc, "agag");
 });
 
-it(tests, "should only call thunk once", async () => {
+it(tests, "should only call thunk once", () => {
   const api = createPipe<RoboCtx>();
   api.use(api.routes());
   let acc = "";
@@ -457,7 +457,7 @@ it(tests, "should only call thunk once", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: {} });
+  const store = configureStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action2());
   asserts.assertEquals(acc, "a");

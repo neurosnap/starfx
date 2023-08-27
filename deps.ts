@@ -19,6 +19,7 @@ export {
   expect,
   filter,
   getframe,
+  main,
   Ok,
   resource,
   run,

@@ -84,7 +84,7 @@ it(tests, "createApi - POST", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
@@ -94,7 +94,7 @@ it(tests, "createApi - POST", async () => {
   });
 });
 
-it(tests, "POST with uri", async () => {
+it(tests, "POST with uri", () => {
   const query = createApi();
   query.use(queryCtx);
   query.use(urlParser);
@@ -136,12 +136,12 @@ it(tests, "POST with uri", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(query.bootup);
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
-it(tests, "middleware - with request fn", async () => {
+it(tests, "middleware - with request fn", () => {
   const query = createApi();
   query.use(queryCtx);
   query.use(urlParser);
@@ -156,12 +156,12 @@ it(tests, "middleware - with request fn", async () => {
     { supervisor: takeEvery },
     query.request({ method: "POST" }),
   );
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(query.bootup);
   store.dispatch(createUser());
 });
 
-it(tests, "run() on endpoint action - should run the effect", async () => {
+it(tests, "run() on endpoint action - should run the effect", () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   let acc = "";
@@ -180,12 +180,12 @@ it(tests, "run() on endpoint action - should run the effect", async () => {
     expect(acc).toEqual("ab");
   });
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(action2());
 });
 
-it(tests, "run() from a normal saga", async () => {
+it(tests, "run() from a normal saga", () => {
   const api = createApi();
   api.use(api.routes());
   let acc = "";
@@ -215,7 +215,7 @@ it(tests, "run() from a normal saga", async () => {
     yield* task;
   }
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(() => keepAlive([api.bootup, watchAction]));
   store.dispatch(action2());
 });
@@ -269,7 +269,7 @@ it(tests, "createApi with hash key on a large post", async () => {
   const email = mockUser.email + "9";
   const largetext = "abc-def-ghi-jkl-mno-pqr".repeat(100);
 
-  const store = await configureStore({
+  const store = configureStore({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(query.bootup);
@@ -314,7 +314,7 @@ it(tests, "createApi - two identical endpoints", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(first());
   store.dispatch(second());
@@ -329,7 +329,7 @@ interface TestCtx<P = any, S = any, E = any> extends ApiCtx<P, S, E> {
 }
 
 // this is strictly for testing types
-it(tests, "ensure types for get() endpoint", async () => {
+it(tests, "ensure types for get() endpoint", () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -353,7 +353,7 @@ it(tests, "ensure types for get() endpoint", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
 
   store.dispatch(action1({ id: "1" }));
@@ -366,7 +366,7 @@ interface FetchUserProps {
 type FetchUserCtx = TestCtx<FetchUserProps>;
 
 // this is strictly for testing types
-it(tests, "ensure ability to cast `ctx` in function definition", async () => {
+it(tests, "ensure ability to cast `ctx` in function definition", () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -390,7 +390,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
@@ -402,7 +402,7 @@ type FetchUserSecondCtx = TestCtx<any, { result: string }>;
 it(
   tests,
   "ensure ability to cast `ctx` in function definition with no props",
-  async () => {
+  () => {
     const api = createApi<TestCtx>();
     api.use(api.routes());
     api.use(function* (ctx, next) {
@@ -425,14 +425,14 @@ it(
       },
     );
 
-    const store = await configureStore({ initialState: { users: {} } });
+    const store = configureStore({ initialState: { users: {} } });
     store.run(api.bootup);
     store.dispatch(action1());
     expect(acc).toEqual(["wow"]);
   },
 );
 
-it(tests, "should bubble up error", async () => {
+it(tests, "should bubble up error", () => {
   let error: any = null;
   const api = createApi();
   api.use(function* (_, next) {
@@ -455,7 +455,7 @@ it(tests, "should bubble up error", async () => {
     },
   );
 
-  const store = await configureStore({ initialState: { users: {} } });
+  const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(fetchUser());
   expect(error.message).toBe(
