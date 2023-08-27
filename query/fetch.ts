@@ -1,6 +1,6 @@
-import { call } from "../fx/mod.ts";
 import { sleep } from "../deps.ts";
 import { compose } from "../compose.ts";
+import { safe } from "../mod.ts";
 
 import { noop } from "./util.ts";
 import type { FetchCtx, FetchJsonCtx, Next } from "./types.ts";
@@ -59,7 +59,7 @@ export function* jsonMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     return;
   }
 
-  const data = yield* call(() => {
+  const data = yield* safe(() => {
     const resp = ctx.response;
     if (!resp) throw new Error("response is falsy");
     return resp[ctx.bodyType]();
@@ -146,11 +146,11 @@ export function* fetchMdw<CurCtx extends FetchCtx = FetchCtx>(
 ) {
   const { url, ...req } = ctx.req();
   const request = new Request(url, req);
-  const response = yield* call(() => fetch(request));
-  if (response.ok) {
-    ctx.response = response.value;
+  const result = yield* safe(() => fetch(request));
+  if (result.ok) {
+    ctx.response = result.value;
   } else {
-    throw response.error;
+    throw result.error;
   }
   yield* next();
 }
@@ -212,8 +212,8 @@ export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     let waitFor = backoff(attempt);
     while (waitFor >= 1) {
       yield* sleep(waitFor);
-      yield* call(() => fetchMdw(ctx, noop));
-      yield* call(() => jsonMdw(ctx, noop));
+      yield* safe(() => fetchMdw(ctx, noop));
+      yield* safe(() => jsonMdw(ctx, noop));
 
       if (ctx.response.ok) {
         return;

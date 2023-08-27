@@ -1,6 +1,5 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
 import { sleep as delay } from "../deps.ts";
-import { call } from "../fx/mod.ts";
 import {
   createApi,
   createKey,
@@ -26,6 +25,7 @@ import {
   undoer,
   updateStore,
 } from "../store/mod.ts";
+import { safe } from "../mod.ts";
 
 interface User {
   id: string;
@@ -47,7 +47,7 @@ const jsonBlob = (data: any) => {
 
 const tests = describe("middleware");
 
-it(tests, "basic", async () => {
+it(tests, "basic", () => {
   const query = createApi<ApiCtx>();
   query.use(queryCtx);
   query.use(urlParser);
@@ -97,7 +97,7 @@ it(tests, "basic", async () => {
     },
   );
 
-  const store = await configureStore({
+  const store = configureStore({
     initialState: {
       ...createQueryState(),
       users: {},
@@ -117,7 +117,7 @@ it(tests, "basic", async () => {
   });
 });
 
-it(tests, "with loader", async () => {
+it(tests, "with loader", () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
   api.use(storeMdw());
@@ -145,7 +145,7 @@ it(tests, "with loader", async () => {
     },
   );
 
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(api.bootup);
@@ -161,7 +161,7 @@ it(tests, "with loader", async () => {
   });
 });
 
-it(tests, "with item loader", async () => {
+it(tests, "with item loader", () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
   api.use(storeMdw());
@@ -188,7 +188,7 @@ it(tests, "with item loader", async () => {
     },
   );
 
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(api.bootup);
@@ -208,7 +208,7 @@ it(tests, "with item loader", async () => {
   });
 });
 
-it(tests, "with POST", async () => {
+it(tests, "with POST", () => {
   const query = createApi();
   query.use(queryCtx);
   query.use(urlParser);
@@ -254,7 +254,7 @@ it(tests, "with POST", async () => {
     },
   );
 
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(query.bootup);
@@ -262,7 +262,7 @@ it(tests, "with POST", async () => {
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
-it(tests, "simpleCache", async () => {
+it(tests, "simpleCache", () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
   api.use(storeMdw());
@@ -275,7 +275,7 @@ it(tests, "simpleCache", async () => {
   });
 
   const fetchUsers = api.get("/users", { supervisor: takeEvery }, api.cache());
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(api.bootup);
@@ -294,7 +294,7 @@ it(tests, "simpleCache", async () => {
   });
 });
 
-it(tests, "overriding default loader behavior", async () => {
+it(tests, "overriding default loader behavior", () => {
   const api = createApi<ApiCtx>();
   api.use(requestMonitor());
   api.use(storeMdw());
@@ -326,7 +326,7 @@ it(tests, "overriding default loader behavior", async () => {
     },
   );
 
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(api.bootup);
@@ -344,7 +344,7 @@ it(tests, "overriding default loader behavior", async () => {
   });
 });
 
-it(tests, "undo", async () => {
+it(tests, "undo", () => {
   const api = createApi<UndoCtx>();
   api.use(requestMonitor());
   api.use(storeMdw());
@@ -368,7 +368,7 @@ it(tests, "undo", async () => {
     },
   );
 
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(api.bootup);
@@ -386,7 +386,7 @@ it(tests, "undo", async () => {
   });
 });
 
-it(tests, "requestMonitor - error handler", async () => {
+it(tests, "requestMonitor - error handler", () => {
   let err = false;
   console.error = (msg: string) => {
     if (err) return;
@@ -407,7 +407,7 @@ it(tests, "requestMonitor - error handler", async () => {
 
   const fetchUsers = query.create(`/users`, { supervisor: takeEvery });
 
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(query.bootup);
@@ -438,7 +438,7 @@ it(tests, "createApi with own key", async () => {
       ctx.cache = true;
       ctx.key = theTestKey; // or some calculated key //
       yield* next();
-      const buff = yield* call(() => {
+      const buff = yield* safe(() => {
         if (!ctx.response) throw new Error("no response");
         return ctx.response.arrayBuffer();
       });
@@ -464,7 +464,7 @@ it(tests, "createApi with own key", async () => {
     },
   );
   const newUEmail = mockUser.email + ".org";
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(query.bootup);
@@ -509,7 +509,7 @@ it(tests, "createApi with custom key but no payload", async () => {
       ctx.cache = true;
       ctx.key = theTestKey; // or some calculated key //
       yield* next();
-      const buff = yield* call(() => {
+      const buff = yield* safe(() => {
         if (!ctx.response) throw new Error("no response");
         return ctx.response?.arrayBuffer();
       });
@@ -535,7 +535,7 @@ it(tests, "createApi with custom key but no payload", async () => {
     },
   );
 
-  const store = await configureStore<UserState>({
+  const store = configureStore<UserState>({
     initialState: { ...createQueryState(), users: {} },
   });
   store.run(query.bootup);

@@ -50,7 +50,7 @@ const setupTest = async () => {
     });
   });
 
-  const store = await configureStore<{ user?: User }>({
+  const store = configureStore<{ user?: User }>({
     initialState: {},
   });
   store.run(api.bootup);

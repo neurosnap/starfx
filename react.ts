@@ -1,2 +1,2 @@
 export * from "./query/react.ts";
-export * from "./store/react.ts";
+export { Provider, useDispatch, useSelector } from "./deps.ts";

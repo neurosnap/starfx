@@ -1,27 +1,26 @@
 import { describe, expect, it } from "../test.ts";
 import type { Operation, Result } from "../deps.ts";
-import { Err, Ok, run, sleep, spawn } from "../deps.ts";
-import { forEach } from "../iter.ts";
+import { each, Err, Ok, run, sleep, spawn } from "../deps.ts";
 
 import { parallel } from "./parallel.ts";
 
 const test = describe("parallel()");
 
 interface Defer<T> {
-  promise: Operation<T>;
+  promise: Promise<T>;
   resolve: (t: T) => void;
   reject: (t: Error) => void;
 }
 
 function defer<T>(): Defer<T> {
-  let resolve;
-  let reject;
+  let resolve: (t: T) => void = () => {};
+  let reject: (t: Error) => void = () => {};
   const promise = new Promise<T>((res, rej) => {
     resolve = res;
     reject = rej;
   });
 
-  return { resolve, reject, promise } as any;
+  return { resolve, reject, promise };
 }
 
 it(
@@ -41,9 +40,10 @@ it(
       ]);
 
       const res: Result<string>[] = [];
-      yield* forEach(results.immediate.output, function* (val) {
+      for (const val of yield* each(results.immediate.output)) {
         res.push(val);
-      });
+        yield* each.next;
+      }
 
       yield* results;
       return res;
@@ -71,9 +71,10 @@ it(
 
       const res: Result<string>[] = [];
       const { output } = results.sequence;
-      yield* forEach(output, function* (val) {
+      for (const val of yield* each(output)) {
         res.push(val);
-      });
+        yield* each.next;
+      }
 
       yield* results;
       return res;
@@ -108,7 +109,7 @@ it(
 
 it(test, "should return empty array", async () => {
   let actual;
-  await run(function* () {
+  await run(function* (): Operation<void> {
     const results = yield* parallel([]);
     actual = yield* results;
   });
