@@ -36,17 +36,20 @@ export const fxCreateTable = <Entity extends AnyState = AnyState>({
     selectors: {
       selectTable: (state: AnyState) => state[name],
       selectByKey: createSelector(
-        [(state: AnyState) => state[name] as MapEntity<Entity>,
-        (_, key: keyof MapEntity<Entity>) => key],
-        (s, k) => s[k]
+        [
+          (state: AnyState) => state[name] as MapEntity<Entity>,
+          (_, key: keyof MapEntity<Entity>) => key,
+        ],
+        (s, k) => s[k],
       ),
       selectByKeys: createSelector(
-        [(state: AnyState) => state[name] as MapEntity<Entity>,
-        (_, keys: (keyof MapEntity<Entity>)[]) => keys],
-        (s, k) => k.map((key) => s[key])
+        [
+          (state: AnyState) => state[name] as MapEntity<Entity>,
+          (_, keys: (keyof MapEntity<Entity>)[]) => keys,
+        ],
+        (s, k) => k.map((key) => s[key]),
       ),
       ...selectors,
     },
   };
 };
-

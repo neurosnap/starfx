@@ -3,9 +3,7 @@ import type { MapEntity } from "../deps.ts";
 
 import type { RootState } from "../types.ts";
 const _selectSlice =
-  <K extends keyof RootState>(sliceName: K) =>
-  (s: RootState) =>
-    s[sliceName];
+  <K extends keyof RootState>(sliceName: K) => (s: RootState) => s[sliceName];
 /**
  * Selector of a whole slice, by slice name
  * @param {K} sliceName

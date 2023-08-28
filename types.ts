@@ -1,5 +1,5 @@
 import type { Instruction, Operation } from "./deps.ts";
-import type { FxStore, AnyState }  from "./store/types.ts";
+import type { AnyState, FxStore } from "./store/types.ts";
 export interface Computation<T = unknown> {
   // deno-lint-ignore no-explicit-any
   [Symbol.iterator](): Iterator<Instruction, T, any>;
@@ -49,5 +49,3 @@ export interface Payload<P = any> {
 export interface RootState extends QueryState, FxStore<AnyState> {
   [key: string]: any;
 }
-
-

@@ -19,40 +19,39 @@ let initialState: RootState;
 
 export function setGlobalStore(store: FxStore<RootState>) {
   globalStore = store;
-  initialState = store.getInitialState();  
+  initialState = store.getInitialState();
 }
 
 export function setSlice<K extends keyof RootState>(
   key: K,
-  value: RootState[K]
+  value: RootState[K],
 ) {
   return function (state: RootState) {
     state[key] = value as (typeof state)[K];
   };
 }
 
-
 function sxnext(action: any) {
   const fx = globalStore;
   const storeKeys = Object.keys(globalStore);
 
   const setRegexPattern = new RegExp(
-    `^${starfxPrefix}(${storeKeys.join("|")})${setSuffix}$`
+    `^${starfxPrefix}(${storeKeys.join("|")})${setSuffix}$`,
   );
   const resetRegexPattern = new RegExp(
-    `^${starfxPrefix}(${storeKeys.join("|")})${resetSuffix}$`
+    `^${starfxPrefix}(${storeKeys.join("|")})${resetSuffix}$`,
   );
   const addRegexPattern = new RegExp(
-    `^${starfxPrefix}(${storeKeys.join("|")})${addSuffix}$`
+    `^${starfxPrefix}(${storeKeys.join("|")})${addSuffix}$`,
   );
   const removeRegexPattern = new RegExp(
-    `^${starfxPrefix}(${storeKeys.join("|")})${removeSuffix}$`
+    `^${starfxPrefix}(${storeKeys.join("|")})${removeSuffix}$`,
   );
   const patchRegexPattern = new RegExp(
-    `^${starfxPrefix}(${storeKeys.join("|")})${patchSuffix}$`
+    `^${starfxPrefix}(${storeKeys.join("|")})${patchSuffix}$`,
   );
   const mergeRegexPattern = new RegExp(
-    `^${starfxPrefix}(${storeKeys.join("|")})${mergeSuffix}$`
+    `^${starfxPrefix}(${storeKeys.join("|")})${mergeSuffix}$`,
   );
 
   return match(action)
@@ -62,17 +61,17 @@ function sxnext(action: any) {
         const sliceName = type.replace(setRegexPattern, "$1");
         fx.run(function* () {
           yield* updateStore(
-            setSlice(sliceName as keyof RootState, payload as any)
+            setSlice(sliceName as keyof RootState, payload as any),
           );
         });
-      }
+      },
     )
     .with({ type: P.string.regex(resetRegexPattern) }, ({ type }) => {
       const sliceName = type.replace(resetRegexPattern, "$1");
-     
+
       fx.run(function* () {
         yield* updateStore(
-          setSlice(sliceName as keyof RootState, initialState[sliceName])
+          setSlice(sliceName as keyof RootState, initialState[sliceName]),
         );
       });
     })
@@ -85,7 +84,7 @@ function sxnext(action: any) {
         fx.run(function* () {
           yield* updateStore(setSlice(sliceName as keyof RootState, newState));
         });
-      }
+      },
     )
     .with(
       { type: P.string.regex(removeRegexPattern), payload: P.any },
@@ -97,7 +96,7 @@ function sxnext(action: any) {
         fx.run(function* () {
           yield* updateStore(setSlice(sliceName as keyof RootState, newState));
         });
-      }
+      },
     )
     .with(
       { type: P.string.regex(patchRegexPattern), payload: P.any },
@@ -106,12 +105,12 @@ function sxnext(action: any) {
         const current = fx.getState()[sliceName];
         const newState = mapReducers().patch(
           current,
-          payload as { [key: string]: Partial<RootState[keyof RootState]> }
+          payload as { [key: string]: Partial<RootState[keyof RootState]> },
         );
         fx.run(function* () {
           yield* updateStore(setSlice(sliceName as keyof RootState, newState));
         });
-      }
+      },
     )
     .with(
       { type: P.string.regex(mergeRegexPattern), payload: P.any },
@@ -120,12 +119,12 @@ function sxnext(action: any) {
         const current = fx.getState()[sliceName];
         const newState = mapReducers().merge(
           current,
-          payload as { [key: string]: Partial<RootState[keyof RootState]> }
+          payload as { [key: string]: Partial<RootState[keyof RootState]> },
         );
         fx.run(function* () {
           yield* updateStore(setSlice(sliceName as keyof RootState, newState));
         });
-      }
+      },
     )
     .otherwise(() => {
       if (
@@ -141,7 +140,7 @@ function sxnext(action: any) {
         console.log(
           "You probably forgot to register the repo of: ",
           action,
-          " in the rootStore"
+          " in the rootStore",
         );
       }
     });

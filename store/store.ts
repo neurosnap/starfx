@@ -176,4 +176,3 @@ export function configureStore<S extends AnyState>(
   store.getScope().set(StoreContext, store as any);
   return store;
 }
-
