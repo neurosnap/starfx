@@ -1,9 +1,9 @@
-import type { Result } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export type {
   Channel,
   Instruction,
   Operation,
   Port,
+  Result,
   Scope,
   Stream,
   Subscription,
@@ -29,8 +29,6 @@ export {
   useAbortSignal,
 } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 
-export type { Result };
-
 import React from "https://esm.sh/react@18.2.0?pin=v122";
 export { React };
 export {
@@ -49,18 +47,16 @@ export type { Patch } from "https://esm.sh/immer@10.0.2?pin=v122";
 
 export type {
   Action,
-  AnyAction,
-  ConfigureEnhancersCallback,
-  Middleware,
   Reducer,
   ReducersMapObject,
-  StoreEnhancer,
-} from "https://esm.sh/@reduxjs/toolkit@1.9.5?pin=v122";
+  UnknownAction,
+} from "https://esm.sh/@reduxjs/toolkit@2.0.0-beta.1?pin=v122";
 export {
   combineReducers,
   configureStore,
-  getDefaultMiddleware,
-} from "https://esm.sh/@reduxjs/toolkit@1.9.5?pin=v122";
+  Tuple,
+} from "https://esm.sh/@reduxjs/toolkit@2.0.0-beta.1?pin=v122";
+export type { BatchAction } from "https://esm.sh/redux-batched-actions@0.5.0?pin=v122";
 export {
   BATCH,
   batchActions,

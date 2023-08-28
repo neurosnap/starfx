@@ -1,34 +1,28 @@
 import {
   Action,
-  AnyAction,
   BATCH,
-  ConfigureEnhancersCallback,
-  Middleware,
+  BatchAction,
   ReducersMapObject,
   Scope,
-  StoreEnhancer,
+  UnknownAction,
 } from "../deps.ts";
-import {
-  combineReducers,
-  configureStore as reduxStore,
-  createScope,
-  enableBatching,
-} from "../deps.ts";
+import { combineReducers, createScope, enableBatching } from "../deps.ts";
 import { parallel } from "../fx/mod.ts";
 
-import { ActionContext, emit, StoreContext, StoreLike } from "./fx.ts";
+import { ActionContext, emit, StoreContext } from "./fx.ts";
 import { reducers as queryReducers } from "./query.ts";
+import type { StoreLike } from "./types.ts";
 
-function* send(action: AnyAction) {
+function* send(action: UnknownAction) {
   if (action.type === BATCH) {
-    const actions: Action[] = action.payload;
+    const actions = action.payload as BatchAction[];
     const group = yield* parallel(
       actions.map(
         (a) =>
           function* () {
             yield* emit({
               channel: ActionContext,
-              action: a,
+              action: a as Action,
             });
           },
       ),
@@ -51,13 +45,13 @@ export function createFxMiddleware(initScope?: Scope) {
     scope = tuple[0];
   }
 
-  function middleware<S = unknown, T = unknown>(store: StoreLike<S>) {
+  function middleware<S = unknown>(store: StoreLike<S>) {
     scope.set(StoreContext, store);
 
-    return (next: (a: Action) => T) => (action: Action) => {
+    return (next: (a: unknown) => unknown) => (action: unknown) => {
       const result = next(action); // hit reducers
       scope.run(function* () {
-        yield* send(action);
+        yield* send(action as any);
       });
       return result;
     };
@@ -69,9 +63,6 @@ export function createFxMiddleware(initScope?: Scope) {
 // deno-lint-ignore no-explicit-any
 interface SetupStoreProps<S = any> {
   reducers: ReducersMapObject<S>;
-  middleware?: Middleware[];
-  enhancers?: StoreEnhancer[] | ConfigureEnhancersCallback;
-  initialState?: S;
 }
 
 /**
@@ -84,10 +75,15 @@ interface SetupStoreProps<S = any> {
  *
  * @example
  * ```ts
- * import { configureStore } from 'starfx/redux';
+ * import { prepareStore } from 'starfx/redux';
  *
- * const { store, fx } = prepareStore({
+ * const { reducer, fx } = prepareStore({
  *  reducers: { users: (state, action) => state },
+ * });
+ *
+ * const store = configureStore({
+ *  reducer,
+ *  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(fx),
  * });
  *
  * fx.run(function*() {
@@ -97,18 +93,12 @@ interface SetupStoreProps<S = any> {
  * });
  * ```
  */
-export function configureStore(
-  { reducers, middleware = [], enhancers = [], initialState }: SetupStoreProps,
+export function prepareStore(
+  { reducers }: SetupStoreProps,
 ) {
   const fx = createFxMiddleware();
-  const rootReducer = combineReducers({ ...queryReducers, ...reducers });
-  const store = reduxStore({
-    reducer: enableBatching(rootReducer),
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat([fx.middleware, ...middleware]),
-    enhancers,
-    preloadedState: initialState,
-  });
-
-  return { store, fx };
+  const reducer = enableBatching(
+    combineReducers({ ...queryReducers, ...reducers }),
+  );
+  return { reducer, fx };
 }
