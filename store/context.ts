@@ -1,5 +1,5 @@
 import { Channel, createChannel, createContext } from "../deps.ts";
-import type { AnyAction, AnyState } from '../types.ts';
+import type { AnyAction, AnyState } from "../types.ts";
 
 import type { FxStore } from "./types.ts";
 

@@ -1,4 +1,4 @@
-import type { AnyAction } from '../types.ts';
+import type { AnyAction } from "../types.ts";
 
 export interface StoreLike<S = unknown> {
   getState: () => S;

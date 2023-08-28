@@ -2,7 +2,7 @@ import { Action, Channel, Operation, UnknownAction } from "../deps.ts";
 import { createChannel, createContext, spawn } from "../deps.ts";
 import { call, parallel } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
-import type { ActionWPayload, AnyAction } from '../types.ts';
+import type { ActionWPayload, AnyAction } from "../types.ts";
 
 import type { StoreLike } from "./types.ts";
 

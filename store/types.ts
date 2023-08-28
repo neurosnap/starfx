@@ -1,6 +1,6 @@
 import type { Operation, Patch, Result, Scope, Task } from "../deps.ts";
 import { BaseCtx } from "../mod.ts";
-import type { OpFn, AnyAction, AnyState } from "../types.ts";
+import type { AnyAction, AnyState, OpFn } from "../types.ts";
 
 export type StoreUpdater<S extends AnyState> = (s: S) => S | void;
 
