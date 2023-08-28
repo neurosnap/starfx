@@ -1,16 +1,12 @@
-import { configureStore, Tuple } from "../deps.ts";
+import { createStore, applyMiddleware } from "../deps.ts";
 import { prepareStore } from "./middleware.ts";
 
-export const createStore = () => {
+export const createTestStore = () => {
   const { reducer, fx } = prepareStore({
     reducers: {
       def: (s = null, _) => s,
     },
   });
-  const store = configureStore({
-    reducer,
-    middleware: new Tuple(fx.middleware as any),
-    preloadedState: {},
-  });
+  const store = createStore(reducer, {}, applyMiddleware(fx.middleware as any));
   return { store, fx };
 };

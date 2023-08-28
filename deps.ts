@@ -49,13 +49,12 @@ export type {
   Action,
   Reducer,
   ReducersMapObject,
-  UnknownAction,
-} from "https://esm.sh/@reduxjs/toolkit@2.0.0-beta.1?pin=v122";
+} from "https://esm.sh/redux@4.2.1?pin=v122";
 export {
   combineReducers,
-  configureStore,
-  Tuple,
-} from "https://esm.sh/@reduxjs/toolkit@2.0.0-beta.1?pin=v122";
+  applyMiddleware,
+  legacy_createStore as createStore,
+} from "https://esm.sh/redux@4.2.1?pin=v122";
 export type { BatchAction } from "https://esm.sh/redux-batched-actions@0.5.0?pin=v122";
 export {
   BATCH,
