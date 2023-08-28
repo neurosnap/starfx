@@ -3,11 +3,11 @@ export type {
   Instruction,
   Operation,
   Port,
+  Result,
   Scope,
   Stream,
   Subscription,
   Task,
-  Result,
 } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export {
   action,
