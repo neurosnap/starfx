@@ -1,4 +1,3 @@
-import type { Result } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export type {
   Channel,
   Instruction,
@@ -8,6 +7,7 @@ export type {
   Stream,
   Subscription,
   Task,
+  Result,
 } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
 export {
   action,
@@ -28,8 +28,6 @@ export {
   suspend,
   useAbortSignal,
 } from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
-
-export type { Result };
 
 import React from "https://esm.sh/react@18.2.0?pin=v122";
 export { React };
