@@ -1,4 +1,4 @@
-import type { AnyAction } from "./store/types.ts";
+import type { AnyAction } from "./types.ts";
 
 type ActionType = string;
 type GuardPredicate<G extends T, T = unknown> = (arg: T) => arg is G;

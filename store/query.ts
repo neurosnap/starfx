@@ -2,11 +2,10 @@ import { race } from "../fx/mod.ts";
 import { sleep } from "../deps.ts";
 import type { ApiCtx, LoaderCtx, Next } from "../query/mod.ts";
 import { compose } from "../compose.ts";
-import type { QueryState } from "../types.ts";
+import type { QueryState, AnyAction } from "../types.ts";
 import { createAction } from "../action.ts";
 
 import { put, select, take, updateStore } from "./fx.ts";
-import type { AnyAction } from "./types.ts";
 import {
   addData,
   resetLoaderById,

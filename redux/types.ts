@@ -1,12 +1,4 @@
-export interface ActionWPayload<P> {
-  type: string;
-  payload: P;
-}
-
-export interface AnyAction {
-  type: string;
-  [key: string]: any;
-}
+import type { AnyAction } from '../types.ts';
 
 export interface StoreLike<S = unknown> {
   getState: () => S;

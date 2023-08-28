@@ -1,6 +1,6 @@
 import { describe, expect, it } from "../test.ts";
+import type { AnyAction } from "../types.ts";
 
-import type { AnyAction } from "./types.ts";
 import { take, takeEvery } from "./mod.ts";
 import { createStore } from "./util.ts";
 

@@ -1,11 +1,13 @@
 import { Channel, filter, Operation, spawn, Stream, Task } from "../deps.ts";
 import { call, parallel } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
-
 import type {
   ActionWPayload,
   AnyAction,
   AnyState,
+} from '../types.ts';
+
+import type {
   FxStore,
   StoreUpdater,
   UpdaterCtx,

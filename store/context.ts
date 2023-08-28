@@ -1,6 +1,7 @@
 import { Channel, createChannel, createContext } from "../deps.ts";
+import type { AnyAction, AnyState } from '../types.ts';
 
-import type { AnyAction, AnyState, FxStore } from "./types.ts";
+import type { FxStore } from "./types.ts";
 
 export const ActionContext = createContext<Channel<AnyAction, void>>(
   "store:action",

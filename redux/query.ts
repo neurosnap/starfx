@@ -1,10 +1,9 @@
 import { createLoaderTable, createReducerMap, createTable } from "../deps.ts";
 import { compose } from "../compose.ts";
 export { defaultLoader } from "../store/mod.ts";
-import type { AnyAction } from "../store/mod.ts";
 import { ApiCtx, createKey, Next } from "../query/mod.ts";
 import { put, select } from "./mod.ts";
-import type { QueryState } from "../types.ts";
+import type { QueryState, AnyAction } from "../types.ts";
 
 export function reduxMdw<Ctx extends ApiCtx = ApiCtx>(
   errorFn?: (ctx: Ctx) => string,

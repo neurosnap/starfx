@@ -8,13 +8,14 @@ import {
   Task,
 } from "../deps.ts";
 import { BaseMiddleware, compose } from "../compose.ts";
-import type { OpFn } from "../types.ts";
+import type { OpFn,
+AnyAction,
+  AnyState,
+} from "../types.ts";
 import { safe } from "../fx/mod.ts";
 import { Next } from "../query/types.ts";
 
 import type {
-  AnyAction,
-  AnyState,
   FxStore,
   Listener,
   StoreUpdater,

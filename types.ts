@@ -42,6 +42,21 @@ export type LoadingPayload =
   & Pick<LoadingItemState, "id">
   & Partial<Pick<LoadingItemState, "message" | "meta">>;
 
+// deno-lint-ignore no-explicit-any
+export type AnyState = Record<string, any>;
+
+// deno-lint-ignore no-explicit-any
 export interface Payload<P = any> {
+  payload: P;
+}
+
+export interface AnyAction {
+  type: string;
+  // deno-lint-ignore no-explicit-any
+  [key: string]: any;
+}
+
+export interface ActionWPayload<P> {
+  type: string;
   payload: P;
 }
