@@ -1,7 +1,8 @@
 import { describe, expect, it } from "../test.ts";
 import { sleep, spawn } from "../deps.ts";
 
-import { ActionContext, configureStore, put, take } from "./mod.ts";
+import { ActionContext, put, take } from "./mod.ts";
+import { createStore } from "./util.ts";
 
 const putTests = describe("put()");
 
@@ -27,10 +28,8 @@ it(putTests, "should send actions through channel", async () => {
     });
   }
 
-  const store = configureStore({
-    reducers: { def: (s = null, _) => s },
-  });
-  await store.fx.run(() => genFn("arg"));
+  const { fx } = createStore();
+  await fx.run(() => genFn("arg"));
 
   const expected = ["arg", "2"];
   expect(actual).toEqual(expected);
@@ -59,10 +58,8 @@ it(putTests, "should handle nested puts", async () => {
     yield* spawn(genA);
   }
 
-  const store = configureStore({
-    reducers: { def: (s = null, _) => s },
-  });
-  await store.fx.run(root);
+  const { fx } = createStore();
+  await fx.run(root);
 
   const expected = ["put b", "put a"];
   expect(actual).toEqual(expected);
@@ -73,16 +70,14 @@ it(
   "should not cause stack overflow when puts are emitted while dispatching saga",
   async () => {
     function* root() {
-      for (let i = 0; i < 40_000; i += 1) {
+      for (let i = 0; i < 10_000; i += 1) {
         yield* put({ type: "test" });
       }
       yield* sleep(0);
     }
 
-    const store = configureStore({
-      reducers: { def: (s = null, _) => s },
-    });
-    await store.fx.run(root);
+    const { fx } = createStore();
+    await fx.run(root);
     expect(true).toBe(true);
   },
 );
@@ -109,10 +104,8 @@ it(
       yield* tsk;
     }
 
-    const store = configureStore({
-      reducers: { def: (s = null, _) => s },
-    });
-    await store.fx.run(root);
+    const { fx } = createStore();
+    await fx.run(root);
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
   },

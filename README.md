@@ -10,15 +10,16 @@ Supercharged async flow control library.
 ## features
 
 - async flow control library for `deno`, `node`, and browser
-- task tree side-effect management system
-- simple immutable data store
-- traceability throughout the entire system
-- data synchronization and caching for `react`
+- task tree side-effect management system (like `redux-saga`)
+- simple immutable data store (like `redux`)
+- traceability throughout the entire system (dispatch actions)
+- data synchronization and caching for `react` (like `react-query`,
+  `redux/toolkit`)
 
 ## example
 
 ```ts
-import { json, parallel, request, run } from "starfx";
+import { json, main, parallel, request } from "starfx";
 
 function* fetchMovie(title: string) {
   const response = yield* request(`/movies/${title}`);
@@ -26,11 +27,13 @@ function* fetchMovie(title: string) {
   return data;
 }
 
-const task = run(function* () {
+const task = main(function* () {
   const movies = ["titanic", "avatar", "good will hunting"];
   const ops = movies.map((title) => () => fetchMovie(title));
+
   // parallel returns a list of `Result` type
   const group = yield* parallel(ops);
+  // wait for results
   const results = yield* group;
   return results;
 });

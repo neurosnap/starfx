@@ -1,15 +1,9 @@
 import { Channel, filter, Operation, spawn, Stream, Task } from "../deps.ts";
 import { call, parallel } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
+import type { ActionWPayload, AnyAction, AnyState } from "../types.ts";
 
-import type {
-  ActionWPayload,
-  AnyAction,
-  AnyState,
-  FxStore,
-  StoreUpdater,
-  UpdaterCtx,
-} from "./types.ts";
+import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { ActionContext, StoreContext } from "./context.ts";
 
 export function* updateStore<S extends AnyState>(

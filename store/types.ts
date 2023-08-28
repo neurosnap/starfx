@@ -1,6 +1,6 @@
 import type { Operation, Patch, Result, Scope, Task } from "../deps.ts";
 import { BaseCtx } from "../mod.ts";
-import type { OpFn } from "../types.ts";
+import type { AnyAction, AnyState, OpFn } from "../types.ts";
 
 export type StoreUpdater<S extends AnyState> = (s: S) => S | void;
 
@@ -10,20 +10,6 @@ export interface UpdaterCtx<S extends AnyState> extends BaseCtx {
   updater: StoreUpdater<S> | StoreUpdater<S>[];
   patches: Patch[];
 }
-
-export interface AnyAction {
-  type: string;
-  // deno-lint-ignore no-explicit-any
-  [key: string]: any;
-}
-
-export interface ActionWPayload<P> {
-  type: string;
-  payload: P;
-}
-
-// deno-lint-ignore no-explicit-any
-export type AnyState = Record<string, any>;
 
 declare global {
   interface SymbolConstructor {
