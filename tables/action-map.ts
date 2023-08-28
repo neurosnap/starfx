@@ -33,7 +33,7 @@ export function setSlice<K extends keyof RootState>(
 
 function sxnext(action: any) {
   const fx = globalStore;
-  const storeKeys = Object.keys(initialState);
+  const storeKeys = Object.keys(globalStore.getState());
 
   const setRegexPattern = new RegExp(
     `^${starfxPrefix}(${storeKeys.join("|")})${setSuffix}$`,
