@@ -51,8 +51,8 @@ export type {
   ReducersMapObject,
 } from "https://esm.sh/redux@4.2.1?pin=v122";
 export {
-  combineReducers,
   applyMiddleware,
+  combineReducers,
   legacy_createStore as createStore,
 } from "https://esm.sh/redux@4.2.1?pin=v122";
 export type { BatchAction } from "https://esm.sh/redux-batched-actions@0.5.0?pin=v122";

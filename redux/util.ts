@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware } from "../deps.ts";
+import { applyMiddleware, createStore } from "../deps.ts";
 import { prepareStore } from "./middleware.ts";
 
 export const createTestStore = () => {
