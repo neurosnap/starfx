@@ -1,4 +1,4 @@
-export { build, emptyDir } from "https://deno.land/x/dnt@0.36.0/mod.ts";
+export { build, emptyDir } from "https://deno.land/x/dnt@0.38.1/mod.ts";
 export { assert } from "https://deno.land/std@0.187.0/testing/asserts.ts";
 export {
   beforeEach,

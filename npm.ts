@@ -55,9 +55,9 @@ async function main() {
         name: "robodux",
         version: "^15.0.1",
       },
-      "https://esm.sh/@reduxjs/toolkit@2.0.0-beta.1?pin=v122": {
-        name: "@reduxjs/toolkit",
-        version: "2.0.0-beta.1",
+      "https://esm.sh/redux@4.2.1?pin=v122": {
+        name: "redux",
+        version: "^4.2.1",
       },
       "https://esm.sh/redux-batched-actions@0.5.0?pin=v122": {
         name: "redux-batched-actions",

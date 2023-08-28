@@ -1,4 +1,4 @@
-import { Action, Channel, Operation, UnknownAction } from "../deps.ts";
+import { Action, Channel, Operation } from "../deps.ts";
 import { createChannel, createContext, spawn } from "../deps.ts";
 import { call, parallel } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
@@ -17,8 +17,8 @@ export function* emit({
   channel,
   action,
 }: {
-  channel: Operation<Channel<UnknownAction, void>>;
-  action: UnknownAction | UnknownAction[];
+  channel: Operation<Channel<AnyAction, void>>;
+  action: AnyAction | AnyAction[];
 }) {
   const { input } = yield* channel;
   if (Array.isArray(action)) {

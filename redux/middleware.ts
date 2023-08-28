@@ -4,16 +4,16 @@ import {
   BatchAction,
   ReducersMapObject,
   Scope,
-  UnknownAction,
 } from "../deps.ts";
 import { combineReducers, createScope, enableBatching } from "../deps.ts";
 import { parallel } from "../fx/mod.ts";
+import type { AnyAction } from "../types.ts";
 
 import { ActionContext, emit, StoreContext } from "./fx.ts";
 import { reducers as queryReducers } from "./query.ts";
 import type { StoreLike } from "./types.ts";
 
-function* send(action: UnknownAction) {
+function* send(action: AnyAction) {
   if (action.type === BATCH) {
     const actions = action.payload as BatchAction[];
     const group = yield* parallel(
@@ -51,7 +51,7 @@ export function createFxMiddleware(initScope?: Scope) {
     return (next: (a: unknown) => unknown) => (action: unknown) => {
       const result = next(action); // hit reducers
       scope.run(function* () {
-        yield* send(action as any);
+        yield* send(action as AnyAction);
       });
       return result;
     };

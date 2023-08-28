@@ -2,7 +2,7 @@ import { describe, expect, it } from "../test.ts";
 import { sleep, spawn } from "../deps.ts";
 
 import { ActionContext, put, take } from "./mod.ts";
-import { createStore } from "./util.ts";
+import { createTestStore } from "./util.ts";
 
 const putTests = describe("put()");
 
@@ -28,7 +28,7 @@ it(putTests, "should send actions through channel", async () => {
     });
   }
 
-  const { fx } = createStore();
+  const { fx } = createTestStore();
   await fx.run(() => genFn("arg"));
 
   const expected = ["arg", "2"];
@@ -58,7 +58,7 @@ it(putTests, "should handle nested puts", async () => {
     yield* spawn(genA);
   }
 
-  const { fx } = createStore();
+  const { fx } = createTestStore();
   await fx.run(root);
 
   const expected = ["put b", "put a"];
@@ -76,7 +76,7 @@ it(
       yield* sleep(0);
     }
 
-    const { fx } = createStore();
+    const { fx } = createTestStore();
     await fx.run(root);
     expect(true).toBe(true);
   },
@@ -104,7 +104,7 @@ it(
       yield* tsk;
     }
 
-    const { fx } = createStore();
+    const { fx } = createTestStore();
     await fx.run(root);
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
