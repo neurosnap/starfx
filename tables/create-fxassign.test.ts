@@ -8,9 +8,13 @@ import { sleep } from "../test.ts";
 
 import type { Operation } from "../deps.ts";
 import type { ParallelRet } from "../fx/parallel.ts";
-import type { RootState } from "../types.ts";
-
+import type { RootState } from "./action-map.ts";
 const tests = describe("fxCreateAssign()");
+
+type TUser = {
+  id: number;
+  user: string;
+};
 
 const ass_00 = fxCreateAssign({
   name: "assign00",
@@ -29,7 +33,7 @@ const runState = () =>
       function* () {
         yield* tablesTakeEvery();
       },
-    ]) as ParallelRet<Operation<unknown>>;
+    ]) as Operation<ParallelRet<RootState>>;
     yield* engine;
   });
 
@@ -38,13 +42,13 @@ it(tests, "sets up a state, with an assign sets/resets ", async () => {
   runState();
   // set
   store.dispatch(ass_00.actions.set({ user: "B" }));
-  await sleep(150);
+  await sleep(10);
   asserts.assertEquals(store.getState()[ass_00.name], { user: "B" });
   // reset
   store.dispatch(ass_00.actions.reset());
-  await sleep(150);
+  await sleep(10);
   asserts.assertEquals(store.getState()[ass_00.name], { user: "A" });
-  await sleep(150);
+  await sleep(10);
   store.dispatch(ass_00.actions.set({ user: "C" }));
   //knows initial state
   const is = store.getInitialState()[ass_00.name];

@@ -3,8 +3,8 @@ import { match, P } from "../deps.ts";
 import { call } from "../fx/call.ts";
 import { take, updateStore } from "../store/mod.ts";
 import { ensureArray } from "./utils.ts";
-import type { FxStore } from "../store/types.ts";
-import type { RootState } from "../types.ts";
+import type { AnyState, FxStore } from "../store/types.ts";
+import type { QueryState } from "../types.ts";
 
 const setSuffix = "/set";
 const resetSuffix = "/reset";
@@ -13,6 +13,9 @@ const removeSuffix = "/remove";
 const patchSuffix = "/patch";
 const mergeSuffix = "/merge";
 const starfxPrefix = "@@starfx/";
+
+type TInitialStore = AnyState & { [key: string]: unknown };
+export type RootState = QueryState & TInitialStore;
 
 let globalStore: FxStore<RootState>;
 let initialState: RootState;

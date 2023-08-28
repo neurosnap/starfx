@@ -8,7 +8,7 @@ import { sleep } from "../test.ts";
 
 import type { MapEntity, Operation } from "../deps.ts";
 import type { ParallelRet } from "../fx/parallel.ts";
-import type { RootState } from "../types.ts";
+import type { RootState } from "./action-map.ts";
 
 const tests = describe("fxCreateTable()");
 
@@ -35,7 +35,7 @@ const runState = () =>
       function* () {
         yield* tablesTakeEvery();
       },
-    ]) as ParallelRet<Operation<unknown>>;
+    ]) as Operation<ParallelRet<RootState>>;
     yield* engine;
   });
 
@@ -53,25 +53,25 @@ it(tests, "sets up a table", async () => {
   // set
 
   store.dispatch(tab00.actions.set(mapRecords([first])));
-  await sleep(150);
+  await sleep(10);
   asserts.assertEquals(store.getState()[tab00.name], { 1: first });
 });
 it(tests, "adds a row", async () => {
   store.dispatch(tab00.actions.add(mapRecords([second])));
-  await sleep(150);
+  await sleep(10);
   asserts.assertEquals(store.getState()[tab00.name], { 1: first, 2: second });
 });
 
 it(tests, "removes a row", async () => {
   store.dispatch(tab00.actions.remove(["1"]));
-  await sleep(150);
+  await sleep(10);
   asserts.assertEquals(store.getState()[tab00.name], { 2: second });
 });
 
 it(tests, "updates a row", async () => {
   const updated = { ...second, user: "BB" };
   store.dispatch(tab00.actions.patch({ 2: updated }));
-  await sleep(150);
+  await sleep(10);
   asserts.assertEquals(store.getState()[tab00.name], { 2: updated });
 });
 
