@@ -148,7 +148,6 @@ function sxnext(action: any) {
 export function* tablesTakeEvery() {
   while (true) {
     const next = yield* take("*");
-    console.log("next", next);
     yield* call(() => sxnext(next));
   }
 }

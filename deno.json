@@ -3,7 +3,7 @@
     "types": "deno run --allow-write ./api-type-template.ts",
     "npm": "deno run --allow-write --allow-read --allow-env --allow-run --allow-net --no-check ./npm.ts",
     "test": "deno test --allow-env --allow-read",
-    "test:vlad":"deno test --allow-env --allow-read ./tables/create-fxassign.test.ts"
+    "test:vlad":"deno test --allow-env --allow-read ./tables/create-fxtable.test.ts"
   },
   "lint": {
     "exclude": ["npm/", "examples/"],

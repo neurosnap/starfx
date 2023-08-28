@@ -10,7 +10,7 @@ import type { Operation } from "../deps.ts";
 import type { ParallelRet } from "../fx/parallel.ts";
 import type { RootState } from "../types.ts";
 
-const tests = describe("create-fxAssign()");
+const tests = describe("fxCreateAssign()");
 
 const ass_00 = fxCreateAssign({
   name: "assign00",
