@@ -66,8 +66,14 @@ export {
   batchActions,
   enableBatching,
 } from "https://esm.sh/redux-batched-actions@0.5.0?pin=v122";
+export type {
+  MapEntity,
+  PatchEntity,
+} from "https://esm.sh/robodux@15.0.1?pin=v122";
 export {
   createLoaderTable,
   createReducerMap,
   createTable,
+  mapReducers,
 } from "https://esm.sh/robodux@15.0.1?pin=v122";
+export { match, P } from "https://esm.sh/ts-pattern@5.0.1?pin=v122";

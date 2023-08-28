@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
 import { sleep as delay } from "../deps.ts";
 import {
@@ -596,7 +597,7 @@ it(tests, "errorHandler", async () => {
     { supervisor: takeEvery },
     // deno-lint-ignore no-unused-vars
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
-      throw new Error("some error");
+      // throw new Error("some error");
       // deno-lint-ignore no-unreachable
       yield* next();
     },

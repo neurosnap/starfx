@@ -40,6 +40,7 @@ export interface FxStore<S extends AnyState> {
   // deno-lint-ignore no-explicit-any
   dispatch: (a: AnyAction) => any;
   replaceReducer: (r: (s: S, a: AnyAction) => S) => void;
+  getInitialState: () => S;
   // deno-lint-ignore no-explicit-any
   [Symbol.observable]: () => any;
 }
