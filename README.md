@@ -10,10 +10,11 @@ Supercharged async flow control library.
 ## features
 
 - async flow control library for `deno`, `node`, and browser
-- task tree side-effect management system
-- simple immutable data store
-- traceability throughout the entire system
-- data synchronization and caching for `react`
+- task tree side-effect management system (like `redux-saga`)
+- simple immutable data store (like `redux`)
+- traceability throughout the entire system (dispatch actions)
+- data synchronization and caching for `react` (like `react-query`,
+  `redux/toolkit`)
 
 ## example
 
