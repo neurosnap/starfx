@@ -33,7 +33,7 @@ export function setSlice<K extends keyof RootState>(
 
 function sxnext(action: any) {
   const fx = globalStore;
-  const storeKeys = Object.keys(globalStore);
+  const storeKeys = Object.keys(initialState);
 
   const setRegexPattern = new RegExp(
     `^${starfxPrefix}(${storeKeys.join("|")})${setSuffix}$`,
@@ -145,9 +145,10 @@ function sxnext(action: any) {
       }
     });
 }
-export function* starduxTakeEvery() {
+export function* tablesTakeEvery() {
   while (true) {
     const next = yield* take("*");
+    console.log("next", next);
     yield* call(() => sxnext(next));
   }
 }
