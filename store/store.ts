@@ -22,7 +22,6 @@ import type {
 } from "./types.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { put } from "./fx.ts";
-
 const stubMsg = "This is merely a stub, not implemented";
 
 // https://github.com/reduxjs/redux/blob/4a6d2fb227ba119d3498a43fab8f53fe008be64c/src/createStore.ts#L344
@@ -145,6 +144,9 @@ export function createStore<S extends AnyState>({
     });
   }
 
+  function getInitialState() {
+    return initialState;
+  }
   return {
     getScope,
     getState,
@@ -161,6 +163,7 @@ export function createStore<S extends AnyState>({
     ): void {
       throw new Error(stubMsg);
     },
+    getInitialState,
     [Symbol.observable]: observable,
   };
 }
@@ -173,3 +176,4 @@ export function configureStore<S extends AnyState>(
   store.getScope().set(StoreContext, store as any);
   return store;
 }
+
