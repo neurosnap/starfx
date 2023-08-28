@@ -1,8 +1,8 @@
 import { describe, expect, it } from "../test.ts";
-import type { AnyAction } from "../deps.ts";
 
-import { configureStore, take, takeEvery } from "./mod.ts";
-const reducers = { init: () => null };
+import type { AnyAction } from "./types.ts";
+import { take, takeEvery } from "./mod.ts";
+import { createStore } from "./util.ts";
 
 const testEvery = describe("takeEvery()");
 
@@ -23,7 +23,7 @@ it(testEvery, "should work", async () => {
     actual.push([arg1, arg2, action.payload]);
   }
 
-  const { store, fx } = configureStore({ reducers });
+  const { store, fx } = createStore();
   const task = fx.run(root);
 
   for (let i = 1; i <= loop / 2; i += 1) {

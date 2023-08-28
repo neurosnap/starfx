@@ -1,17 +1,9 @@
-import { Action, AnyAction, Channel, Operation } from "../deps.ts";
+import { Action, Channel, Operation, UnknownAction } from "../deps.ts";
 import { createChannel, createContext, spawn } from "../deps.ts";
 import { call, parallel } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 
-export interface ActionWPayload<P> {
-  type: string;
-  payload: P;
-}
-
-export interface StoreLike<S = unknown> {
-  getState: () => S;
-  dispatch: (action: Action) => void;
-}
+import type { ActionWPayload, AnyAction, StoreLike } from "./types.ts";
 
 export const ActionContext = createContext<Channel<Action, void>>(
   "redux:action",
@@ -24,8 +16,8 @@ export function* emit({
   channel,
   action,
 }: {
-  channel: Operation<Channel<AnyAction, void>>;
-  action: AnyAction | AnyAction[];
+  channel: Operation<Channel<UnknownAction, void>>;
+  action: UnknownAction | UnknownAction[];
 }) {
   const { input } = yield* channel;
   if (Array.isArray(action)) {
