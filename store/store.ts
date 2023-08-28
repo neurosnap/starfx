@@ -22,6 +22,7 @@ import type {
 } from "./types.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { put } from "./fx.ts";
+
 const stubMsg = "This is merely a stub, not implemented";
 
 // https://github.com/reduxjs/redux/blob/4a6d2fb227ba119d3498a43fab8f53fe008be64c/src/createStore.ts#L344
