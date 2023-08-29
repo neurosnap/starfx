@@ -17,9 +17,9 @@ it(tests, "sets up set", async () => {
   const store = configureStore({
     initialState: {
       [NAME]: slice.initialState,
-    }
+    },
   });
-  await store.run(function*() {
+  await store.run(function* () {
     yield* updateStore(
       slice.actions.set(2),
     );
@@ -31,9 +31,9 @@ it(tests, "reset", async () => {
   const store = configureStore({
     initialState: {
       [NAME]: 2,
-    }
+    },
   });
-  await store.run(function*() {
+  await store.run(function* () {
     yield* updateStore(
       slice.actions.reset(),
     );

@@ -6,4 +6,4 @@ export * from "./slice.ts";
 export * from "./query.ts";
 export * from "./supervisor.ts";
 export { createSelector } from "../deps.ts";
-export * from './slice/mod.ts';
+export * from "./slice/mod.ts";
