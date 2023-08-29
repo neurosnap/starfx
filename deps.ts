@@ -71,4 +71,3 @@ export {
   createTable,
   mapReducers,
 } from "https://esm.sh/robodux@15.0.1?pin=v122";
-export { match, P } from "https://esm.sh/ts-pattern@5.0.1?pin=v122";
