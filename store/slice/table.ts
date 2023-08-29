@@ -1,5 +1,5 @@
-import { createSelector } from "../deps.ts";
-import type { AnyState, IdProp } from "../types.ts";
+import { createSelector } from "../../deps.ts";
+import type { AnyState, IdProp } from "../../types.ts";
 
 interface PropId {
   id: IdProp;
@@ -82,7 +82,7 @@ export function mustSelectEntity<Entity extends AnyState = AnyState>(
   };
 }
 
-export const fxCreateTable = <
+export const createTable = <
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
 >({

@@ -1,8 +1,8 @@
-import { asserts, describe, it } from "../test.ts";
-import { configureStore, updateStore } from "../store/mod.ts";
-import { createQueryState } from "../action.ts";
+import { asserts, describe, it } from "../../test.ts";
+import { configureStore, updateStore } from "../../store/mod.ts";
+import { createQueryState } from "../../action.ts";
 
-import { fxCreateTable } from "./create-table.ts";
+import { createTable } from "./table.ts";
 
 const tests = describe("createTable()");
 
@@ -12,7 +12,7 @@ type TUser = {
 };
 
 const NAME = "table";
-const slice = fxCreateTable<TUser>({
+const slice = createTable<TUser>({
   name: NAME,
 });
 

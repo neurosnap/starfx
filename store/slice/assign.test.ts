@@ -1,8 +1,9 @@
-import { asserts, describe, it } from "../test.ts";
-import { configureStore } from "../store/store.ts";
-import { updateStore } from "../store/mod.ts";
+import { asserts, describe, it } from "../../test.ts";
 
-import { createAssign } from "./create-assign.ts";
+import { configureStore } from "../store.ts";
+import { updateStore } from "../fx.ts";
+
+import { createAssign } from "./assign.ts";
 
 const tests = describe("createAssign()");
 
@@ -16,9 +17,9 @@ it(tests, "sets up set", async () => {
   const store = configureStore({
     initialState: {
       [NAME]: slice.initialState,
-    },
+    }
   });
-  await store.run(function* () {
+  await store.run(function*() {
     yield* updateStore(
       slice.actions.set(2),
     );
@@ -30,9 +31,9 @@ it(tests, "reset", async () => {
   const store = configureStore({
     initialState: {
       [NAME]: 2,
-    },
+    }
   });
-  await store.run(function* () {
+  await store.run(function*() {
     yield* updateStore(
       slice.actions.reset(),
     );
