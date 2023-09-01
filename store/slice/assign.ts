@@ -1,5 +1,5 @@
 export function createAssign<V = unknown, S = unknown>(
-  { name, initialState }: { name: keyof S; initialState: V },
+  { name, initialState }: { name: string; initialState: V },
 ) {
   return {
     name,
