@@ -37,3 +37,4 @@ jobs:
           src: './public/*'
           project: "git-starfx-${{ steps.vars.outputs.sha_short }}"
           promote: "git-starfx"
+          retain: "git-starfx-"
