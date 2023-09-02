@@ -30,7 +30,7 @@ article
 [The gotcha of unhandled promise rejections](https://jakearchibald.com/2023/unhandled-rejections/):
 
 ```ts
-import { json, main, parallel, request, each } from "starfx";
+import { each, json, main, parallel, request } from "starfx";
 
 function* fetchChapter(title: string) {
   const response = yield* request(`/chapters/${title}`);
@@ -45,8 +45,7 @@ const task = main(function* () {
   // parallel returns a list of `Result` type
   const chapters = yield* parallel(ops);
 
-  // make http requests in parallel but process them in sequence (e.g. 01, 02,
-  03)
+  // make http requests in parallel but process them in sequence (e.g. 01, 02, 03)
   for (const result of yield* each(chapters.sequence)) {
     if (result.ok) {
       console.log(result.value);
