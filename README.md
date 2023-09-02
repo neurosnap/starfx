@@ -16,13 +16,6 @@ Supercharged async flow control library.
 - data synchronization and caching for `react` (like `react-query`,
   `redux/toolkit`)
 
-## talk
-
-I recently gave a talk about deliminited continuations where I also discuss this
-library:
-
-[![Delminited continuations are all you need](http://img.youtube.com/vi/uRbqLGj_6mI/0.jpg)](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
-
 ## example
 
 This complete solution to the problem Jake Archibald discusses in his blog
@@ -63,6 +56,15 @@ console.log(results);
 ## usage
 
 Please see [examples repo](https://github.com/neurosnap/starfx-examples).
+
+## talk
+
+I recently gave a talk about deliminited continuations where I also discuss this
+library:
+
+[![Delminited continuations are all you need](http://img.youtube.com/vi/uRbqLGj_6mI/0.jpg)](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
+
+
 
 ## resources
 
