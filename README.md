@@ -16,7 +16,18 @@ Supercharged async flow control library.
 - data synchronization and caching for `react` (like `react-query`,
   `redux/toolkit`)
 
+## talk
+
+I recently gave a talk about deliminited continuations where I also discuss this
+library:
+
+[![Delminited continuations are all you need](http://img.youtube.com/vi/uRbqLGj_6mI/0.jpg)](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
+
 ## example
+
+This complete solution to the problem Jake Archibald discusses in his blog
+article
+[The gotcha of unhandled promise rejections](https://jakearchibald.com/2023/unhandled-rejections/):
 
 ```ts
 import { json, main, parallel, request } from "starfx";
@@ -45,3 +56,10 @@ console.log(results);
 ## usage
 
 Please see [examples repo](https://github.com/neurosnap/starfx-examples).
+
+## resources
+
+This library is not possible without these foundational libraries:
+
+- [continuation](https://github.com/thefrontside/continuation)
+- [effection v3](https://github.com/thefrontside/effection/tree/v3)
