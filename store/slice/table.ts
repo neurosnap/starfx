@@ -15,6 +15,25 @@ interface PatchEntity<T> {
 
 const excludesFalse = <T>(n?: T): n is T => Boolean(n);
 
+export function mustSelectEntity<Entity extends AnyState = AnyState>(
+  defaultEntity: Entity | (() => Entity),
+) {
+  const isFn = typeof defaultEntity === "function";
+
+  return function selectEntity<S extends AnyState = AnyState>(
+    selectById: (s: S, p: PropId) => Entity | undefined,
+  ) {
+    return (state: S, { id }: PropId): Entity => {
+      if (isFn) {
+        const entity = defaultEntity as () => Entity;
+        return selectById(state, { id }) || entity();
+      }
+
+      return selectById(state, { id }) || (defaultEntity as Entity);
+    };
+  };
+}
+
 interface TableSelectors<
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
@@ -63,23 +82,18 @@ function tableSelectors<
   };
 }
 
-export function mustSelectEntity<Entity extends AnyState = AnyState>(
-  defaultEntity: Entity | (() => Entity),
-) {
-  const isFn = typeof defaultEntity === "function";
-
-  return function selectEntity<S extends AnyState = AnyState>(
-    selectById: (s: S, p: PropId) => Entity | undefined,
-  ) {
-    return (state: S, { id }: PropId): Entity => {
-      if (isFn) {
-        const entity = defaultEntity as () => Entity;
-        return selectById(state, { id }) || entity();
-      }
-
-      return selectById(state, { id }) || (defaultEntity as Entity);
-    };
+export interface TableOutput<Entity extends AnyState, S extends AnyState> {
+  name: keyof S;
+  initialState: Record<IdProp, Entity>;
+  actions: {
+    add: (e: Record<IdProp, Entity>) => (s: S) => void;
+    set: (e: Record<IdProp, Entity>) => (s: S) => void;
+    remove: (ids: IdProp[]) => (s: S) => void;
+    patch: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
+    merge: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
+    reset: () => (s: S) => void;
   };
+  selectors: TableSelectors<Entity, S>;
 }
 
 export const createTable = <
@@ -91,35 +105,35 @@ export const createTable = <
 }: {
   name: keyof S;
   initialState?: Record<IdProp, Entity>;
-}) => {
+}): TableOutput<Entity, S> => {
   const selectors = tableSelectors<Entity, S>((s: S) => s[name]);
 
   return {
     name,
     initialState,
     actions: {
-      add: (entities: Record<IdProp, Entity>) => (s: S) => {
+      add: (entities) => (s) => {
         const state = selectors.selectTable(s);
         Object.keys(entities).forEach((id) => {
           state[id] = entities[id];
         });
       },
-      set: (entities: Record<IdProp, Entity>) => (s: S) => {
+      set: (entities) => (s) => {
         (s as any)[name] = entities;
       },
-      remove: (ids: IdProp[]) => (s: S) => {
+      remove: (ids) => (s) => {
         const state = selectors.selectTable(s);
         ids.forEach((id) => {
           delete state[id];
         });
       },
-      patch: (entities: PatchEntity<Record<IdProp, Entity>>) => (s: S) => {
+      patch: (entities) => (s) => {
         const state = selectors.selectTable(s);
         Object.keys(entities).forEach((id) => {
           state[id] = { ...state[id], ...entities[id] };
         });
       },
-      merge: (entities: PatchEntity<Record<IdProp, Entity>>) => (s: S) => {
+      merge: (entities) => (s) => {
         const state = selectors.selectTable(s);
         Object.keys(entities).forEach((id) => {
           const entity = entities[id];
@@ -134,7 +148,7 @@ export const createTable = <
           });
         });
       },
-      reset: () => (s: S) => {
+      reset: () => (s) => {
         (s as any)[name] = initialState;
       },
     },
