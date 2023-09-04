@@ -2,19 +2,12 @@ import { AnyState } from "../../types.ts";
 
 import { createTable } from "./table.ts";
 import { createAssign } from "./assign.ts";
-// import { StoreUpdater } from "../types.ts";
+import { StoreUpdater } from "../types.ts";
 import { configureStore } from "../store.ts";
 
-/* interface BaseType<TInput, TOutput = TInput> {
+interface BaseType<TInput, TOutput> {
   _types: { input: TInput; output: TOutput };
 }
-
-interface TableType<TInput, TOutput = TInput>
-  extends BaseType<TInput, TOutput> {
-}
-
-interface StringType<TOutput = string, S extends AnyState = AnyState> extends BaseType<string, TOutput>, AssignOutput<string, S> {
-} */
 
 /* interface SchemaType<S extends AnyState,
   O extends Record<string, SchemaFn<S>> = Record<string, SchemaFn<S>>,
@@ -23,30 +16,36 @@ interface StringType<TOutput = string, S extends AnyState = AnyState> extends Ba
   actions: Record<P, (...args: any[]) => StoreUpdater<S>>;
   selectors?: Record<P, any>;
 } */
-/* type SchemaFn<
+type SchemaFn<
   S extends AnyState,
   O extends Record<string, SchemaFn<S>>,
-  P extends keyof O = keyof O
-> = (name: string) => { actions: Record<P>}; */
+  P extends keyof O = keyof O,
+> = (name: string) => { actions: Record<P> };
 
-/* function createSchema<
+function createSchema<
   S extends AnyState = AnyState,
->(obj: Record<string, (name: string) => BaseType<any>>) {
-  return Object.keys(obj).reduce((acc, key) => {
+  O extends Record<string, SchemaFn<S>> = Record<string, SchemaFn<S>>,
+  P extends keyof O = keyof O,
+>(obj: O) {
+  const fin: Record<string, ReturnType<O[P]>> = {};
+  Object.keys(obj).forEach((key) => {
     const slice = obj[key];
-    (acc as any)[key] = slice(key);
-    return acc;
-  }, {});
-} */
-
-function table<V extends AnyState = AnyState, S extends AnyState = AnyState>(
-  name: keyof S,
-) {
-  return createTable<V, S>({ name });
+    fin[key] = slice(key);
+  });
+  return fin as Record<P, ReturnType<O[P]>> & { initialState: S };
 }
 
-function str<S extends AnyState = AnyState>(name: string, initialState = "") {
-  return createAssign<string, S>({ name, initialState });
+function table<V extends AnyState = AnyState, S extends AnyState = AnyState>() {
+  return (name: string) => createTable<V, S>({ name });
+}
+
+function str() {
+  return (name: string, initialState = "") =>
+    createAssign({ name, initialState });
+}
+
+function createStore<S extends AnyState = AnyState>(sch: { initialState: S }) {
+  return configureStore<S>({ initialState: sch.initialState });
 }
 
 // trying something
@@ -61,17 +60,12 @@ interface AppState {
   token: string;
 }
 
-const schema = {
-  users: table<User, AppState>("users"),
-  token: str<AppState>("token"),
-};
-const initialState = Object.keys(schema).reduce<
-  { [key in keyof AppState]: AppState[key] }
->((acc, key) => {
-  (acc as any)[key] = schema[key as keyof AppState].initialState;
-  return acc;
-}, {} as any);
+const users = table<User>();
+const schema = createSchema<AppState>({
+  users,
+  token: str(),
+});
 
-const store = configureStore({ initialState });
+const store = createStore(schema);
 schema.users.actions.add();
 schema.users.selectors.selectTable();

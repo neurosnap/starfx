@@ -115,3 +115,8 @@ export function* takeLeading<T>(
     }
   });
 }
+
+export function* apply<S, R, P>(actionFn: (s: S, p?: P) => R, p?: P) {
+  const store = yield* StoreContext;
+  actionFn(store.getState() as S, p);
+}
