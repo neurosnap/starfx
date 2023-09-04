@@ -20,7 +20,7 @@ type SchemaFn<
   S extends AnyState,
   O extends Record<string, SchemaFn<S>>,
   P extends keyof O = keyof O,
-  > = (name: string) => { actions: Record<P>};
+> = (name: string) => { actions: Record<P>};
 
 function createSchema<
   S extends AnyState = AnyState,
