@@ -3,11 +3,12 @@ import { describe, expect, it } from "../test.ts";
 import { call, keepAlive } from "../fx/mod.ts";
 import {
   configureStore,
+  createSchema,
+  slice,
   storeMdw,
   takeEvery,
   updateStore,
 } from "../store/mod.ts";
-import { createQueryState } from "../action.ts";
 import { sleep } from "../test.ts";
 import { safe } from "../mod.ts";
 
@@ -22,7 +23,18 @@ interface User {
   email: string;
 }
 
+const emptyUser: User = { id: "", name: "", email: "" };
 const mockUser: User = { id: "1", name: "test", email: "test@test.com" };
+
+const testStore = () => {
+  const schema = createSchema({
+    users: slice.table<User>({ empty: emptyUser }),
+    loaders: slice.loader(),
+    data: slice.table({ empty: {} }),
+  });
+  const store = configureStore(schema);
+  return { schema, store };
+};
 
 const jsonBlob = (data: unknown) => {
   return JSON.stringify(data);
@@ -221,9 +233,10 @@ it(tests, "run() from a normal saga", () => {
 });
 
 it(tests, "createApi with hash key on a large post", async () => {
+  const { store, schema } = testStore();
   const query = createApi();
   query.use(requestMonitor());
-  query.use(storeMdw());
+  query.use(storeMdw(schema.db));
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const data = {
@@ -269,9 +282,6 @@ it(tests, "createApi with hash key on a large post", async () => {
   const email = mockUser.email + "9";
   const largetext = "abc-def-ghi-jkl-mno-pqr".repeat(100);
 
-  const store = configureStore({
-    initialState: { ...createQueryState(), users: {} },
-  });
   store.run(query.bootup);
   store.dispatch(createUserDefaultKey({ email, largetext }));
 
@@ -284,16 +294,17 @@ it(tests, "createApi with hash key on a large post", async () => {
   });
 
   expect([8, 9].includes(expectedKey.split("|")[1].length)).toBeTruthy();
-  expect(s["@@starfx/data"][expectedKey]).toEqual({
+  expect(s.data[expectedKey]).toEqual({
     "1": { id: "1", name: "test", email: email, largetext: largetext },
   });
 });
 
 it(tests, "createApi - two identical endpoints", async () => {
   const actual: string[] = [];
+  const { store, schema } = testStore();
   const api = createApi();
   api.use(requestMonitor());
-  api.use(storeMdw());
+  api.use(storeMdw(schema.db));
   api.use(api.routes());
 
   const first = api.get(
@@ -314,7 +325,6 @@ it(tests, "createApi - two identical endpoints", async () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(first());
   store.dispatch(second());
@@ -434,6 +444,7 @@ it(
 
 it(tests, "should bubble up error", () => {
   let error: any = null;
+  const { store, schema } = testStore();
   const api = createApi();
   api.use(function* (_, next) {
     try {
@@ -443,7 +454,7 @@ it(tests, "should bubble up error", () => {
     }
   });
   api.use(queryCtx);
-  api.use(storeMdw());
+  api.use(storeMdw(schema.db));
   api.use(api.routes());
 
   const fetchUser = api.get(
@@ -455,7 +466,6 @@ it(tests, "should bubble up error", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(fetchUser());
   expect(error.message).toBe(

@@ -37,7 +37,15 @@ export function* emit({
   }
 }
 
-export function* select<S, R, P>(selectorFn: (s: S, p?: P) => R, p?: P) {
+export function select<S, R>(selectorFn: (s: S) => R): Operation<R>;
+export function select<S, R, P>(
+  selectorFn: (s: S, p: P) => R,
+  p: P,
+): Operation<R>;
+export function* select<S, R, P>(
+  selectorFn: (s: S, p?: P) => R,
+  p?: P,
+): Operation<R> {
   const store = yield* StoreContext;
   return selectorFn(store.getState() as S, p);
 }

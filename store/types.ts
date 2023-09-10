@@ -17,6 +17,16 @@ declare global {
   }
 }
 
+export interface BaseSchema<TOutput> {
+  initialState: TOutput;
+  schema: string;
+  name: string;
+}
+
+export type Output<O extends { [key: string]: BaseSchema<unknown> }> = {
+  [key in keyof O]: O[key]["initialState"];
+};
+
 export interface FxStore<S extends AnyState> {
   getScope: () => Scope;
   getState: () => S;
@@ -26,6 +36,7 @@ export interface FxStore<S extends AnyState> {
   // deno-lint-ignore no-explicit-any
   dispatch: (a: AnyAction) => any;
   replaceReducer: (r: (s: S, a: AnyAction) => S) => void;
+  getInitialState: () => S;
   // deno-lint-ignore no-explicit-any
   [Symbol.observable]: () => any;
 }
