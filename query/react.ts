@@ -1,4 +1,4 @@
-import type { LoadingState, QueryState } from "../types.ts";
+import type { LoaderState, QueryState } from "../types.ts";
 import { React, useDispatch, useSelector } from "../deps.ts";
 const { useState, useEffect } = React;
 
@@ -13,16 +13,16 @@ interface SagaAction<P = any> {
   payload: { key: string; options: P };
 }
 
-export interface UseApiProps<P = any> extends LoadingState {
+export interface UseApiProps<P = any> extends LoaderState {
   trigger: (p: P) => void;
   action: ActionFn<P>;
 }
-export interface UseApiSimpleProps extends LoadingState {
+export interface UseApiSimpleProps extends LoaderState {
   trigger: () => void;
   action: ActionFn;
 }
 export interface UseApiAction<A extends SagaAction = SagaAction>
-  extends LoadingState {
+  extends LoaderState {
   trigger: () => void;
   action: A;
 }
@@ -201,7 +201,7 @@ export function useCache<D = any, A extends SagaAction = SagaAction>(
  * ```
  */
 export function useLoaderSuccess(
-  cur: Pick<LoadingState, "isLoading" | "isSuccess">,
+  cur: Pick<LoaderState, "isLoading" | "isSuccess">,
   success: () => any,
 ) {
   const [prev, setPrev] = useState(cur);
