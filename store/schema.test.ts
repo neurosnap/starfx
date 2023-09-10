@@ -4,6 +4,8 @@ import { configureStore } from "./store.ts";
 import { slice } from "./slice/mod.ts";
 import { createSchema } from "./schema.ts";
 
+import { app } from "./test.util.ts"
+import { updateStore } from "./mod.ts";
 const tests = describe("createSchema()");
 
 interface User {
@@ -89,5 +91,19 @@ it(tests, "can work with a nested object", async () => {
     yield* schema.update(db.currentUser.patch({ key: "roles", value: ["admin", "user"] }));
     const curUser3 = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser3, { id: "", name: "vvv", roles: ["admin", "user"] });
+  });
+});
+
+it(tests, "can use an imported object for the schema definition", async () => {
+  const schema = createSchema({
+    [app.repoName]: slice.obj<typeof app>(app),
+  });
+  const db = schema.db;
+  const store = await configureStore(schema);
+  
+  await store.run(function* () {
+    yield* updateStore(db.app.patch({ key: "thisAppVersion", value: "2.0.0" }));
+    const app = yield* select(db.app.select);
+    asserts.assertEquals(app, { repoName:"app", thisAppName: "my-app", thisAppVersion: "2.0.0" });
   });
 });
