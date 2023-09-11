@@ -4,11 +4,16 @@ import { configureStore } from "./store.ts";
 import { slice } from "./slice/mod.ts";
 import { createSchema } from "./schema.ts";
 
+import { app } from "./test.util.ts";
+import { updateStore } from "./mod.ts";
 const tests = describe("createSchema()");
 
 interface User {
   id: string;
   name: string;
+}
+interface UserWithRoles extends User {
+  roles: string[];
 }
 
 const emptyUser = { id: "", name: "" };
@@ -54,7 +59,7 @@ it(tests, "general types and functionality", async () => {
     const counter = yield* select(db.counter.select);
     asserts.assertEquals(counter, 1);
 
-    yield* schema.update(db.currentUser.patch({ key: "name", value: "vvv" }));
+    yield* schema.update(db.currentUser.update({ key: "name", value: "vvv" }));
     const curUser = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser, { id: "", name: "vvv" });
 
@@ -65,5 +70,54 @@ it(tests, "general types and functionality", async () => {
     asserts.assertEquals(fetchLoader.id, "fetch-users");
     asserts.assertEquals(fetchLoader.status, "loading");
     asserts.assertNotEquals(fetchLoader.lastRun, 0);
+  });
+});
+
+it(tests, "can work with a nested object", async () => {
+  const schema = createSchema({
+    currentUser: slice.obj<UserWithRoles>({ id: "", name: "", roles: [] }),
+  });
+  const db = schema.db;
+  const store = configureStore(schema);
+  await store.run(function* () {
+    yield* schema.update(db.currentUser.update({ key: "name", value: "vvv" }));
+    const curUser = yield* select(db.currentUser.select);
+    asserts.assertEquals(curUser, { id: "", name: "vvv", roles: [] });
+
+    yield* schema.update(
+      db.currentUser.update({ key: "roles", value: ["admin"] }),
+    );
+    const curUser2 = yield* select(db.currentUser.select);
+    asserts.assertEquals(curUser2, { id: "", name: "vvv", roles: ["admin"] });
+
+    yield* schema.update(
+      db.currentUser.update({ key: "roles", value: ["admin", "user"] }),
+    );
+    const curUser3 = yield* select(db.currentUser.select);
+    asserts.assertEquals(curUser3, {
+      id: "",
+      name: "vvv",
+      roles: ["admin", "user"],
+    });
+  });
+});
+
+it(tests, "can use an imported object for the schema definition", async () => {
+  const schema = createSchema({
+    [app.repoName]: slice.obj<typeof app>(app),
+  });
+  const db = schema.db;
+  const store = await configureStore(schema);
+
+  await store.run(function* () {
+    yield* updateStore(
+      db.app.update({ key: "thisAppVersion", value: "2.0.0" }),
+    );
+    const app = yield* select(db.app.select);
+    asserts.assertEquals(app, {
+      repoName: "app",
+      thisAppName: "my-app",
+      thisAppVersion: "2.0.0",
+    });
   });
 });
