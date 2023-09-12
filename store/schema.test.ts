@@ -10,6 +10,9 @@ interface User {
   id: string;
   name: string;
 }
+interface UserWithRoles extends User {
+  roles: string[];
+}
 
 const emptyUser = { id: "", name: "" };
 it(tests, "general types and functionality", async () => {
@@ -54,7 +57,7 @@ it(tests, "general types and functionality", async () => {
     const counter = yield* select(db.counter.select);
     asserts.assertEquals(counter, 1);
 
-    yield* schema.update(db.currentUser.patch({ key: "name", value: "vvv" }));
+    yield* schema.update(db.currentUser.update({ key: "name", value: "vvv" }));
     const curUser = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser, { id: "", name: "vvv" });
 
@@ -65,5 +68,34 @@ it(tests, "general types and functionality", async () => {
     asserts.assertEquals(fetchLoader.id, "fetch-users");
     asserts.assertEquals(fetchLoader.status, "loading");
     asserts.assertNotEquals(fetchLoader.lastRun, 0);
+  });
+});
+
+it(tests, "can work with a nested object", async () => {
+  const schema = createSchema({
+    currentUser: slice.obj<UserWithRoles>({ id: "", name: "", roles: [] }),
+  });
+  const db = schema.db;
+  const store = configureStore(schema);
+  await store.run(function* () {
+    yield* schema.update(db.currentUser.update({ key: "name", value: "vvv" }));
+    const curUser = yield* select(db.currentUser.select);
+    asserts.assertEquals(curUser, { id: "", name: "vvv", roles: [] });
+
+    yield* schema.update(
+      db.currentUser.update({ key: "roles", value: ["admin"] }),
+    );
+    const curUser2 = yield* select(db.currentUser.select);
+    asserts.assertEquals(curUser2, { id: "", name: "vvv", roles: ["admin"] });
+
+    yield* schema.update(
+      db.currentUser.update({ key: "roles", value: ["admin", "users"] }),
+    );
+    const curUser3 = yield* select(db.currentUser.select);
+    asserts.assertEquals(curUser3, {
+      id: "",
+      name: "vvv",
+      roles: ["admin", "users"],
+    });
   });
 });
