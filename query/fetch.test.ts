@@ -10,7 +10,7 @@ import {
 import { fetcher, fetchRetry } from "./fetch.ts";
 import { createApi } from "./api.ts";
 import { requestMonitor } from "./middleware.ts";
-import { StoreApiCtx } from "../store/query.ts";
+import { select, StoreApiCtx } from "../store/mod.ts";
 
 install();
 

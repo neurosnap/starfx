@@ -32,10 +32,21 @@ export function storeMdw<
   errorFn?: (ctx: Ctx) => string;
 }) {
   return compose<Ctx>([
+    schemaMdw(schema),
     dispatchActions,
     loadingMonitor(schema.db.loaders, errorFn),
     simpleCache(schema.db.data),
   ]);
+}
+
+export function schemaMdw<Ctx extends StoreApiCtx<any> = StoreApiCtx<any>>(
+  schema: FxStoreSchema<any, any>,
+) {
+  return function* (ctx: Ctx, next: Next) {
+    ctx.db = schema.db;
+    ctx.update = schema.update;
+    yield* next();
+  };
 }
 
 /**
