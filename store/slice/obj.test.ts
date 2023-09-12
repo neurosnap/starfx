@@ -4,12 +4,12 @@ import { configureStore, updateStore } from "../../store/mod.ts";
 import { createObj } from "./obj.ts";
 const tests = describe("createObj()");
 
-export type TCurrentUser = {
+export interface ICurrentUser {
   username: string;
   userId: number;
   isadmin: boolean;
   roles: string[];
-};
+}
 
 const NAME = "currentUser";
 const crtInitialState = {
@@ -19,7 +19,7 @@ const crtInitialState = {
   roles: [],
 };
 
-const slice = createObj<TCurrentUser>({
+const slice = createObj<ICurrentUser>({
   name: NAME,
   initialState: crtInitialState,
 });
