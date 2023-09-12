@@ -2,7 +2,7 @@ import type { Operation, Task } from "../deps.ts";
 import { action, resource, spawn } from "../deps.ts";
 import type { OpFn } from "../types.ts";
 
-import { toOperation } from "./call.ts";
+import { toOp } from "./call.ts";
 
 interface OpMap<T = unknown> {
   [key: string]: OpFn<T>;
@@ -20,8 +20,9 @@ export function race(
       for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
         yield* spawn(function* () {
-          const task = yield* spawn(() => toOperation(opMap[key]));
+          const task = yield* spawn(() => toOp(opMap[key]));
           taskMap[key] = task;
+          // deno-lint-ignore no-explicit-any
           (resultMap as any)[key] = yield* task;
           resolve(task);
         });

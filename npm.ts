@@ -30,9 +30,9 @@ async function main() {
       },
     ],
     mappings: {
-      "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts": {
+      "https://deno.land/x/effection@3.0.0-alpha.14/mod.ts": {
         name: "effection",
-        version: "3.0.0-alpha.13",
+        version: "3.0.0-alpha.14",
       },
       "https://esm.sh/react@18.2.0?pin=v122": {
         name: "react",

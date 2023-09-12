@@ -16,6 +16,7 @@ import { queryCtx, requestMonitor, urlParser } from "./middleware.ts";
 import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
+import { StoreApiCtx } from "../store/mod.ts";
 
 interface User {
   id: string;
@@ -234,9 +235,9 @@ it(tests, "run() from a normal saga", () => {
 
 it(tests, "createApi with hash key on a large post", async () => {
   const { store, schema } = testStore();
-  const query = createApi();
+  const query = createApi<StoreApiCtx<typeof schema>>();
   query.use(requestMonitor());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw({ schema }));
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const data = {
@@ -302,9 +303,9 @@ it(tests, "createApi with hash key on a large post", async () => {
 it(tests, "createApi - two identical endpoints", async () => {
   const actual: string[] = [];
   const { store, schema } = testStore();
-  const api = createApi();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
 
   const first = api.get(
@@ -445,7 +446,7 @@ it(
 it(tests, "should bubble up error", () => {
   let error: any = null;
   const { store, schema } = testStore();
-  const api = createApi();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(function* (_, next) {
     try {
       yield* next();
@@ -454,7 +455,7 @@ it(tests, "should bubble up error", () => {
     }
   });
   api.use(queryCtx);
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
 
   const fetchUser = api.get(

@@ -3,4 +3,3 @@ export * from "./call.ts";
 export * from "./race.ts";
 export * from "./request.ts";
 export * from "./watch.ts";
-export * from "./defer.ts";

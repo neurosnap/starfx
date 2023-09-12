@@ -8,13 +8,16 @@ export type {
   Stream,
   Subscription,
   Task,
-} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.14/mod.ts";
 export {
   action,
   createChannel,
   createContext,
+  createQueue,
   createScope,
+  createSignal,
   each,
+  ensure,
   Err,
   expect,
   filter,
@@ -27,7 +30,7 @@ export {
   spawn,
   suspend,
   useAbortSignal,
-} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.14/mod.ts";
 
 import React from "https://esm.sh/react@18.2.0?pin=v122";
 export { React };

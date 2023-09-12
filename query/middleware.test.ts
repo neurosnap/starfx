@@ -21,6 +21,7 @@ import {
   updateStore,
 } from "../store/mod.ts";
 import { safe } from "../mod.ts";
+import { StoreApiCtx } from "../store/query.ts";
 
 interface User {
   id: string;
@@ -115,9 +116,10 @@ it(tests, "basic", () => {
 
 it(tests, "with loader", () => {
   const { schema, store } = testStore();
-  const api = createApi<ApiCtx>();
+  type MyCtx<P = any, S = any, E = any> = StoreApiCtx<typeof schema, P, S, E>;
+  const api = createApi<MyCtx>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
@@ -128,13 +130,13 @@ it(tests, "with loader", () => {
   const fetchUsers = api.create(
     `/users`,
     { supervisor: takeEvery },
-    function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
+    function* processUsers(ctx: MyCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
 
       const { data } = ctx.json;
 
-      yield* updateStore((state) => {
+      yield* ctx.update((state) => {
         data.users.forEach((u) => {
           state.users[u.id] = u;
         });
@@ -157,9 +159,10 @@ it(tests, "with loader", () => {
 
 it(tests, "with item loader", () => {
   const { store, schema } = testStore();
-  const api = createApi<ApiCtx>();
+  type MyCtx<P = any, S = any, E = any> = StoreApiCtx<typeof schema, P, S, E>;
+  const api = createApi<MyCtx>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
@@ -170,12 +173,12 @@ it(tests, "with item loader", () => {
   const fetchUser = api.create<{ id: string }>(
     `/users/:id`,
     { supervisor: takeEvery },
-    function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
+    function* processUsers(ctx: MyCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
 
       const { data } = ctx.json;
-      yield* updateStore((state) => {
+      yield* ctx.update((state) => {
         data.users.forEach((u) => {
           state.users[u.id] = u;
         });
@@ -253,9 +256,9 @@ it(tests, "with POST", () => {
 
 it(tests, "simpleCache", () => {
   const { store, schema } = testStore();
-  const api = createApi<ApiCtx>();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
@@ -283,9 +286,10 @@ it(tests, "simpleCache", () => {
 
 it(tests, "overriding default loader behavior", () => {
   const { store, schema } = testStore();
-  const api = createApi<ApiCtx>();
+  type MyCtx<P = any, S = any, E = any> = StoreApiCtx<typeof schema, P, S, E>;
+  const api = createApi<MyCtx>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
@@ -297,7 +301,7 @@ it(tests, "overriding default loader behavior", () => {
   const fetchUsers = api.create(
     `/users`,
     { supervisor: takeEvery },
-    function* (ctx: ApiCtx<unknown, { users: User[] }>, next) {
+    function* (ctx: MyCtx<unknown, { users: User[] }>, next) {
       const id = ctx.name;
       yield* next();
 
@@ -306,7 +310,7 @@ it(tests, "overriding default loader behavior", () => {
       }
       const { data } = ctx.json;
       ctx.loader = { id, message: "yes", meta: { wow: true } };
-      yield* updateStore((state) => {
+      yield* ctx.update((state) => {
         data.users.forEach((u) => {
           state.users[u.id] = u;
         });
@@ -341,9 +345,9 @@ it(tests, "requestMonitor - error handler", () => {
   };
 
   const { schema, store } = testStore();
-  const query = createApi<ApiCtx>();
+  const query = createApi<StoreApiCtx<typeof schema>>();
   query.use(requestMonitor());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw({ schema }));
   query.use(query.routes());
   query.use(function* () {
     throw new Error("something happened");
@@ -357,9 +361,9 @@ it(tests, "requestMonitor - error handler", () => {
 
 it(tests, "createApi with own key", async () => {
   const { schema, store } = testStore();
-  const query = createApi();
+  const query = createApi<StoreApiCtx<typeof schema>>();
   query.use(requestMonitor());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw({ schema }));
   query.use(query.routes());
   query.use(customKey);
   query.use(function* fetchApi(ctx, next) {
@@ -427,9 +431,9 @@ it(tests, "createApi with own key", async () => {
 
 it(tests, "createApi with custom key but no payload", async () => {
   const { store, schema } = testStore();
-  const query = createApi();
+  const query = createApi<StoreApiCtx<typeof schema>>();
   query.use(requestMonitor());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw({ schema }));
   query.use(query.routes());
   query.use(customKey);
   query.use(function* fetchApi(ctx, next) {

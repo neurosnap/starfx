@@ -5,19 +5,31 @@ import type { AnyAction, AnyState } from "../types.ts";
 import { put, select, updateStore } from "./fx.ts";
 import { LoaderOutput } from "./slice/loader.ts";
 import { TableOutput } from "./slice/table.ts";
+import { FxStoreSchema } from "./schema.ts";
+import { BaseSchema } from "./types.ts";
+
+export interface StoreApiCtx<
+  Schema extends FxStoreSchema<any, any>,
+  Payload = any,
+  ApiSuccess = any,
+  ApiError = any,
+  > extends ApiCtx<Payload, ApiSuccess, ApiError> {
+    db: Schema["db"];
+    update: Schema["update"];
+}
 
 export function storeMdw<
-  Ctx extends ApiCtx = ApiCtx,
-  M extends AnyState = AnyState,
->({ data, loaders, errorFn }: {
-  loaders: LoaderOutput<M, AnyState>;
-  data: TableOutput<any, AnyState>;
+  O extends { [key: string]: (name: string) => BaseSchema<unknown> } & { data: TableOutput<any, AnyState>, loaders: LoaderOutput<any, AnyState> },
+  S extends AnyState,
+  Ctx extends StoreApiCtx<FxStoreSchema<O, S>> = StoreApiCtx<FxStoreSchema<O, S>>,
+>({ schema, errorFn }: {
+  schema: FxStoreSchema<O, S>,
   errorFn?: (ctx: Ctx) => string;
 }) {
   return compose<Ctx>([
     dispatchActions,
-    loadingMonitor(loaders, errorFn),
-    simpleCache(data),
+    loadingMonitor(schema.db.loaders, errorFn),
+    simpleCache(schema.db.data),
   ]);
 }
 
@@ -26,6 +38,7 @@ export function storeMdw<
  * which is where we store JSON data from the `fetcher` middleware.
  */
 export function simpleCache<Ctx extends ApiCtx = ApiCtx>(
+  // deno-lint-ignore no-explicit-any
   dataSchema: TableOutput<any, AnyState>,
 ) {
   return function* (
@@ -71,6 +84,7 @@ export function loadingMonitor<
       loaderSchema.start({ id: ctx.name }),
       loaderSchema.start({ id: ctx.key }),
     ]);
+    // deno-lint-ignore no-explicit-any
     if (!ctx.loader) ctx.loader = {} as any;
 
     yield* next();

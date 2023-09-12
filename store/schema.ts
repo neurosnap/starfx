@@ -1,16 +1,22 @@
 import { updateStore } from "./fx.ts";
 import { BaseSchema, FxStore, StoreUpdater } from "./types.ts";
+import { AnyState } from "../types.ts";
+
+export interface FxStoreSchema<
+  O extends { [key: string]: (name: string) => BaseSchema<unknown> },
+  S extends AnyState,
+> {
+  db: { [key in keyof O]: ReturnType<O[key]> };
+  initialState: S;
+  update: FxStore<S>["update"];
+}
 
 export function createSchema<
   O extends { [key: string]: (name: string) => BaseSchema<unknown> },
   S extends { [key in keyof O]: ReturnType<O[key]>["initialState"] },
 >(
   slices: O,
-): {
-  db: { [key in keyof O]: ReturnType<O[key]> };
-  initialState: S;
-  update: FxStore<S>["update"];
-} {
+): FxStoreSchema<O, S> {
   const db = Object.keys(slices).reduce((acc, key) => {
     // deno-lint-ignore no-explicit-any
     (acc as any)[key] = slices[key](key);

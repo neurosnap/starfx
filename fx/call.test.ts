@@ -6,7 +6,7 @@ import { call } from "./call.ts";
 const tests = describe("call()");
 
 it(tests, "should call the generator function", async () => {
-  function* me() {
+  function me() {
     return "valid";
   }
 
@@ -18,7 +18,7 @@ it(tests, "should call the generator function", async () => {
 
 it(tests, "should return an Err()", async () => {
   const err = new Error("bang!");
-  function* me() {
+  function me() {
     throw err;
   }
 

@@ -10,6 +10,7 @@ import {
 import { fetcher, fetchRetry } from "./fetch.ts";
 import { createApi } from "./api.ts";
 import { requestMonitor } from "./middleware.ts";
+import { StoreApiCtx } from "../store/query.ts";
 
 install();
 
@@ -41,9 +42,9 @@ it(
     });
 
     const { store, schema } = testStore();
-    const api = createApi();
+    const api = createApi<StoreApiCtx<typeof schema>>();
     api.use(requestMonitor());
-    api.use(storeMdw(schema.db));
+    api.use(storeMdw({ schema }));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -89,9 +90,9 @@ it(
     });
 
     const { store, schema } = testStore();
-    const api = createApi();
+    const api = createApi<StoreApiCtx<typeof schema>>();
     api.use(requestMonitor());
-    api.use(storeMdw(schema.db));
+    api.use(storeMdw({ schema }));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -124,9 +125,9 @@ it(tests, "fetch - error handling", async () => {
   });
 
   const { schema, store } = testStore();
-  const api = createApi();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -165,9 +166,9 @@ it(tests, "fetch - status 204", async () => {
   });
 
   const { schema, store } = testStore();
-  const api = createApi();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -205,9 +206,9 @@ it(tests, "fetch - malformed json", async () => {
   });
 
   const { schema, store } = testStore();
-  const api = createApi();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -248,9 +249,9 @@ it(tests, "fetch - POST", async () => {
   });
 
   const { schema, store } = testStore();
-  const api = createApi();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(fetcher({ baseUrl }));
 
@@ -288,9 +289,9 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
   });
 
   const { store, schema } = testStore();
-  const api = createApi();
+  const api = createApi<StoreApiCtx<typeof schema>>();
   api.use(requestMonitor());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw({ schema }));
   api.use(api.routes());
   api.use(fetcher({ baseUrl }));
 
@@ -348,9 +349,9 @@ it(
   "fetch - slug in url but payload has empty string for slug value",
   async () => {
     const { store, schema } = testStore();
-    const api = createApi();
+    const api = createApi<StoreApiCtx<typeof schema>>();
     api.use(requestMonitor());
-    api.use(storeMdw(schema.db));
+    api.use(storeMdw({ schema }));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -395,9 +396,9 @@ it(
     });
 
     const { schema, store } = testStore();
-    const api = createApi();
+    const api = createApi<StoreApiCtx<typeof schema>>();
     api.use(requestMonitor());
-    api.use(storeMdw(schema.db));
+    api.use(storeMdw({ schema }));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 
@@ -441,9 +442,9 @@ it(
 
     const { schema, store } = testStore();
     let actual = null;
-    const api = createApi();
+    const api = createApi<StoreApiCtx<typeof schema>>();
     api.use(requestMonitor());
-    api.use(storeMdw(schema.db));
+    api.use(storeMdw({ schema }));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
 

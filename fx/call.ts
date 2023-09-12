@@ -10,7 +10,7 @@ export const isIterator = (it: unknown) =>
   isFunc((it as Iterator<unknown>).next) &&
   isFunc((it as Iterator<unknown>).throw);
 
-export function* toOperation<T>(opFn: OpFn<T>): Operation<T> {
+export function* toOp<T>(opFn: OpFn<T>): Operation<T> {
   const op = opFn();
   let result: T;
   if (isPromise(op)) {
@@ -25,7 +25,7 @@ export function* toOperation<T>(opFn: OpFn<T>): Operation<T> {
 
 export function call<T>(op: OpFn<T>): Operation<T> {
   return action(function* (resolve) {
-    const result = yield* toOperation(op);
+    const result = yield* toOp(op);
     resolve(result);
   });
 }
