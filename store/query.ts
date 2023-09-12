@@ -13,17 +13,22 @@ export interface StoreApiCtx<
   Payload = any,
   ApiSuccess = any,
   ApiError = any,
-  > extends ApiCtx<Payload, ApiSuccess, ApiError> {
-    db: Schema["db"];
-    update: Schema["update"];
+> extends ApiCtx<Payload, ApiSuccess, ApiError> {
+  db: Schema["db"];
+  update: Schema["update"];
 }
 
 export function storeMdw<
-  O extends { [key: string]: (name: string) => BaseSchema<unknown> } & { data: TableOutput<any, AnyState>, loaders: LoaderOutput<any, AnyState> },
+  O extends { [key: string]: (name: string) => BaseSchema<unknown> } & {
+    data: TableOutput<any, AnyState>;
+    loaders: LoaderOutput<any, AnyState>;
+  },
   S extends AnyState,
-  Ctx extends StoreApiCtx<FxStoreSchema<O, S>> = StoreApiCtx<FxStoreSchema<O, S>>,
+  Ctx extends StoreApiCtx<FxStoreSchema<O, S>> = StoreApiCtx<
+    FxStoreSchema<O, S>
+  >,
 >({ schema, errorFn }: {
-  schema: FxStoreSchema<O, S>,
+  schema: FxStoreSchema<O, S>;
   errorFn?: (ctx: Ctx) => string;
 }) {
   return compose<Ctx>([
