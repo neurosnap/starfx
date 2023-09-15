@@ -8,7 +8,7 @@ export type {
   Stream,
   Subscription,
   Task,
-} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.14/mod.ts";
 export {
   action,
   createChannel,
@@ -27,7 +27,7 @@ export {
   spawn,
   suspend,
   useAbortSignal,
-} from "https://deno.land/x/effection@3.0.0-alpha.13/mod.ts";
+} from "https://deno.land/x/effection@3.0.0-alpha.14/mod.ts";
 
 import React from "https://esm.sh/react@18.2.0?pin=v122";
 export { React };
@@ -64,10 +64,10 @@ export {
 export type {
   MapEntity,
   PatchEntity,
-} from "https://esm.sh/robodux@15.0.1?pin=v122";
+} from "https://esm.sh/robodux@15.0.2?pin=v122";
 export {
   createLoaderTable,
   createReducerMap,
   createTable,
   mapReducers,
-} from "https://esm.sh/robodux@15.0.1?pin=v122";
+} from "https://esm.sh/robodux@15.0.2?pin=v122";

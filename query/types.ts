@@ -56,7 +56,7 @@ export interface FetchJsonCtx<P = any, ApiSuccess = any, ApiError = any>
 export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   extends FetchJsonCtx<Payload, ApiSuccess, ApiError> {
   actions: Action[];
-  loader: LoaderPayload<any> | null;
+  loader: Omit<LoaderPayload<any>, "id"> | null;
   cache: boolean;
   cacheData: any;
 }

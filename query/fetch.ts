@@ -237,7 +237,6 @@ export function fetcher<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   } = { baseUrl: "" },
 ) {
   return compose<CurCtx>([
-    headersMdw,
     apiUrlMdw(baseUrl),
     payloadMdw,
     fetchMdw,

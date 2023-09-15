@@ -298,14 +298,13 @@ it(tests, "overriding default loader behavior", () => {
     `/users`,
     { supervisor: takeEvery },
     function* (ctx: ApiCtx<unknown, { users: User[] }>, next) {
-      const id = ctx.name;
       yield* next();
 
       if (!ctx.json.ok) {
         return;
       }
       const { data } = ctx.json;
-      ctx.loader = { id, message: "yes", meta: { wow: true } };
+      ctx.loader = { message: "yes", meta: { wow: true } };
       yield* updateStore((state) => {
         data.users.forEach((u) => {
           state.users[u.id] = u;

@@ -1,6 +1,6 @@
 import type { LoaderState, QueryState } from "../types.ts";
 import { React, useDispatch, useSelector } from "../deps.ts";
-const { useState, useEffect } = React;
+const { useEffect, useRef } = React;
 
 // TODO: remove store deps
 import { selectDataById, selectLoaderById } from "../redux/mod.ts";
@@ -201,15 +201,14 @@ export function useCache<D = any, A extends SagaAction = SagaAction>(
  * ```
  */
 export function useLoaderSuccess(
-  cur: Pick<LoaderState, "isLoading" | "isSuccess">,
+  cur: Pick<LoaderState, "status">,
   success: () => any,
 ) {
-  const [prev, setPrev] = useState(cur);
+  const prev = useRef(cur);
   useEffect(() => {
-    const curSuccess = !cur.isLoading && cur.isSuccess;
-    if (prev.isLoading && curSuccess) {
+    if (prev.current.status !== "success" && cur.status === "success") {
       success();
     }
-    setPrev(cur);
-  }, [cur.isSuccess, cur.isLoading]);
+    prev.current = cur;
+  }, [cur.status]);
 }

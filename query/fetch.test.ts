@@ -7,7 +7,7 @@ import {
   takeEvery,
 } from "../store/mod.ts";
 
-import { fetcher, fetchRetry } from "./fetch.ts";
+import { fetcher, fetchRetry, headersMdw } from "./fetch.ts";
 import { createApi } from "./api.ts";
 import { requestMonitor } from "./middleware.ts";
 
@@ -45,6 +45,7 @@ it(
     api.use(requestMonitor());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
+    api.use(headersMdw);
     api.use(fetcher({ baseUrl }));
 
     const actual: any[] = [];
