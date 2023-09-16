@@ -1,22 +1,17 @@
 import { call, race } from "../fx/mod.ts";
-import { take, takeLatest, takeLeading } from "./fx.ts";
+import { take } from "./fx.ts";
 import { Operation, sleep, spawn, Task } from "../deps.ts";
-import type { ActionWPayload, AnyAction, OpFn } from "../types.ts";
-import type { CreateActionPayload } from "../query/mod.ts";
+import type { ActionWPayload, AnyAction } from "../types.ts";
+import type { CreateActionPayload, Supervisor } from "../query/mod.ts";
 
 const MS = 1000;
 const SECONDS = 1 * MS;
 const MINUTES = 60 * SECONDS;
 
-export function* latest(action: string, saga: any) {
-  yield takeLatest(`${action}`, saga);
-}
-
-export function* leading(action: string, saga: any) {
-  yield takeLeading(`${action}`, saga);
-}
-
-export function poll(parentTimer: number = 5 * 1000, cancelType?: string) {
+export function poll(
+  parentTimer: number = 5 * 1000,
+  cancelType?: string,
+): Supervisor {
   return function* poller<T>(
     actionType: string,
     op: (action: AnyAction) => Operation<T>,
@@ -49,10 +44,10 @@ export function poll(parentTimer: number = 5 * 1000, cancelType?: string) {
  * So if we call `fetchApp({ id: 1 })` and then `fetchApp({ id: 2 })` if we use a normal
  * cache timer then the second call will not send an http request.
  */
-export function timer(timer: number = 5 * MINUTES) {
-  return function* onTimer(
+export function timer(timer: number = 5 * MINUTES): Supervisor {
+  return function* onTimer<T>(
     actionType: string,
-    op: (action: AnyAction) => OpFn,
+    op: (action: AnyAction) => Operation<T>,
   ) {
     const map: { [key: string]: Task<unknown> } = {};
 

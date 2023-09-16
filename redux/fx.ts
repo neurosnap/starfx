@@ -93,6 +93,7 @@ export function* takeLatest<T>(
     }
   });
 }
+export const latest = takeLatest;
 
 export function* takeLeading<T>(
   pattern: ActionPattern,
@@ -106,6 +107,7 @@ export function* takeLeading<T>(
     }
   });
 }
+export const leading = takeLeading;
 
 export function* put(action: AnyAction | AnyAction[]) {
   const store = yield* StoreContext;
