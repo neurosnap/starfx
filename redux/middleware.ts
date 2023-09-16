@@ -1,36 +1,21 @@
-import {
-  Action,
-  BATCH,
-  BatchAction,
-  ReducersMapObject,
-  Scope,
-} from "../deps.ts";
+import { BATCH, BatchAction, ReducersMapObject, Scope } from "../deps.ts";
 import { combineReducers, createScope, enableBatching } from "../deps.ts";
-import { parallel } from "../fx/mod.ts";
 import type { AnyAction } from "../types.ts";
-
 import { ActionContext, emit, StoreContext } from "./fx.ts";
 import { reducers as queryReducers } from "./query.ts";
 import type { StoreLike } from "./types.ts";
 
 function* send(action: AnyAction) {
+  const signal = yield* ActionContext;
   if (action.type === BATCH) {
     const actions = action.payload as BatchAction[];
-    const group = yield* parallel(
-      actions.map(
-        (a) =>
-          function* () {
-            yield* emit({
-              channel: ActionContext,
-              action: a as Action,
-            });
-          },
-      ),
-    );
-    yield* group;
+    emit({
+      signal,
+      action: actions,
+    });
   } else {
-    yield* emit({
-      channel: ActionContext,
+    emit({
+      signal,
       action,
     });
   }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { sleep, spawn } from "../deps.ts";
+import { each, sleep, spawn } from "../deps.ts";
 
 import { ActionContext, put, take } from "./mod.ts";
 import { createTestStore } from "./util.ts";
@@ -12,11 +12,9 @@ it(putTests, "should send actions through channel", async () => {
   function* genFn(arg: string) {
     yield* spawn(function* () {
       const actions = yield* ActionContext;
-      const msgs = yield* actions.output;
-      let action = yield* msgs.next();
-      while (!action.done) {
-        actual.push(action.value.type);
-        action = yield* msgs.next();
+      for (const action of yield* each(actions.stream)) {
+        actual.push(action.type);
+        yield* each.next;
       }
     });
 

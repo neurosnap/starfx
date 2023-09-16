@@ -1,52 +1,48 @@
-import { Action, Channel, Operation } from "../deps.ts";
-import { createChannel, createContext, spawn } from "../deps.ts";
-import { call, parallel } from "../fx/mod.ts";
+import { Action, Operation, Signal } from "../deps.ts";
+import { createContext, createSignal, each, spawn } from "../deps.ts";
+import { call } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 import type { ActionWPayload, AnyAction } from "../types.ts";
 
 import type { StoreLike } from "./types.ts";
 
-export const ActionContext = createContext<Channel<Action, void>>(
+export const ActionContext = createContext<Signal<Action, void>>(
   "redux:action",
-  createChannel<Action, void>(),
+  createSignal<Action, void>(),
 );
 
 export const StoreContext = createContext<StoreLike>("redux:store");
 
-export function* emit({
-  channel,
+export function emit({
+  signal,
   action,
 }: {
-  channel: Operation<Channel<AnyAction, void>>;
+  signal: Signal<AnyAction, void>;
   action: AnyAction | AnyAction[];
 }) {
-  const { input } = yield* channel;
   if (Array.isArray(action)) {
     if (action.length === 0) {
       return;
     }
-    yield* parallel(action.map((a) => () => input.send(a)));
+    action.map((a) => signal.send(a));
   } else {
-    yield* input.send(action);
+    signal.send(action);
   }
 }
 
 export function* once({
-  channel,
+  signal,
   pattern,
 }: {
-  channel: Operation<Channel<Action, void>>;
+  signal: Signal<Action, void>;
   pattern: ActionPattern;
 }) {
-  const { output } = yield* channel;
-  const msgList = yield* output;
-  let next = yield* msgList.next();
-  while (!next.done) {
+  for (const action of yield* each(signal.stream)) {
     const match = matcher(pattern);
-    if (match(next.value)) {
-      return next.value;
+    if (match(action)) {
+      return action;
     }
-    next = yield* msgList.next();
+    yield* each.next;
   }
 }
 
@@ -57,8 +53,9 @@ export function* select<S, R>(selectorFn: (s: S) => R) {
 
 export function take<P>(pattern: ActionPattern): Operation<ActionWPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
+  const signal = yield* ActionContext;
   const action = yield* once({
-    channel: ActionContext,
+    signal,
     pattern,
   });
   return action as Action;
