@@ -5,7 +5,7 @@ import { ActionContext, emit, StoreContext } from "./fx.ts";
 import { reducers as queryReducers } from "./query.ts";
 import type { StoreLike } from "./types.ts";
 
-function* send(action: AnyAction) {
+export function* send(action: AnyAction) {
   const signal = yield* ActionContext;
   if (action.type === BATCH) {
     const actions = action.payload as BatchAction[];
