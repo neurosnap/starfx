@@ -1,6 +1,6 @@
 import type { ApiRequest, RequiredApiRequest } from "./types.ts";
 
-export const noop = () => {};
+export function* noop() {}
 // deno-lint-ignore no-explicit-any
 export const isFn = (fn?: any) => fn && typeof fn === "function";
 // deno-lint-ignore no-explicit-any

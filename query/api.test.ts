@@ -48,7 +48,7 @@ it(tests, "createApi - POST", async () => {
   query.use(queryCtx);
   query.use(urlParser);
   query.use(query.routes());
-  query.use(function* fetchApi(ctx, next): Iterator<unknown> {
+  query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
       url: "/users",
       headers: {},

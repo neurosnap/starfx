@@ -13,6 +13,7 @@ import type {
   Supervisor,
 } from "./types.ts";
 import type { Payload } from "../types.ts";
+import type { Operation } from "../deps.ts";
 
 export type ApiName = string | string[];
 
@@ -20,8 +21,8 @@ export interface SagaQueryApi<Ctx extends ApiCtx = ApiCtx>
   extends SagaApi<Ctx> {
   request: (
     r: Partial<RequestInit>,
-  ) => (ctx: Ctx, next: Next) => Iterator<unknown>;
-  cache: () => (ctx: Ctx, next: Next) => Iterator<unknown>;
+  ) => (ctx: Ctx, next: Next) => Operation<unknown>;
+  cache: () => (ctx: Ctx, next: Next) => Operation<unknown>;
 
   uri: (uri: string) => {
     /**
