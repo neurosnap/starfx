@@ -1,6 +1,6 @@
 import { createLoaderTable, createReducerMap, createTable } from "../deps.ts";
 import { compose } from "../compose.ts";
-export { defaultLoader } from "../store/mod.ts";
+export { defaultLoader, defaultLoaderItem } from "../store/mod.ts";
 import { ApiCtx, createKey, Next } from "../query/mod.ts";
 import { put, select } from "./mod.ts";
 import type { AnyAction, QueryState } from "../types.ts";
