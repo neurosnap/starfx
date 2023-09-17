@@ -1,5 +1,5 @@
-import { Action, Operation, Signal } from "../deps.ts";
-import { createContext, createSignal, each, spawn } from "../deps.ts";
+import type { Action, Operation, Signal } from "../deps.ts";
+import { createContext, each, spawn } from "../deps.ts";
 import { call } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 import type { ActionWPayload, AnyAction } from "../types.ts";
@@ -8,9 +8,7 @@ import type { StoreLike } from "./types.ts";
 
 export const ActionContext = createContext<Signal<Action, void>>(
   "redux:action",
-  createSignal<Action, void>(),
 );
-
 export const StoreContext = createContext<StoreLike>("redux:store");
 
 export function emit({
