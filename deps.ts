@@ -3,6 +3,7 @@ export type {
   Instruction,
   Operation,
   Port,
+  Predicate,
   Result,
   Scope,
   Signal,

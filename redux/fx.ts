@@ -1,5 +1,5 @@
 import type { Action, Operation, Signal } from "../deps.ts";
-import { createContext, each, spawn } from "../deps.ts";
+import { createContext, each, filter, spawn } from "../deps.ts";
 import { call } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 import type { ActionWPayload, AnyAction } from "../types.ts";
@@ -10,6 +10,15 @@ export const ActionContext = createContext<Signal<Action, void>>(
   "redux:action",
 );
 export const StoreContext = createContext<StoreLike>("redux:store");
+
+export function* put(action: AnyAction | AnyAction[]) {
+  const store = yield* StoreContext;
+  if (Array.isArray(action)) {
+    action.map((act) => store.dispatch(act));
+  } else {
+    store.dispatch(action);
+  }
+}
 
 export function emit({
   signal,
@@ -28,35 +37,26 @@ export function emit({
   }
 }
 
-export function* once({
-  signal,
-  pattern,
-}: {
-  signal: Signal<Action, void>;
-  pattern: ActionPattern;
-}) {
-  for (const action of yield* each(signal.stream)) {
-    const match = matcher(pattern);
-    if (match(action)) {
-      return action;
-    }
-    yield* each.next;
-  }
-}
-
 export function* select<S, R>(selectorFn: (s: S) => R) {
   const store = yield* StoreContext;
   return selectorFn(store.getState() as S);
 }
 
+function* createPatternStream(pattern: ActionPattern) {
+  const signal = yield* ActionContext;
+  const match = matcher(pattern);
+  const fd = filter(match)(signal.stream);
+  return fd;
+}
+
 export function take<P>(pattern: ActionPattern): Operation<ActionWPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
-  const signal = yield* ActionContext;
-  const action = yield* once({
-    signal,
-    pattern,
-  });
-  return action as Action;
+  const fd = yield* createPatternStream(pattern);
+  for (const action of yield* each(fd)) {
+    return action;
+  }
+
+  return { type: "take failed, this should not be possible" };
 }
 
 export function* takeEvery<T>(
@@ -64,10 +64,10 @@ export function* takeEvery<T>(
   op: (action: Action) => Operation<T>,
 ) {
   return yield* spawn(function* (): Operation<void> {
-    while (true) {
-      const action = yield* take(pattern);
-      if (!action) continue;
+    const fd = yield* createPatternStream(pattern);
+    for (const action of yield* each(fd)) {
       yield* spawn(() => op(action));
+      yield* each.next;
     }
   });
 }
@@ -77,14 +77,15 @@ export function* takeLatest<T>(
   op: (action: Action) => Operation<T>,
 ) {
   return yield* spawn(function* (): Operation<void> {
+    const fd = yield* createPatternStream(pattern);
     let lastTask;
-    while (true) {
-      const action = yield* take(pattern);
+
+    for (const action of yield* each(fd)) {
       if (lastTask) {
         yield* lastTask.halt();
       }
-      if (!action) continue;
       lastTask = yield* spawn(() => op(action));
+      yield* each.next;
     }
   });
 }
@@ -95,20 +96,11 @@ export function* takeLeading<T>(
   op: (action: Action) => Operation<T>,
 ) {
   return yield* spawn(function* (): Operation<void> {
-    while (true) {
-      const action = yield* take(pattern);
-      if (!action) continue;
+    const fd = yield* createPatternStream(pattern);
+    for (const action of yield* each(fd)) {
       yield* call(() => op(action));
+      yield* each.next;
     }
   });
 }
 export const leading = takeLeading;
-
-export function* put(action: AnyAction | AnyAction[]) {
-  const store = yield* StoreContext;
-  if (Array.isArray(action)) {
-    action.map((act) => store.dispatch(act));
-  } else {
-    store.dispatch(action);
-  }
-}

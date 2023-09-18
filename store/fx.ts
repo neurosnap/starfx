@@ -58,14 +58,10 @@ export function* put(action: AnyAction | AnyAction[]) {
 }
 
 export function* useActions(pattern: ActionPattern): Stream<AnyAction, void> {
-  const match = matcher(pattern);
   const { output } = yield* ActionContext;
-  // deno-lint-ignore require-yield
-  function* fn(a: AnyAction) {
-    return match(a);
-  }
+  const match = matcher(pattern);
   // return a subscription to the filtered actions.
-  const result = yield* filter(fn)(output);
+  const result = yield* filter(match)(output);
   return result;
 }
 
