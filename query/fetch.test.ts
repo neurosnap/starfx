@@ -13,8 +13,8 @@ import { requestMonitor } from "./middleware.ts";
 
 install();
 
-const baseUrl = "https://saga-query.com";
-const mockUser = { id: "1", email: "test@saga-query.com" };
+const baseUrl = "https://starfx.com";
+const mockUser = { id: "1", email: "test@starfx.com" };
 
 const delay = (n = 200) =>
   new Promise((resolve) => {

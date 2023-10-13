@@ -320,7 +320,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
       asserts.assert(acc === "ab");
       assertLike(curCtx, {
         action: {
-          type: `@@saga-query${action1}`,
+          type: `@@starfx${action1}`,
           payload: {
             name: "/users",
           },

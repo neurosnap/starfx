@@ -214,7 +214,7 @@ it(tests, "run() from a normal saga", () => {
       throw new Error("no ctx");
     }
     const payload = { name: "/users/:id [GET]", options: { id: "1" } };
-    expect(ctx.value.action.type).toEqual(`@@saga-query${action1}`);
+    expect(ctx.value.action.type).toEqual(`@@starfx${action1}`);
     expect(ctx.value.action.payload).toEqual(payload);
     expect(ctx.value.name).toEqual("/users/:id [GET]");
     expect(ctx.value.payload).toEqual({ id: "1" });

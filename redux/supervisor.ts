@@ -37,7 +37,7 @@ export function poll(
 
 /**
  * timer() will create a cache timer for each `key` inside
- * of a saga-query api endpoint.  `key` is a hash of the action type and payload.
+ * of a starfx api endpoint.  `key` is a hash of the action type and payload.
  *
  * Why do we want this?  If we have an api endpoint to fetch a single app: `fetchApp({ id: 1 })`
  * if we don't set a timer per key then all calls to `fetchApp` will be on a timer.

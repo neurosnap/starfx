@@ -12,7 +12,7 @@ import type { ApiName, SagaQueryApi } from "./api-types.ts";
  *
  * @example
  * ```ts
- * import { createApi, requestMonitor, fetcher } from 'saga-query';
+ * import { createApi, requestMonitor, fetcher } from 'starfx';
  *
  * const api = createApi();
  * api.use(requestMonitor());

@@ -18,7 +18,7 @@ import { createKey } from "./create-key.ts";
 
 const h = React.createElement;
 
-const mockUser = { id: "1", email: "test@saga-query.com" };
+const mockUser = { id: "1", email: "test@starfx.com" };
 
 const jsonBlob = (data: any) => {
   return JSON.stringify(data);

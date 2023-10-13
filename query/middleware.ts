@@ -98,7 +98,7 @@ export function* urlParser<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
  *
  * @example
  * ```ts
- * import { createPipe } from 'saga-query';
+ * import { createPipe } from 'starfx';
  *
  * const thunk = createPipe();
  * thunk.use(customKey);

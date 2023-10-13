@@ -44,7 +44,7 @@ interface UseCacheResult<D = any, A extends SagaAction = SagaAction>
  *
  * @example
  * ```ts
- * import { useLoader } from 'saga-query/react';
+ * import { useLoader } from 'starfx/react';
  *
  * import { api } from './api';
  *
@@ -76,7 +76,7 @@ export function useLoader<S extends QueryState = QueryState>(
  *
  * @example
  * ```ts
- * import { useApi } from 'saga-query/react';
+ * import { useApi } from 'starfx/react';
  *
  * import { api } from './api';
  *
@@ -120,7 +120,7 @@ export function useApi(action: any): any {
  *
  * @example
  * ```ts
- * import { useQuery } from 'saga-query/react';
+ * import { useQuery } from 'starfx/react';
  *
  * import { api } from './api';
  *
@@ -150,7 +150,7 @@ export function useQuery<P = any, A extends SagaAction = SagaAction<P>>(
  *
  * @example
  * ```ts
- * import { useCache } from 'saga-query/react';
+ * import { useCache } from 'starfx/react';
  *
  * import { api } from './api';
  *
@@ -177,7 +177,7 @@ export function useCache<D = any, A extends SagaAction = SagaAction>(
  *
  * @example
  * ```ts
- * import { useLoaderSuccess, useApi } from 'saga-query/react';
+ * import { useLoaderSuccess, useApi } from 'starfx/react';
  *
  * import { api } from './api';
  *

@@ -94,7 +94,7 @@ export interface SagaApi<Ctx extends PipeCtx> {
  *
  * @example
  * ```ts
- * import { createPipe } from 'saga-query';
+ * import { createPipe } from 'starfx';
  *
  * const thunk = createPipe();
  * thunk.use(function* (ctx, next) {
