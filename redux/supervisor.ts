@@ -28,7 +28,7 @@ export function poll(
       const action = yield* take<{ timer?: number }>(actionType);
       const timer = action.payload?.timer || parentTimer;
       yield* race({
-        fire: () => call(() => fire(action, timer)),
+        fire: () => fire(action, timer),
         cancel: () => take(`${cancel}`),
       });
     }
