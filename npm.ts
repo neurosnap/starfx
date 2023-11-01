@@ -11,6 +11,8 @@ async function main() {
   }
 
   await build({
+    declaration: "inline",
+    scriptModule: "cjs",
     entryPoints: [
       {
         name: ".",
