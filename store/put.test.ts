@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { sleep, spawn } from "../deps.ts";
+import { each, sleep, spawn } from "../deps.ts";
 
 import { ActionContext, put, take } from "./mod.ts";
 import { configureStore } from "./store.ts";
@@ -10,13 +10,11 @@ it(putTests, "should send actions through channel", async () => {
   const actual: string[] = [];
 
   function* genFn(arg: string) {
-    yield* spawn(function* () {
-      const actions = yield* ActionContext;
-      const msgs = yield* actions.output;
-      let action = yield* msgs.next();
-      while (!action.done) {
-        actual.push(action.value.type);
-        action = yield* msgs.next();
+    const actions = yield* ActionContext;
+    const task = yield* spawn(function* () {
+      for (const action of yield* each(actions)) {
+        actual.push(action.type);
+        yield* each.next();
       }
     });
 
@@ -26,6 +24,8 @@ it(putTests, "should send actions through channel", async () => {
     yield* put({
       type: "2",
     });
+    actions.close();
+    yield* task;
   }
 
   const store = configureStore({ initialState: {} });

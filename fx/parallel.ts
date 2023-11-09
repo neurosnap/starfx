@@ -21,7 +21,7 @@ export function parallel<T>(operations: OpFn<T>[]) {
         tasks.push(
           yield* spawn(function* () {
             const result = yield* safe(op);
-            yield* immediate.input.send(result);
+            yield* immediate.send(result);
             return result;
           }),
         );
@@ -30,11 +30,11 @@ export function parallel<T>(operations: OpFn<T>[]) {
       for (const tsk of tasks) {
         const res = yield* tsk;
         results.push(res);
-        yield* sequence.input.send(res);
+        yield* sequence.send(res);
       }
 
-      yield* sequence.input.close();
-      yield* immediate.input.close();
+      yield* sequence.close();
+      yield* immediate.close();
     });
 
     function* wait(): Operation<Result<T>[]> {

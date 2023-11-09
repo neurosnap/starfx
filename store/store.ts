@@ -1,5 +1,6 @@
 import {
   createScope,
+  createSignal,
   enablePatches,
   Ok,
   produceWithPatches,
@@ -11,9 +12,8 @@ import { BaseMiddleware, compose } from "../compose.ts";
 import type { AnyAction, AnyState, OpFn } from "../types.ts";
 import { safe } from "../fx/mod.ts";
 import { Next } from "../query/types.ts";
-
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
-import { StoreContext, StoreUpdateContext } from "./context.ts";
+import { ActionContext, StoreContext, StoreUpdateContext } from "./context.ts";
 import { put } from "./fx.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
@@ -90,7 +90,7 @@ export function createStore<S extends AnyState>({
 
   function* notifyChannelMdw(_: UpdaterCtx<S>, next: Next) {
     const chan = yield* StoreUpdateContext;
-    yield* chan.input.send();
+    yield* chan.send();
     yield* next();
   }
 
@@ -166,7 +166,9 @@ export function configureStore<S extends AnyState>(
   props: CreateStore<S>,
 ): FxStore<S> {
   const store = createStore<S>(props);
+  const signal = createSignal<AnyAction, void>();
   // deno-lint-ignore no-explicit-any
   store.getScope().set(StoreContext, store as any);
+  store.getScope().set(ActionContext, signal);
   return store;
 }

@@ -45,7 +45,7 @@ const task = main(function* () {
     } else {
       console.error(result.error);
     }
-    yield* each.next;
+    yield* each.next();
   }
 });
 
