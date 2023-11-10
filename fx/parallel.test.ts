@@ -40,9 +40,9 @@ it(
       ]);
 
       const res: Result<string>[] = [];
-      for (const val of yield* each(results.immediate.output)) {
+      for (const val of yield* each(results.immediate)) {
         res.push(val);
-        yield* each.next;
+        yield* each.next();
       }
 
       yield* results;
@@ -70,10 +70,9 @@ it(
       ]);
 
       const res: Result<string>[] = [];
-      const { output } = results.sequence;
-      for (const val of yield* each(output)) {
+      for (const val of yield* each(results.sequence)) {
         res.push(val);
-        yield* each.next;
+        yield* each.next();
       }
 
       yield* results;

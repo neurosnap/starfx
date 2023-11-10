@@ -12,9 +12,9 @@ it(putTests, "should send actions through channel", async () => {
   function* genFn(arg: string) {
     yield* spawn(function* () {
       const actions = yield* ActionContext;
-      for (const action of yield* each(actions.stream)) {
+      for (const action of yield* each(actions)) {
         actual.push(action.type);
-        yield* each.next;
+        yield* each.next();
       }
     });
 

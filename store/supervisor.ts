@@ -1,5 +1,5 @@
 import { call, race } from "../fx/mod.ts";
-import { take, takeLatest, takeLeading } from "./fx.ts";
+import { take } from "./fx.ts";
 import { Operation, sleep, spawn, Task } from "../deps.ts";
 import type { ActionWPayload, AnyAction, OpFn } from "../types.ts";
 import type { CreateActionPayload } from "../query/mod.ts";
@@ -7,14 +7,6 @@ import type { CreateActionPayload } from "../query/mod.ts";
 const MS = 1000;
 const SECONDS = 1 * MS;
 const MINUTES = 60 * SECONDS;
-
-export function* latest(action: string, saga: any) {
-  yield takeLatest(`${action}`, saga);
-}
-
-export function* leading(action: string, saga: any) {
-  yield takeLeading(`${action}`, saga);
-}
 
 export function poll(parentTimer: number = 5 * 1000, cancelType?: string) {
   return function* poller<T>(

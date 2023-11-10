@@ -1,15 +1,35 @@
-import type { Action, Operation, Signal } from "../deps.ts";
-import { createContext, each, filter, spawn } from "../deps.ts";
+import type { Action, Operation, Queue, Signal, Stream } from "../deps.ts";
+import {
+  createContext,
+  createQueue,
+  each,
+  SignalQueueFactory,
+  spawn,
+} from "../deps.ts";
 import { call } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 import type { ActionWPayload, AnyAction } from "../types.ts";
-
 import type { StoreLike } from "./types.ts";
 
 export const ActionContext = createContext<Signal<Action, void>>(
   "redux:action",
 );
 export const StoreContext = createContext<StoreLike>("redux:store");
+
+function createFilterQueue<T, TClose>(
+  predicate: (a: T) => boolean,
+): Queue<T, TClose> {
+  const queue = createQueue<T, TClose>();
+
+  return {
+    ...queue,
+    add(value: T) {
+      if (predicate(value)) {
+        queue.add(value);
+      }
+    },
+  };
+}
 
 export function* put(action: AnyAction | AnyAction[]) {
   const store = yield* StoreContext;
@@ -42,16 +62,22 @@ export function* select<S, R>(selectorFn: (s: S) => R) {
   return selectorFn(store.getState() as S);
 }
 
-function* createPatternStream(pattern: ActionPattern) {
-  const signal = yield* ActionContext;
-  const match = matcher(pattern);
-  const fd = filter(match)(signal.stream);
-  return fd;
+function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
+  return {
+    *subscribe() {
+      const actions = yield* ActionContext;
+      const match = matcher(pattern);
+      yield* SignalQueueFactory.set(() =>
+        createFilterQueue<AnyAction, void>(match) as any
+      );
+      return yield* actions.subscribe();
+    },
+  };
 }
 
 export function take<P>(pattern: ActionPattern): Operation<ActionWPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
-  const fd = yield* createPatternStream(pattern);
+  const fd = useActions(pattern);
   for (const action of yield* each(fd)) {
     return action;
   }
@@ -64,10 +90,10 @@ export function* takeEvery<T>(
   op: (action: Action) => Operation<T>,
 ) {
   return yield* spawn(function* (): Operation<void> {
-    const fd = yield* createPatternStream(pattern);
+    const fd = useActions(pattern);
     for (const action of yield* each(fd)) {
       yield* spawn(() => op(action));
-      yield* each.next;
+      yield* each.next();
     }
   });
 }
@@ -77,7 +103,7 @@ export function* takeLatest<T>(
   op: (action: Action) => Operation<T>,
 ) {
   return yield* spawn(function* (): Operation<void> {
-    const fd = yield* createPatternStream(pattern);
+    const fd = useActions(pattern);
     let lastTask;
 
     for (const action of yield* each(fd)) {
@@ -85,7 +111,7 @@ export function* takeLatest<T>(
         yield* lastTask.halt();
       }
       lastTask = yield* spawn(() => op(action));
-      yield* each.next;
+      yield* each.next();
     }
   });
 }
@@ -96,10 +122,9 @@ export function* takeLeading<T>(
   op: (action: Action) => Operation<T>,
 ) {
   return yield* spawn(function* (): Operation<void> {
-    const fd = yield* createPatternStream(pattern);
-    for (const action of yield* each(fd)) {
+    while (true) {
+      const action = yield* take(pattern);
       yield* call(() => op(action));
-      yield* each.next;
     }
   });
 }
