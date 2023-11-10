@@ -1,5 +1,5 @@
 import { compose } from "../compose.ts";
-import type { OpFn, Payload } from "../types.ts";
+import type { Operator, Payload } from "../types.ts";
 import { parallel } from "../mod.ts";
 
 // TODO: remove store deps
@@ -24,7 +24,7 @@ import { Ok } from "../deps.ts";
 export interface SagaApi<Ctx extends PipeCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
-  bootup: OpFn;
+  bootup: Operator<unknown>;
 
   /**
    * Name only
@@ -127,7 +127,7 @@ export function createPipe<Ctx extends PipeCtx = PipeCtx<any>>(
   } = { supervisor: takeEvery },
 ): SagaApi<Ctx> {
   const middleware: Middleware<Ctx>[] = [];
-  const visors: { [key: string]: OpFn } = {};
+  const visors: { [key: string]: Operator<unknown> } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {
     [key: string]: CreateActionWithPayload<Ctx, any>;

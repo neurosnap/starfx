@@ -5,10 +5,11 @@ export interface Computation<T = unknown> {
   [Symbol.iterator](): Iterator<Instruction, T, any>;
 }
 
-export type OpFn<T = unknown> =
+export type Operator<T> =
+  | Operation<T>
+  | Promise<T>
   | (() => Operation<T>)
-  | (() => PromiseLike<T>)
-  | (() => T);
+  | (() => Promise<T>);
 
 export interface QueryState {
   "@@starfx/loaders": Record<string, LoaderItemState>;

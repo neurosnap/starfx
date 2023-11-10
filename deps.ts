@@ -15,6 +15,7 @@ export type {
 } from "https://deno.land/x/effection@3.0.0-beta.2/mod.ts";
 export {
   action,
+  call,
   createChannel,
   createContext,
   createQueue,

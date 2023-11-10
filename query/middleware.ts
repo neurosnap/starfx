@@ -1,6 +1,6 @@
 import { call } from "../fx/mod.ts";
 import { compose } from "../compose.ts";
-import type { OpFn } from "../types.ts";
+import type { Operator } from "../types.ts";
 
 import type {
   Action,
@@ -153,9 +153,13 @@ export function* performanceMonitor<Ctx extends PerfCtx = PerfCtx>(
 /**
  * This middleware will call the `saga` provided with the action sent to the middleware pipeline.
  */
-export function wrap<Ctx extends PipeCtx = PipeCtx>(op: (a: Action) => OpFn) {
+export function wrap<Ctx extends PipeCtx = PipeCtx, T = any>(
+  op: (a: Action) => Operator<T>,
+) {
   return function* (ctx: Ctx, next: Next) {
-    yield* call(() => op(ctx.action));
+    yield* call(function* () {
+      return op(ctx.action);
+    });
     yield* next();
   };
 }
