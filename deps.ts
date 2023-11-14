@@ -43,6 +43,9 @@ export {
   useDispatch,
   useSelector,
 } from "https://esm.sh/react-redux@8.0.5?pin=v122";
+export type {
+  TypedUseSelectorHook,
+} from "https://esm.sh/react-redux@8.0.5?pin=v122";
 export { createSelector } from "https://esm.sh/reselect@4.1.8?pin=v122";
 
 export {

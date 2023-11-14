@@ -33,6 +33,10 @@ export interface LoaderState<
   isInitialLoading: boolean;
 }
 
+export type LoaderItemPayload<M extends AnyState> = Partial<
+  Pick<LoaderItemState<M>, "message" | "meta">
+>;
+
 export type LoaderPayload<M extends AnyState> =
   & Pick<LoaderItemState<M>, "id">
   & Partial<Pick<LoaderItemState<M>, "message" | "meta">>;

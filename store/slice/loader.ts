@@ -1,6 +1,7 @@
 import { createSelector } from "../../deps.ts";
 import type {
   AnyState,
+  LoaderItemPayload,
   LoaderItemState,
   LoaderPayload,
   LoaderState,
@@ -123,6 +124,75 @@ export interface LoaderOutput<
 }
 
 const ts = () => new Date().getTime();
+
+export interface LoaderItemOutput<
+  M extends Record<string, unknown>,
+  S extends AnyState,
+> extends BaseSchema<LoaderItemState<M>> {
+  schema: "loader-item";
+  initialState: LoaderItemState<M>;
+  start: (e?: LoaderItemPayload<M>) => (s: S) => void;
+  success: (e?: LoaderItemPayload<M>) => (s: S) => void;
+  error: (e?: LoaderItemPayload<M>) => (s: S) => void;
+  reset: () => (s: S) => void;
+  select: (s: S) => LoaderItemState<M>;
+}
+
+export const createLoaderItem = <
+  M extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>(
+  { name, initialState = defaultLoaderItem<M>() }: {
+    name: keyof S;
+    initialState?: LoaderItemState<M>;
+  },
+): LoaderItemOutput<M, S> => {
+  return {
+    schema: "loader-item",
+    name: name as string,
+    initialState,
+    select: (s: S) => s[name],
+    start: (e = {}) => (s) => {
+      const prev = s[name];
+      s[name] = {
+        ...prev,
+        ...e,
+        id: name,
+        status: "loading",
+        lastRun: ts(),
+      };
+    },
+    success: (e = {}) => (s) => {
+      const prev = s[name];
+      s[name] = {
+        ...prev,
+        ...e,
+        id: name,
+        status: "success",
+        lastSuccess: ts(),
+      };
+    },
+    error: (e = {}) => (s) => {
+      const prev = s[name];
+      s[name] = {
+        ...prev,
+        ...e,
+        id: name,
+        status: "error",
+      };
+    },
+    reset: () => (s) => {
+      // deno-lint-ignore no-explicit-any
+      (s as any)[name] = initialState;
+    },
+  };
+};
+
+export function loaderItem<
+  M extends AnyState = AnyState,
+>(initialState?: LoaderItemState<M>) {
+  return (name: string) => createLoaderItem<M>({ name, initialState });
+}
 
 export const createLoader = <
   M extends AnyState = AnyState,
