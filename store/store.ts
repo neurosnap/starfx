@@ -1,5 +1,6 @@
 import {
   Callable,
+  action,
   createScope,
   createSignal,
   enablePatches,
@@ -36,6 +37,31 @@ export interface CreateStore<S extends AnyState> {
   scope?: Scope;
   initialState: S;
   middleware?: BaseMiddleware[];
+}
+
+export function microtask(resolve: () => void) {
+  queueMicrotask(function () {
+    resolve();
+  });
+}
+
+export function createBatchMdw<S extends AnyState>(
+  queue: (send: () => void) => void,
+) {
+  let notifying = false;
+  return function* batchMdw(_: UpdaterCtx<S>, next: Next) {
+    try {
+      if (!notifying) {
+        notifying = true;
+        yield* action<void>(function* (resolve) {
+          queue(resolve);
+        });
+        yield* next();
+      }
+    } finally {
+      notifying = false;
+    }
+  };
 }
 
 export function createStore<S extends AnyState>({
@@ -103,8 +129,8 @@ export function createStore<S extends AnyState>({
 
   function createUpdater() {
     const fn = compose<UpdaterCtx<S>>([
-      ...middleware,
       updateMdw,
+      ...middleware,
       notifyChannelMdw,
       notifyListenersMdw,
     ]);
