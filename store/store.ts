@@ -39,14 +39,8 @@ export interface CreateStore<S extends AnyState> {
   middleware?: BaseMiddleware[];
 }
 
-export function microtask(resolve: () => void) {
-  queueMicrotask(function () {
-    resolve();
-  });
-}
-
 export function createBatchMdw<S extends AnyState>(
-  queue: (send: () => void) => void,
+  queue: (send: () => void) => void = queueMicrotask,
 ) {
   let notifying = false;
   return function* batchMdw(_: UpdaterCtx<S>, next: Next) {
