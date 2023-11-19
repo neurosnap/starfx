@@ -2,20 +2,32 @@
 
 # starfx
 
-A modern approach to side-effect and state management.
+Structured concurrency for your FE apps with a modern approach to side-effect
+and state management.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]\
 > This project is under active development, there are zero guarantees for API
 > stability.
+
+Read my introductory blog post:
+[what is starfx?](https://bower.sh/what-is-starfx)
 
 ## features
 
 - async flow control library for `deno`, `node`, and browser
 - task tree side-effect management system (like `redux-saga`)
 - simple immutable data store (like `redux`)
-- traceability throughout the entire system (dispatch actions)
-- data synchronization and caching for `react` (like `react-query`,
-  `redux/toolkit`)
+- traceability throughout the entire system (event logs via dispatching actions)
+- data synchronization and caching for `react` (like `react-query`, `rtk-query`)
+
+## design philosophy
+
+- side-effect management is a first-class citizen
+- leverage structured concurrency to manage side-effects
+- business logic lives outside the view layer
+- state management is just a side-effect of user interaction
+- state management should not be coupled to the view
+- full control over state management
 
 ## example
 
