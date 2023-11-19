@@ -29,3 +29,6 @@ jobs:
 
       - name: test
         run: deno task test
+
+      - name: npm
+        run: deno task npm 0.0.0
