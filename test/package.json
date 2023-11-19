@@ -1,14 +1,20 @@
 {
   "name": "test",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "starfx node integration suite",
+  "main": "react.test.tsx",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Eric Bower",
+  "license": "MIT",
   "dependencies": {
+    "@testing-library/react": "^14.1.2",
+    "@vitejs/plugin-react": "^4.2.0",
+    "jsdom": "^22.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "starfx": "^0.0.34",
     "vitest": "^0.34.6"
   }
 }
