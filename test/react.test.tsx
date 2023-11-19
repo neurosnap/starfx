@@ -37,7 +37,7 @@ const setupTest = () => {
   return { store, fetchUser, api };
 };
 
-describe('useApi - with action', async () => {
+test('useApi - with action', async () => {
   const { fetchUser, store } = setupTest();
   const App = () => {
     const action = fetchUser({ id: '1' });
@@ -62,12 +62,12 @@ describe('useApi - with action', async () => {
   await screen.findByText('success');
 });
 
-describe('useApi - with action creator', async () => {
+test('useApi - with action creator', async () => {
   const { fetchUser, store } = setupTest();
   const App = () => {
     const query = useApi(fetchUser);
+    const id = createKey(`${fetchUser}`, { id: '1' });
     const user = useSelector((s: any) => {
-      const id = createKey(`${fetchUser}`, { id: '1' });
       return selectDataById(s, { id });
     });
     return <div>
