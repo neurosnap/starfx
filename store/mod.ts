@@ -8,3 +8,4 @@ export * from "./supervisor.ts";
 export { createSelector } from "../deps.ts";
 export * from "./slice/mod.ts";
 export * from "./schema.ts";
+export * from "./batch.ts";
