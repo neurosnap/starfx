@@ -29,7 +29,7 @@ const testStore = () => {
   const schema = createSchema({
     users: slice.table<User>({ empty: emptyUser }),
     loaders: slice.loader(),
-    data: slice.table({ empty: {} }),
+    cache: slice.table({ empty: {} }),
   });
   const store = configureStore(schema);
   return { schema, store };
@@ -298,7 +298,7 @@ it(tests, "createApi with hash key on a large post", async () => {
   });
 
   expect([8, 9].includes(expectedKey.split("|")[1].length)).toBeTruthy();
-  expect(s.data[expectedKey]).toEqual({
+  expect(s.cache[expectedKey]).toEqual({
     "1": { id: "1", name: "test", email: email, largetext: largetext },
   });
 });

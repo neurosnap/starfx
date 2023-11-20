@@ -34,7 +34,7 @@ const testStore = () => {
   const schema = createSchema({
     users: slice.table<User>({ empty: emptyUser }),
     loaders: slice.loader(),
-    data: slice.table({ empty: {} }),
+    cache: slice.table({ empty: {} }),
   });
   const store = configureStore(schema);
   return { schema, store };
@@ -410,7 +410,7 @@ it(tests, "createApi with own key", async () => {
     : createKey("/users [POST]", { email: newUEmail });
 
   const s = store.getState();
-  asserts.assertEquals(schema.db.data.selectById(s, { id: expectedKey }), {
+  asserts.assertEquals(schema.db.cache.selectById(s, { id: expectedKey }), {
     "1": { id: "1", name: "test", email: newUEmail },
   });
 
@@ -480,7 +480,7 @@ it(tests, "createApi with custom key but no payload", async () => {
     : createKey("/users [GET]", null);
 
   const s = store.getState();
-  asserts.assertEquals(schema.db.data.selectById(s, { id: expectedKey }), {
+  asserts.assertEquals(schema.db.cache.selectById(s, { id: expectedKey }), {
     "1": mockUser,
   });
 
