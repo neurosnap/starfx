@@ -1,12 +1,12 @@
-import { call } from "../fx/mod.ts";
+import { call, safe } from "../fx/mod.ts";
 import { compose } from "../compose.ts";
 import type { Operator } from "../types.ts";
-
 import type {
   Action,
   ApiCtx,
   ApiRequest,
   Next,
+  PerfCtx,
   PipeCtx,
   RequiredApiRequest,
 } from "./types.ts";
@@ -16,18 +16,16 @@ import { isObject, mergeRequest } from "./util.ts";
  * This middleware will catch any errors in the pipeline
  * and return the context object.
  */
-export function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
+export function* err<Ctx extends PipeCtx = PipeCtx>(
   ctx: Ctx,
   next: Next,
 ) {
-  yield* next();
-
+  ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
     console.error(
       `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,
       ctx,
     );
-    console.error(ctx.result.error);
   }
 }
 
@@ -35,7 +33,7 @@ export function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
  * This middleware sets up the context object with some values that are
  * necessary for {@link createApi} to work properly.
  */
-export function* queryCtx<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
+export function* query<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
   if (!ctx.req) {
     ctx.req = (r?: ApiRequest): RequiredApiRequest =>
       mergeRequest(ctx.request, r);
@@ -51,7 +49,7 @@ export function* queryCtx<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
 /**
  * This middleware converts the name provided to {@link createApi} into data for the fetch request.
  */
-export function* urlParser<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
+export function* request<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
   const httpMethods = [
     "get",
     "head",
@@ -124,23 +122,19 @@ export function* customKey<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
 /**
  * This middleware is a composition of many middleware used to faciliate the {@link createApi}
  */
-export function requestMonitor<Ctx extends ApiCtx = ApiCtx>() {
+export function api<Ctx extends ApiCtx = ApiCtx>() {
   return compose<Ctx>([
-    errorHandler,
-    queryCtx,
-    urlParser,
+    err,
+    query,
+    request,
     customKey,
   ]);
-}
-
-export interface PerfCtx<P = unknown> extends PipeCtx<P> {
-  performance: number;
 }
 
 /**
  * This middleware will add `performance.now()` before and after your middleware pipeline.
  */
-export function* performanceMonitor<Ctx extends PerfCtx = PerfCtx>(
+export function* perf<Ctx extends PerfCtx = PerfCtx>(
   ctx: Ctx,
   next: Next,
 ) {

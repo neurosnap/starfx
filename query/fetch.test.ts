@@ -6,10 +6,9 @@ import {
   storeMdw,
   takeEvery,
 } from "../store/mod.ts";
-
 import { fetcher, fetchRetry, headersMdw } from "./fetch.ts";
 import { createApi } from "./api.ts";
-import { requestMonitor } from "./middleware.ts";
+import * as mdw from "./middleware.ts";
 
 install();
 
@@ -42,7 +41,7 @@ it(
 
     const { store, schema } = testStore();
     const api = createApi();
-    api.use(requestMonitor());
+    api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(headersMdw);
@@ -91,7 +90,7 @@ it(
 
     const { store, schema } = testStore();
     const api = createApi();
-    api.use(requestMonitor());
+    api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
@@ -126,7 +125,7 @@ it(tests, "fetch - error handling", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -167,7 +166,7 @@ it(tests, "fetch - status 204", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -207,7 +206,7 @@ it(tests, "fetch - malformed json", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -250,9 +249,17 @@ it(tests, "fetch - POST", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
+  api.use(function* (ctx, next) {
+    ctx.request = ctx.req({
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    yield* next();
+  });
   api.use(fetcher({ baseUrl }));
 
   const fetchUsers = api.post(
@@ -260,7 +267,9 @@ it(tests, "fetch - POST", async () => {
     { supervisor: takeEvery },
     function* (ctx, next) {
       ctx.cache = true;
-      ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
+      ctx.request = ctx.req({
+        body: JSON.stringify(mockUser),
+      });
       yield* next();
 
       expect(ctx.req()).toEqual({
@@ -290,9 +299,17 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
 
   const { store, schema } = testStore();
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
+  api.use(function* (ctx, next) {
+    ctx.request = ctx.req({
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    yield* next();
+  });
   api.use(fetcher({ baseUrl }));
 
   const fetchUsers = api.post<{ id: string }>(
@@ -350,7 +367,7 @@ it(
   async () => {
     const { store, schema } = testStore();
     const api = createApi();
-    api.use(requestMonitor());
+    api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
@@ -397,7 +414,7 @@ it(
 
     const { schema, store } = testStore();
     const api = createApi();
-    api.use(requestMonitor());
+    api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));
@@ -443,7 +460,7 @@ it(
     const { schema, store } = testStore();
     let actual = null;
     const api = createApi();
-    api.use(requestMonitor());
+    api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetcher({ baseUrl }));

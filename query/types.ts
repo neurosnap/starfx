@@ -61,6 +61,10 @@ export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   cacheData: any;
 }
 
+export interface PerfCtx<P = unknown> extends PipeCtx<P> {
+  performance: number;
+}
+
 export type Middleware<Ctx extends PipeCtx = PipeCtx> = (
   ctx: Ctx,
   next: Next,
@@ -77,7 +81,7 @@ export type MiddlewareApiCo<Ctx extends ApiCtx = ApiCtx> =
   | Middleware<Ctx>
   | Middleware<Ctx>[];
 
-export type Next = () => Operation<unknown>;
+export type Next = () => Operation<void>;
 
 export interface Action {
   type: string;

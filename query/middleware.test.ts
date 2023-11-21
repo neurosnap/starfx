@@ -1,12 +1,5 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
-import {
-  createApi,
-  createKey,
-  customKey,
-  queryCtx,
-  requestMonitor,
-  urlParser,
-} from "../query/mod.ts";
+import { createApi, createKey, mdw } from "../query/mod.ts";
 import type { ApiCtx, Next, PipeCtx } from "../query/mod.ts";
 import { createQueryState } from "../action.ts";
 import { sleep } from "../test.ts";
@@ -52,8 +45,8 @@ const tests = describe("middleware");
 it(tests, "basic", () => {
   const { store } = testStore();
   const query = createApi<ApiCtx>();
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.query);
+  query.use(mdw.api());
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     if (`${ctx.req().url}`.startsWith("/users/")) {
@@ -116,7 +109,7 @@ it(tests, "basic", () => {
 it(tests, "with loader", () => {
   const { schema, store } = testStore();
   const api = createApi<ApiCtx>();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
@@ -158,7 +151,7 @@ it(tests, "with loader", () => {
 it(tests, "with item loader", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
@@ -202,8 +195,8 @@ it(tests, "with item loader", () => {
 
 it(tests, "with POST", () => {
   const query = createApi();
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.query);
+  query.use(mdw.api());
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const request = ctx.req();
@@ -254,7 +247,7 @@ it(tests, "with POST", () => {
 it(tests, "simpleCache", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
@@ -284,7 +277,7 @@ it(tests, "simpleCache", () => {
 it(tests, "overriding default loader behavior", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
@@ -341,7 +334,7 @@ it(tests, "requestMonitor - error handler", () => {
 
   const { schema, store } = testStore();
   const query = createApi<ApiCtx>();
-  query.use(requestMonitor());
+  query.use(mdw.api());
   query.use(storeMdw(schema.db));
   query.use(query.routes());
   query.use(function* () {
@@ -357,10 +350,10 @@ it(tests, "requestMonitor - error handler", () => {
 it(tests, "createApi with own key", async () => {
   const { schema, store } = testStore();
   const query = createApi();
-  query.use(requestMonitor());
+  query.use(mdw.api());
   query.use(storeMdw(schema.db));
   query.use(query.routes());
-  query.use(customKey);
+  query.use(mdw.customKey);
   query.use(function* fetchApi(ctx, next) {
     const data = {
       users: [{ ...mockUser, ...ctx.action.payload.options }],
@@ -427,10 +420,10 @@ it(tests, "createApi with own key", async () => {
 it(tests, "createApi with custom key but no payload", async () => {
   const { store, schema } = testStore();
   const query = createApi();
-  query.use(requestMonitor());
+  query.use(mdw.api());
   query.use(storeMdw(schema.db));
   query.use(query.routes());
-  query.use(customKey);
+  query.use(mdw.customKey);
   query.use(function* fetchApi(ctx, next) {
     const data = {
       users: [mockUser],
@@ -500,19 +493,18 @@ it(tests, "errorHandler", () => {
     ctx: Ctx,
     next: Next,
   ) {
-    a = 1;
-    yield* next();
-    a = 2;
-    if (!ctx.result.ok) {
+    try {
+      a = 1;
+      yield* next();
+      a = 2;
+    } catch (err) {
       console.error(
-        `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,
+        `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
         ctx,
       );
-      console.error(ctx.result.error);
     }
   });
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.query);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     if (`${ctx.req().url}`.startsWith("/users/")) {

@@ -11,8 +11,7 @@ import {
 } from "../store/mod.ts";
 import { sleep } from "../test.ts";
 import { safe } from "../mod.ts";
-
-import { queryCtx, requestMonitor, urlParser } from "./middleware.ts";
+import * as mdw from "./middleware.ts";
 import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
@@ -45,8 +44,8 @@ const tests = describe("createApi()");
 it(tests, "createApi - POST", async () => {
   const query = createApi();
 
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.query);
+  query.use(mdw.request);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -108,8 +107,8 @@ it(tests, "createApi - POST", async () => {
 
 it(tests, "POST with uri", () => {
   const query = createApi();
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.query);
+  query.use(mdw.request);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -155,8 +154,8 @@ it(tests, "POST with uri", () => {
 
 it(tests, "middleware - with request fn", () => {
   const query = createApi();
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.query);
+  query.use(mdw.request);
   query.use(query.routes());
   query.use(function* (ctx, next) {
     expect(ctx.req().method).toEqual("POST");
@@ -235,7 +234,7 @@ it(tests, "run() from a normal saga", () => {
 it(tests, "createApi with hash key on a large post", async () => {
   const { store, schema } = testStore();
   const query = createApi();
-  query.use(requestMonitor());
+  query.use(mdw.api());
   query.use(storeMdw(schema.db));
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
@@ -303,7 +302,7 @@ it(tests, "createApi - two identical endpoints", async () => {
   const actual: string[] = [];
   const { store, schema } = testStore();
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
 
@@ -453,7 +452,7 @@ it(tests, "should bubble up error", () => {
       error = err;
     }
   });
-  api.use(queryCtx);
+  api.use(mdw.query);
   api.use(storeMdw(schema.db));
   api.use(api.routes());
 
