@@ -11,7 +11,7 @@ import {
 } from "../store/mod.ts";
 import { sleep } from "../test.ts";
 import { safe } from "../mod.ts";
-import * as mdw from "./middleware.ts";
+import * as mdw from "./mdw.ts";
 import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";

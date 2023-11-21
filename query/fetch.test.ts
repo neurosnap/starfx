@@ -8,7 +8,7 @@ import {
 } from "../store/mod.ts";
 import { fetcher, fetchRetry, headersMdw } from "./fetch.ts";
 import { createApi } from "./api.ts";
-import * as mdw from "./middleware.ts";
+import * as mdw from "./mdw.ts";
 
 install();
 
