@@ -45,7 +45,7 @@ it(
     api.use(storeMdw(schema.db));
     api.use(api.routes());
     api.use(fetchMdw.headers);
-    api.use(mdw.fetcher({ baseUrl }));
+    api.use(mdw.fetch({ baseUrl }));
 
     const actual: any[] = [];
     const fetchUsers = api.get(
@@ -93,7 +93,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(mdw.fetcher({ baseUrl }));
+    api.use(mdw.fetch({ baseUrl }));
 
     let actual = null;
     const fetchUsers = api.get(
@@ -129,7 +129,7 @@ it(tests, "fetch - error handling", async () => {
   api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
-  api.use(mdw.fetcher({ baseUrl }));
+  api.use(mdw.fetch({ baseUrl }));
 
   let actual = null;
   const fetchUsers = api.get(
@@ -170,7 +170,7 @@ it(tests, "fetch - status 204", async () => {
     ctx.request = ctx.req({ url: `${baseUrl}${url}` });
     yield* next();
   });
-  api.use(mdw.fetcher());
+  api.use(mdw.fetch());
 
   let actual = null;
   const fetchUsers = api.get(
@@ -210,7 +210,7 @@ it(tests, "fetch - malformed json", async () => {
     ctx.request = ctx.req({ url: `${baseUrl}${url}` });
     yield* next();
   });
-  api.use(mdw.fetcher());
+  api.use(mdw.fetch());
 
   let actual = null;
   const fetchUsers = api.get(
@@ -251,7 +251,7 @@ it(tests, "fetch - POST", async () => {
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(fetchMdw.headers);
-  api.use(mdw.fetcher({ baseUrl }));
+  api.use(mdw.fetch({ baseUrl }));
 
   const fetchUsers = api.post(
     "/users",
@@ -294,7 +294,7 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
   api.use(storeMdw(schema.db));
   api.use(api.routes());
   api.use(fetchMdw.headers);
-  api.use(mdw.fetcher({ baseUrl }));
+  api.use(mdw.fetch({ baseUrl }));
 
   const fetchUsers = api.post<{ id: string }>(
     "/users/:id/something",
@@ -354,7 +354,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(mdw.fetcher({ baseUrl }));
+    api.use(mdw.fetch({ baseUrl }));
 
     const fetchUsers = api.post<{ id: string }>(
       "/users/:id",
@@ -403,7 +403,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(mdw.fetcher({ baseUrl }));
+    api.use(mdw.fetch({ baseUrl }));
 
     let actual = null;
     const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
@@ -449,7 +449,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(mdw.fetcher({ baseUrl }));
+    api.use(mdw.fetch({ baseUrl }));
 
     const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
       function* (ctx, next) {

@@ -222,7 +222,7 @@ export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * This middleware is a composition of other middleware required to use `window.fetch`
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} with {@link createApi}
  */
-export function fetcher<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
+export function fetch<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   {
     baseUrl = "",
   }: {
