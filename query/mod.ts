@@ -1,4 +1,5 @@
-export * from "./pipe.ts";
+import { createThunks } from "./thunk.ts";
+export * from "./thunk.ts";
 export * from "./api.ts";
 export * from "./types.ts";
 export * from "./create-key.ts";
@@ -6,6 +7,10 @@ import * as mdw from "./mdw.ts";
 
 export { mdw };
 
+/**
+ * @deprecated Use {@link createThunks} instead;
+ */
+export const createPipe = createThunks;
 /**
  * @deprecated Use {@link mdw.err} instead;
  */

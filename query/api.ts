@@ -1,14 +1,14 @@
 // deno-lint-ignore-file no-explicit-any
 import type { ApiCtx, ApiRequest, Next } from "./types.ts";
-import { createPipe } from "./pipe.ts";
-import type { SagaApi } from "./pipe.ts";
+import { createThunks } from "./thunk.ts";
+import type { SagaApi } from "./thunk.ts";
 import type { ApiName, SagaQueryApi } from "./api-types.ts";
 
 /**
  * Creates a middleware pipeline for HTTP requests.
  *
  * @remarks
- * It uses {@link createPipe} under the hood.
+ * It uses {@link createThunks} under the hood.
  *
  * @example
  * ```ts
@@ -27,9 +27,9 @@ import type { ApiName, SagaQueryApi } from "./api-types.ts";
  * ```
  */
 export function createApi<Ctx extends ApiCtx = ApiCtx>(
-  basePipe?: SagaApi<Ctx>,
+  baseThunk?: SagaApi<Ctx>,
 ): SagaQueryApi<Ctx> {
-  const pipe = basePipe || createPipe<Ctx>();
+  const pipe = baseThunk || createThunks<Ctx>();
   const uri = (prename: ApiName) => {
     const create = pipe.create as any;
 

@@ -4,9 +4,8 @@ import { configureStore, put, takeEvery } from "../store/mod.ts";
 import { sleep as delay } from "../deps.ts";
 import type { QueryState } from "../types.ts";
 import { createQueryState } from "../action.ts";
-
 import { sleep } from "../test.ts";
-import { createPipe } from "./pipe.ts";
+import { createThunks } from "./thunk.ts";
 import type { Next, PipeCtx } from "./types.ts";
 import { updateStore } from "../store/fx.ts";
 
@@ -121,13 +120,13 @@ function* processTickets(
   yield* next();
 }
 
-const tests = describe("createPipe()");
+const tests = describe("createThunks()");
 
 it(
   tests,
   "when create a query fetch pipeline - execute all middleware and save to redux",
   () => {
-    const api = createPipe<RoboCtx>();
+    const api = createThunks<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
     api.use(onFetchApi);
@@ -154,7 +153,7 @@ it(
   tests,
   "when providing a generator the to api.create function - should call that generator before all other middleware",
   () => {
-    const api = createPipe<RoboCtx>();
+    const api = createThunks<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
     api.use(onFetchApi);
@@ -189,7 +188,7 @@ it(
 
 it(tests, "error handling", () => {
   let called;
-  const api = createPipe<RoboCtx>();
+  const api = createThunks<RoboCtx>();
   api.use(api.routes());
   api.use(function* upstream(_, next) {
     try {
@@ -212,7 +211,7 @@ it(tests, "error handling", () => {
 
 it(tests, "error handling inside create", () => {
   let called = false;
-  const api = createPipe<RoboCtx>();
+  const api = createThunks<RoboCtx>();
   api.use(api.routes());
   api.use(function* fail() {
     throw new Error("some error");
@@ -237,7 +236,7 @@ it(tests, "error handling inside create", () => {
 
 it(tests, "error inside endpoint mdw", () => {
   let called = false;
-  const query = createPipe();
+  const query = createThunks();
   query.use(function* (_, next) {
     try {
       yield* next();
@@ -268,7 +267,7 @@ it(tests, "error inside endpoint mdw", () => {
 });
 
 it(tests, "create fn is an array", () => {
-  const api = createPipe<RoboCtx>();
+  const api = createThunks<RoboCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
     asserts.assertEquals(ctx.request, {
@@ -298,7 +297,7 @@ it(tests, "create fn is an array", () => {
 });
 
 it(tests, "run() on endpoint action - should run the effect", () => {
-  const api = createPipe<RoboCtx>();
+  const api = createThunks<RoboCtx>();
   api.use(api.routes());
   let acc = "";
   const action1 = api.create(
@@ -338,7 +337,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
 
 it(tests, "middleware order of execution", async () => {
   let acc = "";
-  const api = createPipe();
+  const api = createThunks();
   api.use(api.routes());
 
   api.use(function* (_, next) {
@@ -379,7 +378,7 @@ it(tests, "retry with actionFn", async () => {
   let acc = "";
   let called = false;
 
-  const api = createPipe();
+  const api = createThunks();
   api.use(api.routes());
 
   const action = api.create(
@@ -407,7 +406,7 @@ it(tests, "retry with actionFn", async () => {
 
 it(tests, "retry with actionFn with payload", async () => {
   let acc = "";
-  const api = createPipe();
+  const api = createThunks();
   api.use(api.routes());
 
   api.use(function* (ctx: PipeCtx<{ page: number }>, next) {
@@ -436,7 +435,7 @@ it(tests, "retry with actionFn with payload", async () => {
 });
 
 it(tests, "should only call thunk once", () => {
-  const api = createPipe<RoboCtx>();
+  const api = createThunks<RoboCtx>();
   api.use(api.routes());
   let acc = "";
 
