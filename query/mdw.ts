@@ -1,20 +1,24 @@
-import { call, safe } from "../fx/mod.ts";
+import { safe } from "../fx/mod.ts";
 import { compose } from "../compose.ts";
-import type { Operator } from "../types.ts";
 import type {
-  Action,
   ApiCtx,
   ApiRequest,
+  FetchJsonCtx,
   Next,
   PerfCtx,
   PipeCtx,
   RequiredApiRequest,
 } from "./types.ts";
 import { isObject, mergeRequest } from "./util.ts";
+import { sleep } from "../deps.ts";
+import { noop } from "./util.ts";
+import * as fetchMdw from "./fetch.ts";
 
 /**
  * This middleware will catch any errors in the pipeline
- * and return the context object.
+ * and `console.error` the context object.
+ *
+ * It also sets `ctx.result` to `Err()`
  */
 export function* err<Ctx extends PipeCtx = PipeCtx>(
   ctx: Ctx,
@@ -40,7 +44,7 @@ export function* query<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
   }
   if (!ctx.request) ctx.request = ctx.req();
   if (!ctx.response) ctx.response = null;
-  if (!ctx.json) ctx.json = { ok: false, data: {} };
+  if (!ctx.json) ctx.json = { ok: false, data: {}, error: {} };
   if (!ctx.actions) ctx.actions = [];
   if (!ctx.bodyType) ctx.bodyType = "json";
   yield* next();
@@ -144,16 +148,91 @@ export function* perf<Ctx extends PerfCtx = PerfCtx>(
   ctx.performance = t1 - t0;
 }
 
+function backoffExp(attempt: number): number {
+  if (attempt > 5) return -1;
+  // 1s, 1s, 1s, 2s, 4s
+  return Math.max(2 ** attempt * 125, 1000);
+}
+
 /**
- * This middleware will call the `saga` provided with the action sent to the middleware pipeline.
+ * This middleware will retry failed `Fetch` request if `response.ok` is `false`.
+ * It accepts a backoff function to determine how long to continue retrying.
+ * The default is an exponential backoff {@link backoffExp} where the minimum is
+ * 1sec between attempts and it'll reach 4s between attempts at the end with a
+ * max of 5 attempts.
+ *
+ * An example backoff:
+ * @example
+ * ```ts
+ *  // Any value less than 0 will stop the retry middleware.
+ *  // Each attempt will wait 1s
+ *  const backoff = (attempt: number) => {
+ *    if (attempt > 5) return -1;
+ *    return 1000;
+ *  }
+ *
+ * const api = createApi();
+ * api.use(requestMonitor());
+ * api.use(api.routes());
+ * api.use(fetcher());
+ *
+ * const fetchUsers = api.get('/users', [
+ *  function*(ctx, next) {
+ *    // ...
+ *    yield next();
+ *  },
+ *  // fetchRetry should be after your endpoint function because
+ *  // the retry middleware will update `ctx.json` before it reaches your middleware
+ *  fetchRetry(backoff),
+ * ])
+ * ```
  */
-export function wrap<Ctx extends PipeCtx = PipeCtx, T = any>(
-  op: (a: Action) => Operator<T>,
+export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
+  backoff: (attempt: number) => number = backoffExp,
 ) {
-  return function* (ctx: Ctx, next: Next) {
-    yield* call(function* () {
-      return op(ctx.action);
-    });
+  return function* (ctx: CurCtx, next: Next) {
     yield* next();
+
+    if (!ctx.response) {
+      return;
+    }
+
+    if (ctx.response.ok) {
+      return;
+    }
+
+    let attempt = 1;
+    let waitFor = backoff(attempt);
+    while (waitFor >= 1) {
+      yield* sleep(waitFor);
+      yield* safe(() => fetchMdw.request(ctx, noop));
+      yield* safe(() => fetchMdw.json(ctx, noop));
+
+      if (ctx.response.ok) {
+        return;
+      }
+
+      attempt += 1;
+      waitFor = backoff(attempt);
+    }
   };
+}
+
+/**
+ * This middleware is a composition of other middleware required to use `window.fetch`
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} with {@link createApi}
+ */
+export function fetcher<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
+  {
+    baseUrl = "",
+  }: {
+    baseUrl?: string;
+  } = { baseUrl: "" },
+) {
+  return compose<CurCtx>([
+    fetchMdw.composeUrl(baseUrl),
+    fetchMdw.payload,
+    fetchMdw.request,
+    fetchMdw.json,
+  ]);
 }

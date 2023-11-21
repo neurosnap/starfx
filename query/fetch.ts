@@ -1,15 +1,11 @@
-import { sleep } from "../deps.ts";
-import { compose } from "../compose.ts";
-import { safe } from "../mod.ts";
-
-import { noop } from "./util.ts";
+import { safe } from "../fx/mod.ts";
 import type { FetchCtx, FetchJsonCtx, Next } from "./types.ts";
 
 /**
  * Automatically sets `content-type` to `application/json` when
  * that header is not already present.
  */
-export function* headersMdw<CurCtx extends FetchCtx = FetchCtx>(
+export function* headers<CurCtx extends FetchCtx = FetchCtx>(
   ctx: CurCtx,
   next: Next,
 ) {
@@ -41,7 +37,7 @@ export function* headersMdw<CurCtx extends FetchCtx = FetchCtx>(
  * })
  * ```
  */
-export function* jsonMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
+export function* json<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   ctx: CurCtx,
   next: Next,
 ) {
@@ -52,8 +48,9 @@ export function* jsonMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 
   if (ctx.response.status === 204) {
     ctx.json = {
-      ok: ctx.response.ok,
+      ok: true,
       data: {},
+      value: {},
     };
     yield* next();
     return;
@@ -66,14 +63,25 @@ export function* jsonMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   });
 
   if (data.ok) {
-    ctx.json = {
-      ok: ctx.response.ok,
-      data: data.value,
-    };
+    if (ctx.response.ok) {
+      ctx.json = {
+        ok: true,
+        data: data.value,
+        value: data.value,
+      };
+    } else {
+      ctx.json = {
+        ok: false,
+        data: data.value,
+        error: data.value,
+      };
+    }
   } else {
+    const dta = { message: data.error.message };
     ctx.json = {
       ok: false,
-      data: { message: data.error.message },
+      data: dta,
+      error: dta,
     };
   }
 
@@ -84,7 +92,7 @@ export function* jsonMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * This middleware takes the `baseUrl` provided to `fetcher()` and combines it
  * with the url from `ctx.request.url`.
  */
-export function apiUrlMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
+export function composeUrl<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   baseUrl = "",
 ) {
   return function* (ctx: CurCtx, next: Next) {
@@ -105,7 +113,7 @@ export function apiUrlMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * Ideally the action wouldn't have been dispatched at all but that is *not* a
  * gaurantee we can make here.
  */
-export function* payloadMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
+export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   ctx: CurCtx,
   next: Next,
 ) {
@@ -124,10 +132,12 @@ export function* payloadMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 
     const val = payload[key];
     if (!val) {
+      const data =
+        `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`;
       ctx.json = {
         ok: false,
-        data:
-          `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`,
+        data,
+        error: data,
       };
       return;
     }
@@ -140,7 +150,7 @@ export function* payloadMdw<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * This middleware makes the `fetch` http request using `ctx.request` and
  * assigns the response to `ctx.response`.
  */
-export function* fetchMdw<CurCtx extends FetchCtx = FetchCtx>(
+export function* request<CurCtx extends FetchCtx = FetchCtx>(
   ctx: CurCtx,
   next: Next,
 ) {
@@ -153,93 +163,4 @@ export function* fetchMdw<CurCtx extends FetchCtx = FetchCtx>(
     throw result.error;
   }
   yield* next();
-}
-
-function backoffExp(attempt: number): number {
-  if (attempt > 5) return -1;
-  // 1s, 1s, 1s, 2s, 4s
-  return Math.max(2 ** attempt * 125, 1000);
-}
-
-/**
- * This middleware will retry failed `Fetch` request if `response.ok` is `false`.
- * It accepts a backoff function to determine how long to continue retrying.
- * The default is an exponential backoff {@link backoffExp} where the minimum is
- * 1sec between attempts and it'll reach 4s between attempts at the end with a
- * max of 5 attempts.
- *
- * An example backoff:
- * @example
- * ```ts
- *  // Any value less than 0 will stop the retry middleware.
- *  // Each attempt will wait 1s
- *  const backoff = (attempt: number) => {
- *    if (attempt > 5) return -1;
- *    return 1000;
- *  }
- *
- * const api = createApi();
- * api.use(requestMonitor());
- * api.use(api.routes());
- * api.use(fetcher());
- *
- * const fetchUsers = api.get('/users', [
- *  function*(ctx, next) {
- *    // ...
- *    yield next();
- *  },
- *  // fetchRetry should be after your endpoint function because
- *  // the retry middleware will update `ctx.json` before it reaches your middleware
- *  fetchRetry(backoff),
- * ])
- * ```
- */
-export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
-  backoff: (attempt: number) => number = backoffExp,
-) {
-  return function* (ctx: CurCtx, next: Next) {
-    yield* next();
-
-    if (!ctx.response) {
-      return;
-    }
-
-    if (ctx.response.ok) {
-      return;
-    }
-
-    let attempt = 1;
-    let waitFor = backoff(attempt);
-    while (waitFor >= 1) {
-      yield* sleep(waitFor);
-      yield* safe(() => fetchMdw(ctx, noop));
-      yield* safe(() => jsonMdw(ctx, noop));
-
-      if (ctx.response.ok) {
-        return;
-      }
-
-      attempt += 1;
-      waitFor = backoff(attempt);
-    }
-  };
-}
-
-/**
- * This middleware is a composition of other middleware required to use `window.fetch`
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} with {@link createApi}
- */
-export function fetcher<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
-  {
-    baseUrl = "",
-  }: {
-    baseUrl?: string;
-  } = { baseUrl: "" },
-) {
-  return compose<CurCtx>([
-    apiUrlMdw(baseUrl),
-    payloadMdw,
-    fetchMdw,
-    jsonMdw,
-  ]);
 }

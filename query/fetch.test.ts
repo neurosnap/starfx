@@ -6,7 +6,7 @@ import {
   storeMdw,
   takeEvery,
 } from "../store/mod.ts";
-import { fetcher, fetchRetry, headersMdw } from "./fetch.ts";
+import * as fetchMdw from "./fetch.ts";
 import { createApi } from "./api.ts";
 import * as mdw from "./mdw.ts";
 
@@ -44,8 +44,8 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(headersMdw);
-    api.use(fetcher({ baseUrl }));
+    api.use(fetchMdw.headers);
+    api.use(mdw.fetcher({ baseUrl }));
 
     const actual: any[] = [];
     const fetchUsers = api.get(
@@ -76,7 +76,7 @@ it(
       headers: {
         "Content-Type": "application/json",
       },
-    }, { ok: true, data: mockUser }]);
+    }, { ok: true, data: mockUser, value: mockUser }]);
   },
 );
 
@@ -93,7 +93,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(fetcher({ baseUrl }));
+    api.use(mdw.fetcher({ baseUrl }));
 
     let actual = null;
     const fetchUsers = api.get(
@@ -113,7 +113,8 @@ it(
     store.dispatch(action);
 
     await delay();
-    expect(actual).toEqual({ ok: true, data: "this is some text" });
+    const data = "this is some text";
+    expect(actual).toEqual({ ok: true, data, value: data });
   },
 );
 
@@ -128,12 +129,7 @@ it(tests, "fetch - error handling", async () => {
   api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
-  api.use(function* (ctx, next) {
-    const url = ctx.req().url;
-    ctx.request = ctx.req({ url: `${baseUrl}${url}` });
-    yield* next();
-  });
-  api.use(fetcher());
+  api.use(mdw.fetcher({ baseUrl }));
 
   let actual = null;
   const fetchUsers = api.get(
@@ -156,7 +152,7 @@ it(tests, "fetch - error handling", async () => {
 
   const state = store.getState();
   expect(state.data[action.payload.key]).toEqual(errMsg);
-  expect(actual).toEqual({ ok: false, data: errMsg });
+  expect(actual).toEqual({ ok: false, data: errMsg, error: errMsg });
 });
 
 it(tests, "fetch - status 204", async () => {
@@ -174,7 +170,7 @@ it(tests, "fetch - status 204", async () => {
     ctx.request = ctx.req({ url: `${baseUrl}${url}` });
     yield* next();
   });
-  api.use(fetcher());
+  api.use(mdw.fetcher());
 
   let actual = null;
   const fetchUsers = api.get(
@@ -196,7 +192,7 @@ it(tests, "fetch - status 204", async () => {
 
   const state = store.getState();
   expect(state.data[action.payload.key]).toEqual({});
-  expect(actual).toEqual({ ok: true, data: {} });
+  expect(actual).toEqual({ ok: true, data: {}, value: {} });
 });
 
 it(tests, "fetch - malformed json", async () => {
@@ -214,7 +210,7 @@ it(tests, "fetch - malformed json", async () => {
     ctx.request = ctx.req({ url: `${baseUrl}${url}` });
     yield* next();
   });
-  api.use(fetcher());
+  api.use(mdw.fetcher());
 
   let actual = null;
   const fetchUsers = api.get(
@@ -234,11 +230,13 @@ it(tests, "fetch - malformed json", async () => {
 
   await delay();
 
+  const data = {
+    message: "Unexpected token 'o', \"not json\" is not valid JSON",
+  };
   expect(actual).toEqual({
     ok: false,
-    data: {
-      message: "Unexpected token 'o', \"not json\" is not valid JSON",
-    },
+    data,
+    error: data,
   });
 });
 
@@ -252,15 +250,8 @@ it(tests, "fetch - POST", async () => {
   api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
-  api.use(function* (ctx, next) {
-    ctx.request = ctx.req({
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    yield* next();
-  });
-  api.use(fetcher({ baseUrl }));
+  api.use(fetchMdw.headers);
+  api.use(mdw.fetcher({ baseUrl }));
 
   const fetchUsers = api.post(
     "/users",
@@ -281,7 +272,7 @@ it(tests, "fetch - POST", async () => {
         body: JSON.stringify(mockUser),
       });
 
-      expect(ctx.json).toEqual({ ok: true, data: mockUser });
+      expect(ctx.json).toEqual({ ok: true, data: mockUser, value: mockUser });
     },
   );
 
@@ -302,15 +293,8 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
   api.use(mdw.api());
   api.use(storeMdw(schema.db));
   api.use(api.routes());
-  api.use(function* (ctx, next) {
-    ctx.request = ctx.req({
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    yield* next();
-  });
-  api.use(fetcher({ baseUrl }));
+  api.use(fetchMdw.headers);
+  api.use(mdw.fetcher({ baseUrl }));
 
   const fetchUsers = api.post<{ id: string }>(
     "/users/:id/something",
@@ -329,7 +313,7 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
         body: JSON.stringify(mockUser),
       });
 
-      expect(ctx.json).toEqual({ ok: true, data: mockUser });
+      expect(ctx.json).toEqual({ ok: true, data: mockUser, value: mockUser });
     },
   );
 
@@ -349,7 +333,7 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
         body: JSON.stringify(mockUser),
       });
 
-      expect(ctx.json).toEqual({ ok: true, data: mockUser });
+      expect(ctx.json).toEqual({ ok: true, data: mockUser, value: mockUser });
     },
   );
 
@@ -370,7 +354,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(fetcher({ baseUrl }));
+    api.use(mdw.fetcher({ baseUrl }));
 
     const fetchUsers = api.post<{ id: string }>(
       "/users/:id",
@@ -381,10 +365,12 @@ it(
 
         yield* next();
 
+        const data =
+          "found :id in endpoint name (/users/:id [POST]) but payload has falsy value ()";
         expect(ctx.json).toEqual({
           ok: false,
-          data:
-            "found :id in endpoint name (/users/:id [POST]) but payload has falsy value ()",
+          data,
+          error: data,
         });
       },
     );
@@ -417,7 +403,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(fetcher({ baseUrl }));
+    api.use(mdw.fetcher({ baseUrl }));
 
     let actual = null;
     const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
@@ -431,7 +417,7 @@ it(
 
         actual = ctx.json;
       },
-      fetchRetry((n) => (n > 4 ? -1 : 10)),
+      mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
     ]);
 
     store.run(api.bootup);
@@ -443,7 +429,7 @@ it(
 
     const state = store.getState();
     expect(state.data[action.payload.key]).toEqual(mockUser);
-    expect(actual).toEqual({ ok: true, data: mockUser });
+    expect(actual).toEqual({ ok: true, data: mockUser, value: mockUser });
   },
 );
 
@@ -463,7 +449,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw(schema.db));
     api.use(api.routes());
-    api.use(fetcher({ baseUrl }));
+    api.use(mdw.fetcher({ baseUrl }));
 
     const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
       function* (ctx, next) {
@@ -471,7 +457,7 @@ it(
         yield* next();
         actual = ctx.json;
       },
-      fetchRetry((n) => (n > 2 ? -1 : 10)),
+      mdw.fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);
 
     store.run(api.bootup);
@@ -479,6 +465,7 @@ it(
     store.dispatch(action);
 
     await delay();
-    expect(actual).toEqual({ ok: false, data: { message: "error" } });
+    const data = { message: "error" };
+    expect(actual).toEqual({ ok: false, data, error: data });
   },
 );

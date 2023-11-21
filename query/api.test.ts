@@ -274,6 +274,7 @@ it(tests, "createApi with hash key on a large post", async () => {
       ctx.json = {
         ok: true,
         data: curUsers,
+        value: curUsers,
       };
     },
   );
@@ -343,7 +344,8 @@ it(tests, "ensure types for get() endpoint", () => {
   api.use(api.routes());
   api.use(function* (ctx, next) {
     yield* next();
-    ctx.json = { ok: true, data: { result: "wow" } };
+    const data = { result: "wow" };
+    ctx.json = { ok: true, data, value: data };
   });
 
   const acc: string[] = [];
@@ -380,7 +382,8 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
   api.use(api.routes());
   api.use(function* (ctx, next) {
     yield* next();
-    ctx.json = { ok: true, data: { result: "wow" } };
+    const data = { result: "wow" };
+    ctx.json = { ok: true, data, value: data };
   });
 
   const acc: string[] = [];
@@ -416,7 +419,8 @@ it(
     api.use(api.routes());
     api.use(function* (ctx, next) {
       yield* next();
-      ctx.json = { ok: true, data: { result: "wow" } };
+      const data = { result: "wow" };
+      ctx.json = { ok: true, data, value: data };
     });
 
     const acc: string[] = [];
