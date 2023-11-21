@@ -9,10 +9,11 @@ import type {
   PipeCtx,
   RequiredApiRequest,
 } from "./types.ts";
-import { isObject, mergeRequest } from "./util.ts";
+import { mergeRequest } from "./util.ts";
 import { sleep } from "../deps.ts";
 import { noop } from "./util.ts";
 import * as fetchMdw from "./fetch.ts";
+export * from "./fetch.ts";
 
 /**
  * This middleware will catch any errors in the pipeline
@@ -34,6 +35,38 @@ export function* err<Ctx extends PipeCtx = PipeCtx>(
 }
 
 /**
+ * This middleware allows the user to override the default key provided to every pipeline function
+ * and instead use whatever they want.
+ *
+ * @example
+ * ```ts
+ * import { createPipe } from 'starfx';
+ *
+ * const thunk = createPipe();
+ * thunk.use(customKey);
+ *
+ * const doit = thunk.create('some-action', function*(ctx, next) {
+ *   ctx.key = 'something-i-want';
+ * })
+ * ```
+ */
+export function* customKey<Ctx extends PipeCtx = PipeCtx>(
+  ctx: Ctx,
+  next: Next,
+) {
+  if (
+    ctx?.key &&
+    ctx?.action?.payload?.key &&
+    ctx.key !== ctx.action.payload.key
+  ) {
+    const newKey = ctx.name.split("|")[0] + "|" + ctx.key;
+    ctx.key = newKey;
+    ctx.action.payload.key = newKey;
+  }
+  yield* next();
+}
+
+/**
  * This middleware sets up the context object with some values that are
  * necessary for {@link createApi} to work properly.
  */
@@ -51,87 +84,14 @@ export function* query<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
 }
 
 /**
- * This middleware converts the name provided to {@link createApi} into data for the fetch request.
- */
-export function* request<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
-  const httpMethods = [
-    "get",
-    "head",
-    "post",
-    "put",
-    "delete",
-    "connect",
-    "options",
-    "trace",
-    "patch",
-  ];
-
-  const options = ctx.payload || {};
-  if (!isObject(options)) {
-    yield* next();
-    return;
-  }
-
-  let url = Object.keys(options).reduce((acc, key) => {
-    return acc.replace(`:${key}`, options[key]);
-  }, ctx.name);
-
-  let method = "";
-  httpMethods.forEach((curMethod) => {
-    const pattern = new RegExp(`\\s*\\[` + curMethod + `\\]\\s*\\w*`, "i");
-    const tmpUrl = url.replace(pattern, "");
-    if (tmpUrl.length !== url.length) {
-      method = curMethod.toLocaleUpperCase();
-    }
-    url = tmpUrl;
-  }, url);
-
-  ctx.request = ctx.req({ url });
-  if (method) {
-    ctx.request = ctx.req({ method });
-  }
-
-  yield* next();
-}
-
-/**
- * This middleware allows the user to override the default key provided to every pipeline function
- * and instead use whatever they want.
- *
- * @example
- * ```ts
- * import { createPipe } from 'starfx';
- *
- * const thunk = createPipe();
- * thunk.use(customKey);
- *
- * const doit = thunk.create('some-action', function*(ctx, next) {
- *   ctx.key = 'something-i-want';
- * })
- * ```
- */
-export function* customKey<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
-  if (
-    ctx?.key &&
-    ctx?.action?.payload?.key &&
-    ctx.key !== ctx.action.payload.key
-  ) {
-    const newKey = ctx.name.split("|")[0] + "|" + ctx.key;
-    ctx.key = newKey;
-    ctx.action.payload.key = newKey;
-  }
-  yield* next();
-}
-
-/**
  * This middleware is a composition of many middleware used to faciliate the {@link createApi}
  */
 export function api<Ctx extends ApiCtx = ApiCtx>() {
   return compose<Ctx>([
     err,
     query,
-    request,
     customKey,
+    fetchMdw.nameParser,
   ]);
 }
 

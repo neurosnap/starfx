@@ -1,5 +1,4 @@
 import { describe, expect, it } from "../test.ts";
-
 import { call, keepAlive } from "../fx/mod.ts";
 import {
   configureStore,
@@ -12,6 +11,7 @@ import {
 import { sleep } from "../test.ts";
 import { safe } from "../mod.ts";
 import * as mdw from "./mdw.ts";
+import * as fetchMdw from "./fetch.ts";
 import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
@@ -45,7 +45,7 @@ it(tests, "createApi - POST", async () => {
   const query = createApi();
 
   query.use(mdw.query);
-  query.use(mdw.request);
+  query.use(fetchMdw.nameParser);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -108,7 +108,7 @@ it(tests, "createApi - POST", async () => {
 it(tests, "POST with uri", () => {
   const query = createApi();
   query.use(mdw.query);
-  query.use(mdw.request);
+  query.use(fetchMdw.nameParser);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -155,7 +155,7 @@ it(tests, "POST with uri", () => {
 it(tests, "middleware - with request fn", () => {
   const query = createApi();
   query.use(mdw.query);
-  query.use(mdw.request);
+  query.use(fetchMdw.nameParser);
   query.use(query.routes());
   query.use(function* (ctx, next) {
     expect(ctx.req().method).toEqual("POST");
@@ -305,6 +305,7 @@ it(tests, "createApi - two identical endpoints", async () => {
   const api = createApi();
   api.use(mdw.api());
   api.use(storeMdw(schema.db));
+  api.use(fetchMdw.nameParser);
   api.use(api.routes());
 
   const first = api.get(

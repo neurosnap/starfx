@@ -1,5 +1,56 @@
 import { safe } from "../fx/mod.ts";
 import type { FetchCtx, FetchJsonCtx, Next } from "./types.ts";
+import { isObject } from "./util.ts";
+
+/**
+ * This middleware converts the name provided to {@link createApi} into `url` and `method` for the fetch request.
+ */
+export function* nameParser<Ctx extends FetchJsonCtx = FetchJsonCtx>(
+  ctx: Ctx,
+  next: Next,
+) {
+  const httpMethods = [
+    "get",
+    "head",
+    "post",
+    "put",
+    "delete",
+    "connect",
+    "options",
+    "trace",
+    "patch",
+  ];
+
+  const options = ctx.payload || {};
+  if (!isObject(options)) {
+    yield* next();
+    return;
+  }
+
+  let url = Object.keys(options).reduce((acc, key) => {
+    return acc.replace(`:${key}`, options[key]);
+  }, ctx.name);
+
+  let method = "";
+  httpMethods.forEach((curMethod) => {
+    const pattern = new RegExp(`\\s*\\[` + curMethod + `\\]\\s*\\w*`, "i");
+    const tmpUrl = url.replace(pattern, "");
+    if (tmpUrl.length !== url.length) {
+      method = curMethod.toLocaleUpperCase();
+    }
+    url = tmpUrl;
+  }, url);
+
+  if (ctx.req().url === "") {
+    ctx.request = ctx.req({ url });
+  }
+
+  if (method) {
+    ctx.request = ctx.req({ method });
+  }
+
+  yield* next();
+}
 
 /**
  * Automatically sets `content-type` to `application/json` when
