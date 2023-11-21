@@ -65,7 +65,7 @@ export function* dispatchActions(ctx: { actions: AnyAction[] }, next: Next) {
 
 /**
  * This middleware will automatically cache any data found inside `ctx.json`
- * which is where we store JSON data from the `fetcher` middleware.
+ * which is where we store JSON data from the {@link mdw.fetch} middleware.
  */
 export function* simpleCache<Ctx extends ApiCtx = ApiCtx>(
   ctx: Ctx,
@@ -76,8 +76,11 @@ export function* simpleCache<Ctx extends ApiCtx = ApiCtx>(
   );
   yield* next();
   if (!ctx.cache) return;
-  const { data } = ctx.json;
-  yield* put(addData({ [ctx.key]: data }));
+  if (ctx.json.ok) {
+    yield* put(addData({ [ctx.key]: ctx.json.value }));
+  } else {
+    yield* put(addData({ [ctx.key]: ctx.json.error }));
+  }
   ctx.cacheData = data;
 }
 
@@ -85,7 +88,11 @@ export function* simpleCache<Ctx extends ApiCtx = ApiCtx>(
  * This middleware will track the status of a fetch request.
  */
 export function loadingMonitor<Ctx extends ApiCtx = ApiCtx>(
-  errorFn: (ctx: Ctx) => string = (ctx) => ctx.json?.data?.message || "",
+  errorFn: (ctx: Ctx) => string = (ctx) => {
+    const jso = ctx.json;
+    if (jso.ok) return "";
+    return jso.error?.message || "";
+  },
 ) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     yield* put([

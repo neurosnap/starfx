@@ -35,7 +35,12 @@ export function simpleCache<Ctx extends ApiCtx = ApiCtx>(
     ctx.cacheData = yield* select(dataSchema.selectById, { id: ctx.key });
     yield* next();
     if (!ctx.cache) return;
-    const { data } = ctx.json;
+    let data;
+    if (ctx.json.ok) {
+      data = ctx.json.value;
+    } else {
+      data = ctx.json.error;
+    }
     yield* updateStore(dataSchema.add({ [ctx.key]: data }));
     ctx.cacheData = data;
   };
@@ -64,7 +69,11 @@ export function loadingMonitor<
   M extends AnyState = AnyState,
 >(
   loaderSchema: LoaderOutput<M, AnyState>,
-  errorFn: (ctx: Ctx) => string = (ctx) => ctx.json?.data?.message || "",
+  errorFn: (ctx: Ctx) => string = (ctx) => {
+    const jso = ctx.json;
+    if (jso.ok) return "";
+    return jso.error?.message || "";
+  },
 ) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     yield* updateStore([

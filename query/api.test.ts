@@ -138,7 +138,7 @@ it(tests, "POST with uri", () => {
 
       yield* next();
       if (!ctx.json.ok) return;
-      const { users } = ctx.json.data;
+      const { users } = ctx.json.value;
       yield* updateStore<{ users: { [key: string]: User } }>((state) => {
         users.forEach((u) => {
           state.users[u.id] = u;
@@ -360,7 +360,7 @@ it(tests, "ensure types for get() endpoint", () => {
       yield* next();
 
       if (ctx.json.ok) {
-        acc.push(ctx.json.data.result);
+        acc.push(ctx.json.value.result);
       }
     },
   );
@@ -398,7 +398,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
       yield* next();
 
       if (ctx.json.ok) {
-        acc.push(ctx.json.data.result);
+        acc.push(ctx.json.value.result);
       }
     },
   );
@@ -434,7 +434,7 @@ it(
         yield* next();
 
         if (ctx.json.ok) {
-          acc.push(ctx.json.data.result);
+          acc.push(ctx.json.value.result);
         }
       },
     );

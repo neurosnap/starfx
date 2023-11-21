@@ -67,7 +67,7 @@ it(tests, "basic", () => {
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
       if (!ctx.json.ok) return;
-      const { users } = ctx.json.data;
+      const { users } = ctx.json.value;
 
       yield* updateStore((state) => {
         users.forEach((u) => {
@@ -86,7 +86,7 @@ it(tests, "basic", () => {
       ctx.request = ctx.req({ method: "POST" });
       yield* next();
       if (!ctx.json.ok) return;
-      const curUser = ctx.json.data;
+      const curUser = ctx.json.value;
       yield* updateStore((state) => {
         state.users[curUser.id] = curUser;
       });
@@ -126,10 +126,10 @@ it(tests, "with loader", () => {
       yield* next();
       if (!ctx.json.ok) return;
 
-      const { data } = ctx.json;
+      const { value } = ctx.json;
 
       yield* updateStore((state) => {
-        data.users.forEach((u) => {
+        value.users.forEach((u) => {
           state.users[u.id] = u;
         });
       });
@@ -169,9 +169,9 @@ it(tests, "with item loader", () => {
       yield* next();
       if (!ctx.json.ok) return;
 
-      const { data } = ctx.json;
+      const { value } = ctx.json;
       yield* updateStore((state) => {
-        data.users.forEach((u) => {
+        value.users.forEach((u) => {
           state.users[u.id] = u;
         });
       });
@@ -232,7 +232,7 @@ it(tests, "with POST", () => {
 
       if (!ctx.json.ok) return;
 
-      const { users } = ctx.json.data;
+      const { users } = ctx.json.value;
       yield* updateStore((state) => {
         users.forEach((u) => {
           state.users[u.id] = u;
@@ -298,10 +298,10 @@ it(tests, "overriding default loader behavior", () => {
       if (!ctx.json.ok) {
         return;
       }
-      const { data } = ctx.json;
+      const { value } = ctx.json;
       ctx.loader = { message: "yes", meta: { wow: true } };
       yield* updateStore((state) => {
-        data.users.forEach((u) => {
+        value.users.forEach((u) => {
           state.users[u.id] = u;
         });
       });
