@@ -23,7 +23,7 @@ export function storeMdw<
 
 /**
  * This middleware will automatically cache any data found inside `ctx.json`
- * which is where we store JSON data from the `fetcher` middleware.
+ * which is where we store JSON data from the {@link mdw.fetch} middleware.
  */
 export function simpleCache<Ctx extends ApiCtx = ApiCtx>(
   dataSchema: TableOutput<any, AnyState>,

@@ -132,9 +132,9 @@ function backoffExp(attempt: number): number {
  *  }
  *
  * const api = createApi();
- * api.use(requestMonitor());
+ * api.use(mdw.api());
  * api.use(api.routes());
- * api.use(fetcher());
+ * api.use(mdw.fetch());
  *
  * const fetchUsers = api.get('/users', [
  *  function*(ctx, next) {

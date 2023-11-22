@@ -11,7 +11,7 @@ import { Provider, sleep as delay, useSelector } from "../deps.ts";
 import { configureStore, updateStore } from "../store/mod.ts";
 
 import { createApi } from "./api.ts";
-import { requestMonitor } from "./middleware.ts";
+import * as mdw from "./middleware.ts";
 import { useApi } from "./react.ts";
 import { selectDataById } from "./slice.ts";
 import { createKey } from "./create-key.ts";
@@ -32,7 +32,7 @@ interface User {
 
 const setupTest = async () => {
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(api.routes());
   api.use(function* (ctx, next) {
     yield* delay(10);

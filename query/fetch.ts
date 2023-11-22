@@ -140,7 +140,7 @@ export function* json<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 }
 
 /*
- * This middleware takes the `baseUrl` provided to `fetcher()` and combines it
+ * This middleware takes the `baseUrl` provided to {@link mdw.fetch} and combines it
  * with the url from `ctx.request.url`.
  */
 export function composeUrl<CurCtx extends FetchJsonCtx = FetchJsonCtx>(

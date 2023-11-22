@@ -29,7 +29,7 @@ const testStore = () => {
   return { schema, store };
 };
 
-const tests = describe("fetcher()");
+const tests = describe("mdw.fetch()");
 
 it(
   tests,

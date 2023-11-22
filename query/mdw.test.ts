@@ -323,7 +323,7 @@ it(tests, "overriding default loader behavior", () => {
   });
 });
 
-it(tests, "requestMonitor - error handler", () => {
+it(tests, "mdw.api() - error handler", () => {
   let err = false;
   console.error = (msg: string) => {
     if (err) return;

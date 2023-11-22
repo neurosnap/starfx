@@ -12,12 +12,12 @@ import type { ApiName, SagaQueryApi } from "./api-types.ts";
  *
  * @example
  * ```ts
- * import { createApi, requestMonitor, fetcher } from 'starfx';
+ * import { createApi, mdw } from 'starfx';
  *
  * const api = createApi();
- * api.use(requestMonitor());
+ * api.use(mdw.api());
  * api.use(api.routes());
- * api.use(fetcher({ baseUrl: 'https://api.com' }));
+ * api.use(mdw.fetch({ baseUrl: 'https://api.com' }));
  *
  * const fetchUsers = api.get('/users', function*(ctx, next) {
  *   yield next();
