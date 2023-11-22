@@ -3,7 +3,8 @@ import type { FetchCtx, FetchJsonCtx, Next } from "./types.ts";
 import { isObject } from "./util.ts";
 
 /**
- * This middleware converts the name provided to {@link createApi} into `url` and `method` for the fetch request.
+ * This middleware converts the name provided to {@link createApi}
+ * into `url` and `method` for the fetch request.
  */
 export function* nameParser<Ctx extends FetchJsonCtx = FetchJsonCtx>(
   ctx: Ctx,
@@ -207,7 +208,7 @@ export function* request<CurCtx extends FetchCtx = FetchCtx>(
 ) {
   const { url, ...req } = ctx.req();
   const request = new Request(url, req);
-  const result = yield* safe(() => fetch(request));
+  const result = yield* safe(fetch(request));
   if (result.ok) {
     ctx.response = result.value;
   } else {

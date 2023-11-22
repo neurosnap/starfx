@@ -18,7 +18,7 @@ export const errorHandler = mdw.err;
 /**
  * @deprecated Use {@link mdw.query} instead;
  */
-export const queryCtx = mdw.query;
+export const queryCtx = mdw.queryCtx;
 /**
  * @deprecated Use {@link fetchMdw.composeUrl} instead;
  */
@@ -31,3 +31,7 @@ export const customKey = mdw.customKey;
  * @deprecated Use {@link mdw.api} instead;
  */
 export const requestMonitor = mdw.api;
+/**
+ * @deprecated Use {@link mdw.fetch} instead;
+ */
+export const fetcher = mdw.fetch;

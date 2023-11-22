@@ -11,7 +11,6 @@ import {
 import { sleep } from "../test.ts";
 import { safe } from "../mod.ts";
 import * as mdw from "./mdw.ts";
-import * as fetchMdw from "./fetch.ts";
 import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
@@ -44,8 +43,8 @@ const tests = describe("createApi()");
 it(tests, "createApi - POST", async () => {
   const query = createApi();
 
-  query.use(mdw.query);
-  query.use(fetchMdw.nameParser);
+  query.use(mdw.queryCtx);
+  query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -107,8 +106,8 @@ it(tests, "createApi - POST", async () => {
 
 it(tests, "POST with uri", () => {
   const query = createApi();
-  query.use(mdw.query);
-  query.use(fetchMdw.nameParser);
+  query.use(mdw.queryCtx);
+  query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -154,8 +153,8 @@ it(tests, "POST with uri", () => {
 
 it(tests, "middleware - with request fn", () => {
   const query = createApi();
-  query.use(mdw.query);
-  query.use(fetchMdw.nameParser);
+  query.use(mdw.queryCtx);
+  query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* (ctx, next) {
     expect(ctx.req().method).toEqual("POST");
@@ -184,12 +183,16 @@ it(tests, "run() on endpoint action - should run the effect", () => {
       acc += "a";
     },
   );
-  const action2 = api.get("/users2", function* (_, next) {
-    yield* next();
-    yield* call(() => action1.run(action1({ id: "1" })));
-    acc += "b";
-    expect(acc).toEqual("ab");
-  });
+  const action2 = api.get(
+    "/users2",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      yield* next();
+      yield* call(() => action1.run(action1({ id: "1" })));
+      acc += "b";
+      expect(acc).toEqual("ab");
+    },
+  );
 
   const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
@@ -305,7 +308,7 @@ it(tests, "createApi - two identical endpoints", async () => {
   const api = createApi();
   api.use(mdw.api());
   api.use(storeMdw(schema.db));
-  api.use(fetchMdw.nameParser);
+  api.use(mdw.nameParser);
   api.use(api.routes());
 
   const first = api.get(
@@ -457,7 +460,7 @@ it(tests, "should bubble up error", () => {
       error = err;
     }
   });
-  api.use(mdw.query);
+  api.use(mdw.queryCtx);
   api.use(storeMdw(schema.db));
   api.use(api.routes());
 

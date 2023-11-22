@@ -1,0 +1,61 @@
+import { Operation, Result, sleep } from "../deps.ts";
+import type { Operator } from "../types.ts";
+import { safe } from "./call.ts";
+import { parallel } from "./parallel.ts";
+import { log } from "../log.ts";
+
+function backoffExp(attempt: number): number {
+  if (attempt > 10) return -1;
+  // 20ms, 40ms, 80ms, 160ms, 320ms, 640ms, 1280ms, 2560ms, 5120ms, 10240ms
+  return 2 ** attempt * 10;
+}
+
+/**
+ * {@link supvervise} will watch whatever {@link Operation} is provided
+ * and it will automatically try to restart it when it exists.  By
+ * default it uses a backoff pressure mechanism so if there is an
+ * error simply calling the {@link Operation} then it will exponentially
+ * wait longer until attempting to restart and eventually give up.
+ */
+export function supervise<T>(
+  op: Operator<T>,
+  backoff: (a: number) => number = backoffExp,
+) {
+  return function* () {
+    let attempt = 1;
+    let waitFor = backoff(attempt);
+
+    while (waitFor >= 0) {
+      const res = yield* safe(op);
+
+      if (res.ok) {
+        attempt = 0;
+      } else {
+        yield* log({
+          type: "fx:supervise",
+          payload: {
+            message:
+              `Exception caught, waiting ${waitFor}ms before restarting operation`,
+            op,
+            error: res.error,
+          },
+        });
+        yield* sleep(waitFor);
+      }
+
+      attempt += 1;
+      waitFor = backoff(attempt);
+    }
+  };
+}
+
+export function* keepAlive(
+  ops: Operator<unknown>[],
+  backoff?: (a: number) => number,
+): Operation<Result<void>[]> {
+  const group = yield* parallel(
+    ops.map((op) => supervise(op, backoff)),
+  );
+  const results = yield* group;
+  return results;
+}

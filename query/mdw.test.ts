@@ -45,7 +45,7 @@ const tests = describe("middleware");
 it(tests, "basic", () => {
   const { store } = testStore();
   const query = createApi<ApiCtx>();
-  query.use(mdw.query);
+  query.use(mdw.queryCtx);
   query.use(mdw.api());
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
@@ -197,7 +197,7 @@ it(tests, "with item loader", () => {
 
 it(tests, "with POST", () => {
   const query = createApi();
-  query.use(mdw.query);
+  query.use(mdw.queryCtx);
   query.use(mdw.api());
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
@@ -508,7 +508,7 @@ it(tests, "errorHandler", () => {
       );
     }
   });
-  query.use(mdw.query);
+  query.use(mdw.queryCtx);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     if (`${ctx.req().url}`.startsWith("/users/")) {

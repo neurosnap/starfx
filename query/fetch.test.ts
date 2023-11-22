@@ -319,6 +319,7 @@ it(tests, "fetch - POST multiple endpoints with same uri", async () => {
 
   const fetchUsersSecond = api.post<{ id: string }>(
     ["/users/:id/something", "next"],
+    { supervisor: takeEvery },
     function* (ctx, next) {
       ctx.cache = true;
       ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
