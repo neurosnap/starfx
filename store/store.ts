@@ -15,6 +15,7 @@ import { Next } from "../query/types.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { ActionContext, StoreContext, StoreUpdateContext } from "./context.ts";
 import { put } from "./fx.ts";
+import { log } from "../log.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
 
@@ -120,7 +121,13 @@ export function createStore<S extends AnyState>({
     yield* mdw(ctx);
     // TODO: dev mode only?
     if (!ctx.result.ok) {
-      console.error(ctx.result);
+      yield* log({
+        type: "store:update",
+        payload: {
+          message: `Exception raised when calling store updaters`,
+          error: ctx.result.error,
+        },
+      });
     }
     return ctx;
   }

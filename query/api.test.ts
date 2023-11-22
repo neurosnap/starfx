@@ -1,5 +1,4 @@
 import { describe, expect, it } from "../test.ts";
-
 import { call, keepAlive } from "../fx/mod.ts";
 import {
   configureStore,
@@ -11,8 +10,7 @@ import {
 } from "../store/mod.ts";
 import { sleep } from "../test.ts";
 import { safe } from "../mod.ts";
-
-import { queryCtx, requestMonitor, urlParser } from "./middleware.ts";
+import * as mdw from "./mdw.ts";
 import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
@@ -45,8 +43,8 @@ const tests = describe("createApi()");
 it(tests, "createApi - POST", async () => {
   const query = createApi();
 
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.queryCtx);
+  query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -108,8 +106,8 @@ it(tests, "createApi - POST", async () => {
 
 it(tests, "POST with uri", () => {
   const query = createApi();
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.queryCtx);
+  query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     expect(ctx.req()).toEqual({
@@ -139,7 +137,7 @@ it(tests, "POST with uri", () => {
 
       yield* next();
       if (!ctx.json.ok) return;
-      const { users } = ctx.json.data;
+      const { users } = ctx.json.value;
       yield* updateStore<{ users: { [key: string]: User } }>((state) => {
         users.forEach((u) => {
           state.users[u.id] = u;
@@ -155,8 +153,8 @@ it(tests, "POST with uri", () => {
 
 it(tests, "middleware - with request fn", () => {
   const query = createApi();
-  query.use(queryCtx);
-  query.use(urlParser);
+  query.use(mdw.queryCtx);
+  query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* (ctx, next) {
     expect(ctx.req().method).toEqual("POST");
@@ -185,12 +183,16 @@ it(tests, "run() on endpoint action - should run the effect", () => {
       acc += "a";
     },
   );
-  const action2 = api.get("/users2", function* (_, next) {
-    yield* next();
-    yield* call(() => action1.run(action1({ id: "1" })));
-    acc += "b";
-    expect(acc).toEqual("ab");
-  });
+  const action2 = api.get(
+    "/users2",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      yield* next();
+      yield* call(() => action1.run(action1({ id: "1" })));
+      acc += "b";
+      expect(acc).toEqual("ab");
+    },
+  );
 
   const store = configureStore({ initialState: { users: {} } });
   store.run(api.bootup);
@@ -235,7 +237,7 @@ it(tests, "run() from a normal saga", () => {
 it(tests, "createApi with hash key on a large post", async () => {
   const { store, schema } = testStore();
   const query = createApi();
-  query.use(requestMonitor());
+  query.use(mdw.api());
   query.use(storeMdw(schema.db));
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
@@ -275,6 +277,7 @@ it(tests, "createApi with hash key on a large post", async () => {
       ctx.json = {
         ok: true,
         data: curUsers,
+        value: curUsers,
       };
     },
   );
@@ -303,8 +306,9 @@ it(tests, "createApi - two identical endpoints", async () => {
   const actual: string[] = [];
   const { store, schema } = testStore();
   const api = createApi();
-  api.use(requestMonitor());
+  api.use(mdw.api());
   api.use(storeMdw(schema.db));
+  api.use(mdw.nameParser);
   api.use(api.routes());
 
   const first = api.get(
@@ -344,7 +348,8 @@ it(tests, "ensure types for get() endpoint", () => {
   api.use(api.routes());
   api.use(function* (ctx, next) {
     yield* next();
-    ctx.json = { ok: true, data: { result: "wow" } };
+    const data = { result: "wow" };
+    ctx.json = { ok: true, data, value: data };
   });
 
   const acc: string[] = [];
@@ -358,7 +363,7 @@ it(tests, "ensure types for get() endpoint", () => {
       yield* next();
 
       if (ctx.json.ok) {
-        acc.push(ctx.json.data.result);
+        acc.push(ctx.json.value.result);
       }
     },
   );
@@ -381,7 +386,8 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
   api.use(api.routes());
   api.use(function* (ctx, next) {
     yield* next();
-    ctx.json = { ok: true, data: { result: "wow" } };
+    const data = { result: "wow" };
+    ctx.json = { ok: true, data, value: data };
   });
 
   const acc: string[] = [];
@@ -395,7 +401,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
       yield* next();
 
       if (ctx.json.ok) {
-        acc.push(ctx.json.data.result);
+        acc.push(ctx.json.value.result);
       }
     },
   );
@@ -417,7 +423,8 @@ it(
     api.use(api.routes());
     api.use(function* (ctx, next) {
       yield* next();
-      ctx.json = { ok: true, data: { result: "wow" } };
+      const data = { result: "wow" };
+      ctx.json = { ok: true, data, value: data };
     });
 
     const acc: string[] = [];
@@ -430,7 +437,7 @@ it(
         yield* next();
 
         if (ctx.json.ok) {
-          acc.push(ctx.json.data.result);
+          acc.push(ctx.json.value.result);
         }
       },
     );
@@ -453,7 +460,7 @@ it(tests, "should bubble up error", () => {
       error = err;
     }
   });
-  api.use(queryCtx);
+  api.use(mdw.queryCtx);
   api.use(storeMdw(schema.db));
   api.use(api.routes());
 

@@ -2,7 +2,7 @@
  * This is an auto-generated file, do not edit directly!
  * Run "yarn template" to generate this file.
  */
-import type { SagaApi } from "./pipe.ts";
+import type { SagaApi } from "./thunk.ts";
 import type {
   ApiCtx,
   CreateAction,

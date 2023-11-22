@@ -19,19 +19,23 @@ export interface LoaderCtx<P = unknown> extends PipeCtx<P> {
   loader: Partial<LoaderItemState> | null;
 }
 
-export interface ApiFetchSuccess<ApiSuccess = any> {
-  ok: true;
-  data: ApiSuccess;
-}
-
-export interface ApiFetchError<ApiError = any> {
-  ok: false;
-  data: ApiError;
-}
-
-export type ApiFetchResponse<ApiSuccess = any, ApiError = any> =
-  | ApiFetchSuccess<ApiSuccess>
-  | ApiFetchError<ApiError>;
+export type ApiFetchResult<ApiSuccess = any, ApiError = any> =
+  | {
+    ok: true;
+    value: ApiSuccess;
+    /**
+     * @deprecated Use {@link ApiFetchResult.value} instead.
+     */
+    data: ApiSuccess;
+  }
+  | {
+    ok: false;
+    error: ApiError;
+    /**
+     * @deprecated Use {@link ApiFetchResult.error} instead.
+     */
+    data: ApiError;
+  };
 
 export type ApiRequest = Partial<{ url: string } & RequestInit>;
 export type RequiredApiRequest = {
@@ -47,7 +51,7 @@ export interface FetchCtx<P = any> extends PipeCtx<P> {
 }
 
 export interface FetchJson<ApiSuccess = any, ApiError = any> {
-  json: ApiFetchResponse<ApiSuccess, ApiError>;
+  json: ApiFetchResult<ApiSuccess, ApiError>;
 }
 
 export interface FetchJsonCtx<P = any, ApiSuccess = any, ApiError = any>
@@ -59,6 +63,10 @@ export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   loader: Omit<LoaderPayload<any>, "id"> | null;
   cache: boolean;
   cacheData: any;
+}
+
+export interface PerfCtx<P = unknown> extends PipeCtx<P> {
+  performance: number;
 }
 
 export type Middleware<Ctx extends PipeCtx = PipeCtx> = (
@@ -77,7 +85,7 @@ export type MiddlewareApiCo<Ctx extends ApiCtx = ApiCtx> =
   | Middleware<Ctx>
   | Middleware<Ctx>[];
 
-export type Next = () => Operation<unknown>;
+export type Next = () => Operation<void>;
 
 export interface Action {
   type: string;

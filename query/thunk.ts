@@ -1,6 +1,6 @@
 import { compose } from "../compose.ts";
 import type { Operator, Payload } from "../types.ts";
-import { parallel } from "../mod.ts";
+import { keepAlive } from "../mod.ts";
 
 // TODO: remove store deps
 import { takeEvery } from "../redux/mod.ts";
@@ -24,7 +24,7 @@ import { Ok } from "../deps.ts";
 export interface SagaApi<Ctx extends PipeCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
-  bootup: Operator<unknown>;
+  bootup: Operator<void>;
 
   /**
    * Name only
@@ -94,17 +94,17 @@ export interface SagaApi<Ctx extends PipeCtx> {
  *
  * @example
  * ```ts
- * import { createPipe } from 'starfx';
+ * import { createThunks } from 'starfx';
  *
- * const thunk = createPipe();
- * thunk.use(function* (ctx, next) {
+ * const thunks = createThunks();
+ * thunks.use(function* (ctx, next) {
  *   console.log('beginning');
  *   yield* next();
  *   console.log('end');
  * });
  * thunks.use(thunks.routes());
  *
- * const doit = thunk.create('do-something', function*(ctx, next) {
+ * const doit = thunks.create('do-something', function*(ctx, next) {
  *   console.log('middle');
  *   yield* next();
  *   console.log('middle end');
@@ -119,7 +119,7 @@ export interface SagaApi<Ctx extends PipeCtx> {
  * // end
  * ```
  */
-export function createPipe<Ctx extends PipeCtx = PipeCtx<any>>(
+export function createThunks<Ctx extends PipeCtx = PipeCtx<any>>(
   {
     supervisor = takeEvery,
   }: {
@@ -215,8 +215,7 @@ export function createPipe<Ctx extends PipeCtx = PipeCtx<any>>(
   }
 
   function* bootup() {
-    const group = yield* parallel(Object.values(visors));
-    return yield* group;
+    yield* keepAlive(Object.values(visors));
   }
 
   function routes() {
