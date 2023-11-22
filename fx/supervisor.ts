@@ -4,8 +4,8 @@ import { safe } from "./call.ts";
 import { parallel } from "./parallel.ts";
 import { log } from "../log.ts";
 
-function backoffExp(attempt: number): number {
-  if (attempt > 10) return -1;
+export function superviseBackoff(attempt: number, max = 10): number {
+  if (attempt > max) return -1;
   // 20ms, 40ms, 80ms, 160ms, 320ms, 640ms, 1280ms, 2560ms, 5120ms, 10240ms
   return 2 ** attempt * 10;
 }
@@ -19,7 +19,7 @@ function backoffExp(attempt: number): number {
  */
 export function supervise<T>(
   op: Operator<T>,
-  backoff: (a: number) => number = backoffExp,
+  backoff: (attemp: number) => number = superviseBackoff,
 ) {
   return function* () {
     let attempt = 1;
@@ -51,7 +51,7 @@ export function supervise<T>(
 
 export function* keepAlive(
   ops: Operator<unknown>[],
-  backoff?: (a: number) => number,
+  backoff?: (attempt: number) => number,
 ): Operation<Result<void>[]> {
   const group = yield* parallel(
     ops.map((op) => supervise(op, backoff)),
