@@ -31,17 +31,26 @@ Read my introductory blog post:
 
 # example: thunks are tasks for business logic
 
+They also come with built-in support for a middleware stack (like `express`).
+This provides a familiar and powerful abstraction for async flow control for all
+thunks and endpoints.
+
+Why does the BE get to enjoy middleware but not the FE?
+
 ```ts
 import { createThunks, mdw } from "starfx";
 
 const thunks = createThunks();
+// catch errors from task and logs them with extra info
 thunks.use(mdw.err);
+// where all the thunks get called in the middleware stack
 thunks.use(thunks.routes());
 
+// create a thunk
 const log = thunks.create("log", function* (ctx, next) {
   console.log("before calling next middleware");
   yield* next();
-  console.log("after all middleware have run");
+  console.log("after all remaining middleware have run");
 });
 
 store.dispatch(log());
@@ -49,14 +58,18 @@ store.dispatch(log());
 
 # example: endpoints are tasks for managing HTTP requests
 
+Building off of `createThunks` we have a way to easily manage http requests.
+
 ```ts
 import { createApi, mdw } from "starfx";
 
 const api = createApi();
+// composition of handy middleware for createApi to function
 api.use(mdw.api());
 api.use(api.routes());
 api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
 
+// automatically cache results in datastore
 export const fetchUsers = api.get("/users", api.cache());
 
 store.dispatch(fetchUsers());
@@ -107,6 +120,29 @@ const fetchUsers = api.get<never, User[]>(
 
 const store = configureStore({ initialState });
 store.dispatch(fetchUsers());
+```
+
+# example: the view
+
+```tsx
+import { useApi, useDispatch, useSelector } from "starfx/react";
+import { db } from "./store.ts";
+import { fetchUsers } from "./api.ts";
+
+function App() {
+  const users = useSelector(db.users.selectTableAsList);
+  const loader = useApi(fetchUsers());
+
+  return (
+    <div>
+      {users.map((u) => <div>{u.name}</div>)}
+      <div>
+        <button onClick={loader.trigger()}>fetch users</button>
+        {loader.isLoading ? <div>Loading ...</div> : null}
+      </div>
+    </div>
+  );
+}
 ```
 
 # usage
