@@ -12,7 +12,7 @@ and state management.
 Read my introductory blog post:
 [what is starfx?](https://bower.sh/what-is-starfx)
 
-## features
+# features
 
 - async flow control library for `deno`, `node`, and browser
 - task tree side-effect management system (like `redux-saga`)
@@ -20,7 +20,7 @@ Read my introductory blog post:
 - traceability throughout the entire system (event logs via dispatching actions)
 - data synchronization and caching for `react` (like `react-query`, `rtk-query`)
 
-## design philosophy
+# design philosophy
 
 - side-effect management is a first-class citizen
 - leverage structured concurrency to manage side-effects
@@ -109,18 +109,18 @@ const store = configureStore({ initialState });
 store.dispatch(fetchUsers());
 ```
 
-## usage
+# usage
 
 Please see [examples repo](https://github.com/neurosnap/starfx-examples).
 
-## talk
+# talk
 
 I recently gave a talk about deliminited continuations where I also discuss this
 library:
 
 [![Delminited continuations are all you need](http://img.youtube.com/vi/uRbqLGj_6mI/0.jpg)](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
 
-## resources
+# resources
 
 This library is not possible without these foundational libraries:
 
