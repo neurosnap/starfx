@@ -82,9 +82,14 @@ store.dispatch(fetchUsers());
 ```ts
 import { configureStore, createSchema, slice } from "starfx/store";
 
+interface User {
+  id: string;
+  name: string;
+}
+
 // app-wide database for ui, api data, or anything that needs reactivity
 const { db, initialState, update } = createSchema({
-  users: slice.table(),
+  users: slice.table<User>(),
   cache: slice.table(),
   loaders: slice.loader(),
 });
