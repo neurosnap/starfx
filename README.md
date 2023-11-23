@@ -80,7 +80,7 @@ store.dispatch(fetchUsers());
 # example: an immutable store that acts like a reactive, in-memory database
 
 ```ts
-import { configureStore, createSchema, slice } from "starfx/store";
+import { configureStore, createSchema, slice, select } from "starfx/store";
 
 interface User {
   id: string;
