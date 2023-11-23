@@ -67,6 +67,7 @@ const api = createApi();
 // composition of handy middleware for createApi to function
 api.use(mdw.api());
 api.use(api.routes());
+// calls `window.fetch` with `ctx.request` and sets to `ctx.response`
 api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
 
 // automatically cache results in datastore
