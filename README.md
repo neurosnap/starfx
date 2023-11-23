@@ -141,7 +141,7 @@ function App() {
 
   return (
     <div>
-      {users.map((u) => <div>{u.name}</div>)}
+      {users.map((u) => <div key={u.id}>{u.name}</div>)}
       <div>
         <button onClick={api.trigger()}>fetch users</button>
         {api.isLoading ? <div>Loading ...</div> : null}
