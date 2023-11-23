@@ -125,7 +125,7 @@ store.dispatch(fetchUsers());
 # example: the view
 
 ```tsx
-import { useApi, useDispatch, useSelector } from "starfx/react";
+import { useApi, useSelector } from "starfx/react";
 import { db } from "./store.ts";
 import { fetchUsers } from "./api.ts";
 
