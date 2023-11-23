@@ -29,41 +29,84 @@ Read my introductory blog post:
 - state management should not be coupled to the view
 - full control over state management
 
-## example
-
-This complete solution to the problem Jake Archibald discusses in his blog
-article
-[The gotcha of unhandled promise rejections](https://jakearchibald.com/2023/unhandled-rejections/):
+# example: thunks are tasks for business logic
 
 ```ts
-import { each, json, main, parallel, request } from "starfx";
+import { createThunks, mdw } from "starfx";
 
-function* fetchChapter(title: string) {
-  const response = yield* request(`/chapters/${title}`);
-  const data = yield* json(response);
-  return data;
-}
+const thunks = createThunks();
+thunks.use(mdw.err);
+thunks.use(thunks.routes());
 
-const task = main(function* () {
-  const chapters = ["01", "02", "03"];
-  const ops = chapters.map((title) => () => fetchChapter(title));
-
-  // parallel returns a list of `Result` type
-  const chapters = yield* parallel(ops);
-
-  // make http requests in parallel but process them in sequence (e.g. 01, 02, 03)
-  for (const result of yield* each(chapters.sequence)) {
-    if (result.ok) {
-      console.log(result.value);
-    } else {
-      console.error(result.error);
-    }
-    yield* each.next();
-  }
+const log = thunks.create("log", function* (ctx, next) {
+  console.log("before calling next middleware");
+  yield* next();
+  console.log("after all middleware have run");
 });
 
-const results = await task;
-console.log(results);
+store.dispatch(log());
+```
+
+# example: endpoints are tasks for managing HTTP requests
+
+```ts
+import { createApi, mdw } from "starfx";
+
+const api = createApi();
+api.use(mdw.api());
+api.use(api.routes());
+api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
+
+export const fetchUsers = api.get("/users", api.cache());
+
+store.dispatch(fetchUsers());
+// now accessible with useCache(fetchUsers)
+```
+
+# example: an immutable store that acts like a reactive, in-memory database
+
+```ts
+import { configureStore, createSchema, slice } from "starfx/store";
+
+// app-wide database for ui, api data, or anything that needs reactivity
+const { db, initialState, update } = createSchema({
+  users: slice.table(),
+  cache: slice.table(),
+  loaders: slice.loader(),
+});
+
+const fetchUsers = api.get<never, User[]>(
+  "/users",
+  function* (ctx, next) {
+    // make the http request
+    yield* next();
+
+    // ctx.json is a Result type that either contains the http response
+    // json data or an error
+    if (!ctx.json.ok) {
+      return;
+    }
+
+    const { value } = ctx.json;
+    const users = value.reduce<Record<string, User>>((acc, user) => {
+      acc[user.id] = user;
+      return acc;
+    }, {});
+
+    // update the store and trigger a re-render in react
+    yield* update(db.users.add(users));
+
+    // User[]
+    const users = yield* select(db.users.selectTableAsList);
+    // User
+    const user = yield* select(
+      (state) => db.users.selectById(state, { id: "1" }),
+    );
+  },
+);
+
+const store = configureStore({ initialState });
+store.dispatch(fetchUsers());
 ```
 
 ## usage
