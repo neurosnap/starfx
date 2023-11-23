@@ -131,14 +131,14 @@ import { fetchUsers } from "./api.ts";
 
 function App() {
   const users = useSelector(db.users.selectTableAsList);
-  const loader = useApi(fetchUsers());
+  const api = useApi(fetchUsers());
 
   return (
     <div>
       {users.map((u) => <div>{u.name}</div>)}
       <div>
-        <button onClick={loader.trigger()}>fetch users</button>
-        {loader.isLoading ? <div>Loading ...</div> : null}
+        <button onClick={api.trigger()}>fetch users</button>
+        {api.isLoading ? <div>Loading ...</div> : null}
       </div>
     </div>
   );
