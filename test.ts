@@ -1,4 +1,12 @@
-export { asserts, describe, expect, install, it, mock } from "./deps.ts";
+export { assert } from "https://deno.land/std@0.187.0/testing/asserts.ts";
+export {
+  beforeEach,
+  describe,
+  it,
+} from "https://deno.land/std@0.163.0/testing/bdd.ts";
+export * as asserts from "https://deno.land/std@0.185.0/testing/asserts.ts";
+export { expect } from "https://deno.land/x/expect@v0.3.0/mod.ts";
+export { install, mock } from "https://deno.land/x/mock_fetch@0.3.0/mod.ts";
 
 export const sleep = (n: number) =>
   new Promise<void>((resolve) => {
