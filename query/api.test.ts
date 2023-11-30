@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { call, keepAlive } from "../fx/mod.ts";
+import { keepAlive } from "../fx/mod.ts";
 import {
   configureStore,
   createSchema,
@@ -14,6 +14,7 @@ import * as mdw from "./mdw.ts";
 import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
+import { call } from "../deps.ts";
 
 interface User {
   id: string;

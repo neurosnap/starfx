@@ -23,8 +23,6 @@ export {
   createSignal,
   each,
   Err,
-  expect,
-  filter,
   getframe,
   Ok,
   resource,
@@ -52,6 +50,7 @@ export {
 } from "https://esm.sh/immer@10.0.2?pin=v122";
 export type { Patch } from "https://esm.sh/immer@10.0.2?pin=v122";
 
+// redux
 export type {
   Action,
   Reducer,
@@ -68,13 +67,21 @@ export {
   batchActions,
   enableBatching,
 } from "https://esm.sh/redux-batched-actions@0.5.0?pin=v122";
-export type {
-  MapEntity,
-  PatchEntity,
-} from "https://esm.sh/robodux@15.0.2?pin=v122";
 export {
   createLoaderTable,
   createReducerMap,
   createTable,
-  mapReducers,
 } from "https://esm.sh/robodux@15.0.2?pin=v122";
+
+// npm conversion
+export { build, emptyDir } from "https://deno.land/x/dnt@0.38.1/mod.ts";
+// testing
+export { assert } from "https://deno.land/std@0.187.0/testing/asserts.ts";
+export {
+  beforeEach,
+  describe,
+  it,
+} from "https://deno.land/std@0.163.0/testing/bdd.ts";
+export * as asserts from "https://deno.land/std@0.185.0/testing/asserts.ts";
+export { expect } from "https://deno.land/x/expect@v0.3.0/mod.ts";
+export { install, mock } from "https://deno.land/x/mock_fetch@0.3.0/mod.ts";

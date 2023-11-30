@@ -1,8 +1,7 @@
 import { describe, expect, it } from "../test.ts";
-import { call } from "../fx/mod.ts";
-
 import { select } from "./mod.ts";
 import { configureStore } from "./store.ts";
+import { call } from "../deps.ts";
 
 const tests = describe("configureStore()");
 

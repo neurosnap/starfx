@@ -1,7 +1,6 @@
 import { assertLike, asserts, describe, it } from "../test.ts";
-import { call } from "../fx/mod.ts";
 import { configureStore, put, takeEvery } from "../store/mod.ts";
-import { sleep as delay } from "../deps.ts";
+import { call, sleep as delay } from "../deps.ts";
 import type { QueryState } from "../types.ts";
 import { createQueryState } from "../action.ts";
 import { sleep } from "../test.ts";

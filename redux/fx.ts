@@ -1,12 +1,12 @@
 import type { Action, Operation, Queue, Signal, Stream } from "../deps.ts";
 import {
+  call,
   createContext,
   createQueue,
   each,
   SignalQueueFactory,
   spawn,
 } from "../deps.ts";
-import { call } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 import type { ActionWPayload, AnyAction } from "../types.ts";
 import type { StoreLike } from "./types.ts";

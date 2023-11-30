@@ -1,6 +1,6 @@
-import { call, race } from "../fx/mod.ts";
+import { race } from "../fx/mod.ts";
 import { take } from "./fx.ts";
-import { Operation, sleep, spawn, Task } from "../deps.ts";
+import { call, Operation, sleep, spawn, Task } from "../deps.ts";
 import type { ActionWPayload, AnyAction } from "../types.ts";
 import type { CreateActionPayload, Supervisor } from "../query/mod.ts";
 
