@@ -1,5 +1,6 @@
 import {
   Action,
+  call,
   each,
   Operation,
   Signal,
@@ -7,7 +8,6 @@ import {
   spawn,
   Stream,
 } from "../deps.ts";
-import { call } from "../fx/mod.ts";
 import { ActionPattern, matcher } from "../matcher.ts";
 import type { ActionWPayload, AnyAction, AnyState } from "../types.ts";
 import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";

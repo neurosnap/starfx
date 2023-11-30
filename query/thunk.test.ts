@@ -1,16 +1,15 @@
 import { assertLike, asserts, describe, it } from "../test.ts";
-import { call } from "../fx/mod.ts";
 import { configureStore, put, takeEvery } from "../store/mod.ts";
-import { sleep as delay } from "../deps.ts";
+import { call, sleep as delay } from "../deps.ts";
 import type { QueryState } from "../types.ts";
 import { createQueryState } from "../action.ts";
 import { sleep } from "../test.ts";
 import { createThunks } from "./thunk.ts";
-import type { Next, PipeCtx } from "./types.ts";
+import type { Next, ThunkCtx } from "./types.ts";
 import { updateStore } from "../store/fx.ts";
 
 // deno-lint-ignore no-explicit-any
-interface RoboCtx<D = Record<string, unknown>, P = any> extends PipeCtx<P> {
+interface RoboCtx<D = Record<string, unknown>, P = any> extends ThunkCtx<P> {
   url: string;
   request: { method: string; body?: Record<string, unknown> };
   response: D;
@@ -409,7 +408,7 @@ it(tests, "retry with actionFn with payload", async () => {
   const api = createThunks();
   api.use(api.routes());
 
-  api.use(function* (ctx: PipeCtx<{ page: number }>, next) {
+  api.use(function* (ctx: ThunkCtx<{ page: number }>, next) {
     yield* next();
     if (ctx.payload.page == 1) {
       yield* put(ctx.actionFn({ page: 2 }));

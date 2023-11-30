@@ -3,19 +3,19 @@ import type { LoaderItemState, LoaderPayload, Payload } from "../types.ts";
 
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 
-export interface PipeCtx<P = any> extends Payload<P> {
+export interface ThunkCtx<P = any> extends Payload<P> {
   name: string;
   key: string;
   action: ActionWithPayload<CreateActionPayload<P>>;
   actionFn: IfAny<
     P,
-    CreateAction<PipeCtx>,
-    CreateActionWithPayload<PipeCtx<P>, P>
+    CreateAction<ThunkCtx>,
+    CreateActionWithPayload<ThunkCtx<P>, P>
   >;
   result: Result<void>;
 }
 
-export interface LoaderCtx<P = unknown> extends PipeCtx<P> {
+export interface LoaderCtx<P = unknown> extends ThunkCtx<P> {
   loader: Partial<LoaderItemState> | null;
 }
 
@@ -43,7 +43,7 @@ export type RequiredApiRequest = {
   headers: HeadersInit;
 } & Partial<RequestInit>;
 
-export interface FetchCtx<P = any> extends PipeCtx<P> {
+export interface FetchCtx<P = any> extends ThunkCtx<P> {
   request: ApiRequest | null;
   req: (r?: ApiRequest) => RequiredApiRequest;
   response: Response | null;
@@ -65,15 +65,15 @@ export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   cacheData: any;
 }
 
-export interface PerfCtx<P = unknown> extends PipeCtx<P> {
+export interface PerfCtx<P = unknown> extends ThunkCtx<P> {
   performance: number;
 }
 
-export type Middleware<Ctx extends PipeCtx = PipeCtx> = (
+export type Middleware<Ctx extends ThunkCtx = ThunkCtx> = (
   ctx: Ctx,
   next: Next,
 ) => Operation<any>;
-export type MiddlewareCo<Ctx extends PipeCtx = PipeCtx> =
+export type MiddlewareCo<Ctx extends ThunkCtx = ThunkCtx> =
   | Middleware<Ctx>
   | Middleware<Ctx>[];
 
@@ -105,12 +105,14 @@ export type CreateActionFn = () => ActionWithPayload<
   CreateActionPayload<Record<string | number | symbol, never>>
 >;
 
-export interface CreateAction<Ctx> extends CreateActionFn {
+export interface CreateAction<Ctx extends ThunkCtx = ThunkCtx>
+  extends CreateActionFn {
   run: (
     p: ActionWithPayload<
       CreateActionPayload<Record<string | number | symbol, never>>
     >,
   ) => Operation<Ctx>;
+  use: (mdw: Middleware<Ctx>) => void;
 }
 
 export type CreateActionFnWithPayload<P = any> = (

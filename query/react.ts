@@ -8,7 +8,7 @@ import { selectDataById, selectLoaderById } from "../redux/mod.ts";
 type ActionFn<P = any> = (p: P) => { toString: () => string };
 type ActionFnSimple = () => { toString: () => string };
 
-interface SagaAction<P = any> {
+interface ThunkAction<P = any> {
   type: string;
   payload: { key: string; options: P };
 }
@@ -21,17 +21,17 @@ export interface UseApiSimpleProps extends LoaderState {
   trigger: () => void;
   action: ActionFn;
 }
-export interface UseApiAction<A extends SagaAction = SagaAction>
+export interface UseApiAction<A extends ThunkAction = ThunkAction>
   extends LoaderState {
   trigger: () => void;
   action: A;
 }
-export type UseApiResult<P, A extends SagaAction = SagaAction> =
+export type UseApiResult<P, A extends ThunkAction = ThunkAction> =
   | UseApiProps<P>
   | UseApiSimpleProps
   | UseApiAction<A>;
 
-interface UseCacheResult<D = any, A extends SagaAction = SagaAction>
+interface UseCacheResult<D = any, A extends ThunkAction = ThunkAction>
   extends UseApiAction<A> {
   data: D | null;
 }
@@ -60,7 +60,7 @@ interface UseCacheResult<D = any, A extends SagaAction = SagaAction>
  * ```
  */
 export function useLoader<S extends QueryState = QueryState>(
-  action: SagaAction | ActionFn,
+  action: ThunkAction | ActionFn,
 ) {
   const id = typeof action === "function" ? `${action}` : action.payload.key;
   return useSelector((s: S) => selectLoaderById(s, { id }));
@@ -93,13 +93,13 @@ export function useLoader<S extends QueryState = QueryState>(
  * }
  * ```
  */
-export function useApi<P = any, A extends SagaAction = SagaAction<P>>(
+export function useApi<P = any, A extends ThunkAction = ThunkAction<P>>(
   action: A,
 ): UseApiAction<A>;
-export function useApi<P = any, A extends SagaAction = SagaAction<P>>(
+export function useApi<P = any, A extends ThunkAction = ThunkAction<P>>(
   action: ActionFn<P>,
 ): UseApiProps<P>;
-export function useApi<A extends SagaAction = SagaAction>(
+export function useApi<A extends ThunkAction = ThunkAction>(
   action: ActionFnSimple,
 ): UseApiSimpleProps;
 export function useApi(action: any): any {
@@ -134,7 +134,7 @@ export function useApi(action: any): any {
  * }
  * ```
  */
-export function useQuery<P = any, A extends SagaAction = SagaAction<P>>(
+export function useQuery<P = any, A extends ThunkAction = ThunkAction<P>>(
   action: A,
 ): UseApiAction<A> {
   const api = useApi(action);
@@ -162,7 +162,7 @@ export function useQuery<P = any, A extends SagaAction = SagaAction<P>>(
  * }
  * ```
  */
-export function useCache<D = any, A extends SagaAction = SagaAction>(
+export function useCache<D = any, A extends ThunkAction = ThunkAction>(
   action: A,
 ): UseCacheResult<D, A> {
   const id = action.payload.key;

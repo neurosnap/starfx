@@ -6,6 +6,7 @@ export * from "./action.ts";
 export * from "./log.ts";
 export {
   action,
+  call,
   createChannel,
   createContext,
   createQueue,

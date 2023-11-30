@@ -23,8 +23,6 @@ export {
   createSignal,
   each,
   Err,
-  expect,
-  filter,
   getframe,
   Ok,
   resource,
@@ -52,6 +50,7 @@ export {
 } from "https://esm.sh/immer@10.0.2?pin=v122";
 export type { Patch } from "https://esm.sh/immer@10.0.2?pin=v122";
 
+// redux
 export type {
   Action,
   Reducer,
@@ -68,13 +67,8 @@ export {
   batchActions,
   enableBatching,
 } from "https://esm.sh/redux-batched-actions@0.5.0?pin=v122";
-export type {
-  MapEntity,
-  PatchEntity,
-} from "https://esm.sh/robodux@15.0.2?pin=v122";
 export {
   createLoaderTable,
   createReducerMap,
   createTable,
-  mapReducers,
 } from "https://esm.sh/robodux@15.0.2?pin=v122";
