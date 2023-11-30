@@ -1,6 +1,7 @@
+import { sleep } from "../deps.ts";
 import { safe } from "../fx/mod.ts";
 import type { FetchCtx, FetchJsonCtx, Next } from "./types.ts";
-import { isObject } from "./util.ts";
+import { isObject, noop } from "./util.ts";
 
 /**
  * This middleware converts the name provided to {@link createApi}
@@ -198,6 +199,20 @@ export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   yield* next();
 }
 
+export function response<CurCtx extends FetchCtx = FetchCtx>(
+  response?: Response,
+) {
+  return function* responseMdw(
+    ctx: CurCtx,
+    next: Next,
+  ) {
+    if (response) {
+      ctx.response = response;
+    }
+    yield* next();
+  };
+}
+
 /*
  * This middleware makes the `fetch` http request using `ctx.request` and
  * assigns the response to `ctx.response`.
@@ -206,6 +221,13 @@ export function* request<CurCtx extends FetchCtx = FetchCtx>(
   ctx: CurCtx,
   next: Next,
 ) {
+  // if there is already a response then we want to bail so we don't
+  // override it.
+  if (ctx.response) {
+    yield* next();
+    return;
+  }
+
   const { url, ...req } = ctx.req();
   const request = new Request(url, req);
   const result = yield* safe(fetch(request));
@@ -215,4 +237,77 @@ export function* request<CurCtx extends FetchCtx = FetchCtx>(
     throw result.error;
   }
   yield* next();
+}
+
+function backoffExp(attempt: number): number {
+  if (attempt > 5) return -1;
+  // 1s, 1s, 1s, 2s, 4s
+  return Math.max(2 ** attempt * 125, 1000);
+}
+
+/**
+ * This middleware will retry failed `Fetch` request if `response.ok` is `false`.
+ * It accepts a backoff function to determine how long to continue retrying.
+ * The default is an exponential backoff {@link backoffExp} where the minimum is
+ * 1sec between attempts and it'll reach 4s between attempts at the end with a
+ * max of 5 attempts.
+ *
+ * An example backoff:
+ * @example
+ * ```ts
+ *  // Any value less than 0 will stop the retry middleware.
+ *  // Each attempt will wait 1s
+ *  const backoff = (attempt: number) => {
+ *    if (attempt > 5) return -1;
+ *    return 1000;
+ *  }
+ *
+ * const api = createApi();
+ * api.use(mdw.api());
+ * api.use(api.routes());
+ * api.use(mdw.fetch());
+ *
+ * const fetchUsers = api.get('/users', [
+ *  function*(ctx, next) {
+ *    // ...
+ *    yield next();
+ *  },
+ *  // fetchRetry should be after your endpoint function because
+ *  // the retry middleware will update `ctx.json` before it reaches
+ *  // your middleware
+ *  fetchRetry(backoff),
+ * ])
+ * ```
+ */
+export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
+  backoff: (attempt: number) => number = backoffExp,
+) {
+  return function* (ctx: CurCtx, next: Next) {
+    yield* next();
+
+    if (!ctx.response) {
+      return;
+    }
+
+    if (ctx.response.ok) {
+      return;
+    }
+
+    let attempt = 1;
+    let waitFor = backoff(attempt);
+    while (waitFor >= 1) {
+      yield* sleep(waitFor);
+      // reset response so `request` mdw actually runs
+      ctx.response = null;
+      yield* safe(() => request(ctx, noop));
+      yield* safe(() => json(ctx, noop));
+
+      if (ctx.response && (ctx.response as Response).ok) {
+        return;
+      }
+
+      attempt += 1;
+      waitFor = backoff(attempt);
+    }
+  };
 }

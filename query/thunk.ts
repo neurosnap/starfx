@@ -15,13 +15,13 @@ import type {
   Middleware,
   MiddlewareCo,
   Next,
-  PipeCtx,
   Supervisor,
+  ThunkCtx,
 } from "./types.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
 import { Ok } from "../deps.ts";
 
-export interface ThunksApi<Ctx extends PipeCtx> {
+export interface ThunksApi<Ctx extends ThunkCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
   bootup: Operator<void>;
@@ -120,7 +120,7 @@ export interface ThunksApi<Ctx extends PipeCtx> {
  * // end
  * ```
  */
-export function createThunks<Ctx extends PipeCtx = PipeCtx<any>>(
+export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   {
     supervisor = takeEvery,
   }: {

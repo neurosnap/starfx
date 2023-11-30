@@ -1,6 +1,6 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
 import { createApi, createKey, mdw } from "../query/mod.ts";
-import type { ApiCtx, Next, PipeCtx } from "../query/mod.ts";
+import type { ApiCtx, Next, ThunkCtx } from "../query/mod.ts";
 import { createQueryState } from "../action.ts";
 import { sleep } from "../test.ts";
 
@@ -493,7 +493,7 @@ it(tests, "createApi with custom key but no payload", async () => {
 it(tests, "errorHandler", () => {
   let a = 0;
   const query = createApi<ApiCtx>();
-  query.use(function* errorHandler<Ctx extends PipeCtx = PipeCtx>(
+  query.use(function* errorHandler<Ctx extends ThunkCtx = ThunkCtx>(
     ctx: Ctx,
     next: Next,
   ) {
