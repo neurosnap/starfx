@@ -1,15 +1,9 @@
-import type { Instruction, Operation } from "./deps.ts";
+import type { Instruction } from "./deps.ts";
 
 export interface Computation<T = unknown> {
   // deno-lint-ignore no-explicit-any
   [Symbol.iterator](): Iterator<Instruction, T, any>;
 }
-
-export type Operator<T> =
-  | Operation<T>
-  | Promise<T>
-  | (() => Operation<T>)
-  | (() => Promise<T>);
 
 export interface QueryState {
   "@@starfx/loaders": Record<string, LoaderItemState>;

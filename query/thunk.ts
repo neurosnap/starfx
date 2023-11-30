@@ -1,10 +1,8 @@
 import { compose } from "../compose.ts";
-import type { Operator, Payload } from "../types.ts";
+import type { Payload } from "../types.ts";
 import { keepAlive } from "../mod.ts";
-
 // TODO: remove store deps
 import { takeEvery } from "../redux/mod.ts";
-
 import { isFn, isObject } from "./util.ts";
 import { createKey } from "./create-key.ts";
 import type {
@@ -19,12 +17,12 @@ import type {
   ThunkCtx,
 } from "./types.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
-import { Ok } from "../deps.ts";
+import { Callable, Ok } from "../deps.ts";
 
 export interface ThunksApi<Ctx extends ThunkCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
-  bootup: Operator<void>;
+  bootup: Callable<void>;
   reset: () => void;
 
   /**
@@ -128,7 +126,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   } = { supervisor: takeEvery },
 ): ThunksApi<Ctx> {
   const middleware: Middleware<Ctx>[] = [];
-  const visors: { [key: string]: Operator<unknown> } = {};
+  const visors: { [key: string]: Callable<unknown> } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
   let dynamicMiddlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {

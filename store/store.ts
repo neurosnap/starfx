@@ -1,4 +1,5 @@
 import {
+  Callable,
   createScope,
   createSignal,
   enablePatches,
@@ -9,7 +10,7 @@ import {
   Task,
 } from "../deps.ts";
 import { BaseMiddleware, compose } from "../compose.ts";
-import type { AnyAction, AnyState, Operator } from "../types.ts";
+import type { AnyAction, AnyState } from "../types.ts";
 import { safe } from "../fx/mod.ts";
 import { Next } from "../query/types.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
@@ -139,7 +140,7 @@ export function createStore<S extends AnyState>({
     });
   }
 
-  function run<T>(op: Operator<T>): Task<Result<T>> {
+  function run<T>(op: Callable<T>): Task<Result<T>> {
     return scope.run(function* () {
       return yield* safe(op);
     });

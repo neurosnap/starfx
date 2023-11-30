@@ -23,6 +23,7 @@ export {
   useAbortSignal,
 } from "./deps.ts";
 export type {
+  Callable,
   Channel,
   Instruction,
   Operation,

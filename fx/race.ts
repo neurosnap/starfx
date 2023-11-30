@@ -1,9 +1,8 @@
-import type { Operation, Task } from "../deps.ts";
+import type { Callable, Operation, Task } from "../deps.ts";
 import { action, call, resource, spawn } from "../deps.ts";
-import type { Operator } from "../types.ts";
 
 interface OpMap<T = unknown> {
-  [key: string]: Operator<T>;
+  [key: string]: Callable<T>;
 }
 
 export function race<T>(
