@@ -2,7 +2,7 @@
  * This is an auto-generated file, do not edit directly!
  * Run "yarn template" to generate this file.
  */
-import type { SagaApi } from "./thunk.ts";
+import type { ThunksApi } from "./thunk.ts";
 import type {
   ApiCtx,
   CreateAction,
@@ -17,8 +17,7 @@ import type { Operation } from "../deps.ts";
 
 export type ApiName = string | string[];
 
-export interface SagaQueryApi<Ctx extends ApiCtx = ApiCtx>
-  extends SagaApi<Ctx> {
+export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   request: (
     r: Partial<RequestInit>,
   ) => (ctx: Ctx, next: Next) => Operation<unknown>;

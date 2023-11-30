@@ -21,10 +21,11 @@ import type {
 import { API_ACTION_PREFIX } from "../action.ts";
 import { Ok } from "../deps.ts";
 
-export interface SagaApi<Ctx extends PipeCtx> {
+export interface ThunksApi<Ctx extends PipeCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
   bootup: Operator<void>;
+  reset: () => void;
 
   /**
    * Name only
@@ -125,10 +126,11 @@ export function createThunks<Ctx extends PipeCtx = PipeCtx<any>>(
   }: {
     supervisor?: Supervisor;
   } = { supervisor: takeEvery },
-): SagaApi<Ctx> {
+): ThunksApi<Ctx> {
   const middleware: Middleware<Ctx>[] = [];
   const visors: { [key: string]: Operator<unknown> } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
+  let dynamicMiddlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {
     [key: string]: CreateActionWithPayload<Ctx, any>;
   } = {};
@@ -208,6 +210,14 @@ export function createThunks<Ctx extends PipeCtx = PipeCtx<any>>(
       return action({ name, key, options });
     };
     actionFn.run = onApi;
+    actionFn.use = (fn: Middleware<Ctx>) => {
+      const cur = middlewareMap[name];
+      if (cur) {
+        dynamicMiddlewareMap[name] = compose([cur, fn]);
+      } else {
+        dynamicMiddlewareMap[name] = fn;
+      }
+    };
     actionFn.toString = () => name;
     actionMap[name] = actionFn;
 
@@ -220,7 +230,7 @@ export function createThunks<Ctx extends PipeCtx = PipeCtx<any>>(
 
   function routes() {
     function* router(ctx: Ctx, next: Next) {
-      const match = middlewareMap[ctx.name];
+      const match = dynamicMiddlewareMap[ctx.name] || middlewareMap[ctx.name];
       if (!match) {
         yield* next();
         return;
@@ -233,6 +243,10 @@ export function createThunks<Ctx extends PipeCtx = PipeCtx<any>>(
     return router;
   }
 
+  function resetMdw() {
+    dynamicMiddlewareMap = {};
+  }
+
   return {
     use: (fn: Middleware<Ctx>) => {
       middleware.push(fn);
@@ -240,5 +254,6 @@ export function createThunks<Ctx extends PipeCtx = PipeCtx<any>>(
     create,
     routes,
     bootup,
+    reset: resetMdw,
   };
 }

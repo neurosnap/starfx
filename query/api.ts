@@ -1,11 +1,11 @@
 // deno-lint-ignore-file no-explicit-any
 import type { ApiCtx, ApiRequest, Next } from "./types.ts";
 import { createThunks } from "./thunk.ts";
-import type { SagaApi } from "./thunk.ts";
-import type { ApiName, SagaQueryApi } from "./api-types.ts";
+import type { ThunksApi } from "./thunk.ts";
+import type { ApiName, QueryApi } from "./api-types.ts";
 
 /**
- * Creates a middleware pipeline for HTTP requests.
+ * Creates a middleware thunksline for HTTP requests.
  *
  * @remarks
  * It uses {@link createThunks} under the hood.
@@ -27,11 +27,11 @@ import type { ApiName, SagaQueryApi } from "./api-types.ts";
  * ```
  */
 export function createApi<Ctx extends ApiCtx = ApiCtx>(
-  baseThunk?: SagaApi<Ctx>,
-): SagaQueryApi<Ctx> {
-  const pipe = baseThunk || createThunks<Ctx>();
+  baseThunk?: ThunksApi<Ctx>,
+): QueryApi<Ctx> {
+  const thunks = baseThunk || createThunks<Ctx>();
   const uri = (prename: ApiName) => {
-    const create = pipe.create as any;
+    const create = thunks.create as any;
 
     let name = prename;
     let remainder = "";
@@ -63,10 +63,11 @@ export function createApi<Ctx extends ApiCtx = ApiCtx>(
   };
 
   return {
-    use: pipe.use,
-    bootup: pipe.bootup,
-    create: pipe.create,
-    routes: pipe.routes,
+    use: thunks.use,
+    bootup: thunks.bootup,
+    create: thunks.create,
+    routes: thunks.routes,
+    reset: thunks.reset,
     cache: () => {
       return function* onCache(ctx: Ctx, next: Next) {
         ctx.cache = true;
