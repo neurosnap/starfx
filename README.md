@@ -177,7 +177,7 @@ In review:
 - If root task is halted then all child tasks are halted first
 - If a child task is halted or raises exception, it propagates error up the task
   tree
-- An exception can be caught at any point in the task tree
+- An exception can be caught (e.g. `try`/`catch`) at any point in the task tree
 - Supervisor tasks are designed to monitor task health (and automatically
   recover in many cases)
 
