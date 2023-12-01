@@ -121,7 +121,7 @@ export type CreateActionFnWithPayload<P = any> = (
 
 export interface CreateActionWithPayload<Ctx extends ThunkCtx, P>
   extends CreateActionFnWithPayload<P> {
-  run: (a: ActionWithPayload<CreateActionPayload<P>>) => Operation<Ctx>;
+  run: (a: ActionWithPayload<CreateActionPayload<P>> | P) => Operation<Ctx>;
   use: (mdw: Middleware<Ctx>) => void;
 }
 

@@ -334,6 +334,49 @@ it(tests, "run() on endpoint action - should run the effect", () => {
   store.dispatch(action2());
 });
 
+it(
+  tests,
+  "run() on endpoint action with payload - should run the effect",
+  () => {
+    const api = createThunks<RoboCtx>();
+    api.use(api.routes());
+    let acc = "";
+    const action1 = api.create<{ id: string }>(
+      "/users",
+      { supervisor: takeEvery },
+      function* (ctx, next) {
+        yield* next();
+        ctx.request = { method: "expect this" };
+        acc += "a";
+      },
+    );
+    const action2 = api.create(
+      "/users2",
+      { supervisor: takeEvery },
+      function* (_, next) {
+        yield* next();
+        const curCtx = yield* action1.run({ id: "1" });
+        acc += "b";
+        asserts.assert(acc === "ab");
+        assertLike(curCtx, {
+          action: {
+            type: `@@starfx${action1}`,
+            payload: {
+              name: "/users",
+            },
+          },
+          name: "/users",
+          request: { method: "expect this" },
+        });
+      },
+    );
+
+    const store = configureStore({ initialState: {} });
+    store.run(api.bootup);
+    store.dispatch(action2());
+  },
+);
+
 it(tests, "middleware order of execution", async () => {
   let acc = "";
   const api = createThunks();
