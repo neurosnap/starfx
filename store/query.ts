@@ -9,15 +9,15 @@ import { TableOutput } from "./slice/table.ts";
 export function storeMdw<
   Ctx extends ApiCtx = ApiCtx,
   M extends AnyState = AnyState,
->({ data, loaders, errorFn }: {
+>({ cache, loaders, errorFn }: {
   loaders: LoaderOutput<M, AnyState>;
-  data: TableOutput<any, AnyState>;
+  cache: TableOutput<any, AnyState>;
   errorFn?: (ctx: Ctx) => string;
 }) {
   return compose<Ctx>([
     dispatchActions,
     loadingMonitor(loaders, errorFn),
-    simpleCache(data),
+    simpleCache(cache),
   ]);
 }
 

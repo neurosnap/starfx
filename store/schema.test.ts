@@ -25,6 +25,7 @@ it(tests, "general types and functionality", async () => {
     counter: slice.num(),
     dev: slice.any<boolean>(false),
     currentUser: slice.obj<User>(emptyUser),
+    cache: slice.table({ empty: {} }),
     loaders: slice.loader(),
   });
   const db = schema.db;
@@ -36,6 +37,7 @@ it(tests, "general types and functionality", async () => {
     counter: 0,
     dev: false,
     currentUser: { id: "", name: "" },
+    cache: {},
     loaders: {},
   });
   const userMap = schema.db.users.selectTable(store.getState());
@@ -74,6 +76,8 @@ it(tests, "general types and functionality", async () => {
 it(tests, "can work with a nested object", async () => {
   const schema = createSchema({
     currentUser: slice.obj<UserWithRoles>({ id: "", name: "", roles: [] }),
+    cache: slice.table({ empty: {} }),
+    loaders: slice.loader(),
   });
   const db = schema.db;
   const store = configureStore(schema);

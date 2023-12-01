@@ -1,8 +1,15 @@
+import { AnyState } from "../types.ts";
 import { updateStore } from "./fx.ts";
+import { LoaderOutput } from "./slice/loader.ts";
+import { TableOutput } from "./slice/table.ts";
 import { BaseSchema, FxStore, StoreUpdater } from "./types.ts";
 
 export function createSchema<
-  O extends { [key: string]: (name: string) => BaseSchema<unknown> },
+  O extends {
+    loaders: <M extends AnyState>(s: string) => LoaderOutput<M, AnyState>;
+    cache: (s: string) => TableOutput<any, AnyState>;
+    [key: string]: (name: string) => BaseSchema<unknown>;
+  },
   S extends { [key in keyof O]: ReturnType<O[key]>["initialState"] },
 >(
   slices: O,

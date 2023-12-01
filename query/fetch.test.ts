@@ -23,7 +23,7 @@ const delay = (n = 200) =>
 const testStore = () => {
   const schema = createSchema({
     loaders: slice.loader(),
-    data: slice.table({ empty: {} }),
+    cache: slice.table({ empty: {} }),
   });
   const store = configureStore(schema);
   return { schema, store };
@@ -68,7 +68,7 @@ it(
     await delay();
 
     const state = store.getState();
-    expect(state.data[action.payload.key]).toEqual(mockUser);
+    expect(state.cache[action.payload.key]).toEqual(mockUser);
 
     expect(actual).toEqual([{
       url: `${baseUrl}/users`,
@@ -151,7 +151,7 @@ it(tests, "error handling", async () => {
   await delay();
 
   const state = store.getState();
-  expect(state.data[action.payload.key]).toEqual(errMsg);
+  expect(state.cache[action.payload.key]).toEqual(errMsg);
   expect(actual).toEqual({ ok: false, data: errMsg, error: errMsg });
 });
 
@@ -191,7 +191,7 @@ it(tests, "status 204", async () => {
   await delay();
 
   const state = store.getState();
-  expect(state.data[action.payload.key]).toEqual({});
+  expect(state.cache[action.payload.key]).toEqual({});
   expect(actual).toEqual({ ok: true, data: {}, value: {} });
 });
 
@@ -429,7 +429,7 @@ it(
     await delay();
 
     const state = store.getState();
-    expect(state.data[action.payload.key]).toEqual(mockUser);
+    expect(state.cache[action.payload.key]).toEqual(mockUser);
     expect(actual).toEqual({ ok: true, data: mockUser, value: mockUser });
   },
 );
