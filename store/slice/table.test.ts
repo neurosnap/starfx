@@ -112,3 +112,18 @@ it(tests, "gets all rows", async () => {
   });
   asserts.assertEquals(store.getState()[NAME], data);
 });
+
+it(tests, "optional empty", async () => {
+  const tbl = createTable<{ id: number; user: string }>({ name: "table" });
+  const store = configureStore({
+    initialState,
+  });
+
+  await store.run(function* () {
+    yield* updateStore(tbl.set({ [first.id]: first }));
+  });
+  asserts.assertEquals(tbl.selectTable(store.getState()), {
+    [first.id]: first,
+  });
+  const result = tbl.selectById(store.getState(), { id: 1 });
+});

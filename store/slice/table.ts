@@ -39,13 +39,21 @@ interface TableSelectors<
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
 > {
-  findById: (d: Record<IdProp, Entity>, { id }: PropId) => Entity;
+  findById: (d: Record<IdProp, Entity>, { id }: PropId) => Entity | undefined;
   findByIds: (d: Record<IdProp, Entity>, { ids }: PropIds) => Entity[];
   tableAsList: (d: Record<IdProp, Entity>) => Entity[];
   selectTable: (s: S) => Record<IdProp, Entity>;
   selectTableAsList: (state: S) => Entity[];
-  selectById: (s: S, p: PropId) => Entity;
+  selectById: (s: S, p: PropId) => Entity | undefined;
   selectByIds: (s: S, p: PropIds) => Entity[];
+}
+
+interface TableSelectorsMust<
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+> extends TableSelectors<Entity, S> {
+  findById: (d: Record<IdProp, Entity>, { id }: PropId) => Entity;
+  selectById: (s: S, p: PropId) => Entity;
 }
 
 function tableSelectors<
@@ -54,8 +62,22 @@ function tableSelectors<
 >(
   selectTable: (s: S) => Record<IdProp, Entity>,
   empty: Entity | (() => Entity),
+): TableSelectorsMust<Entity, S>;
+function tableSelectors<
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>(
+  selectTable: (s: S) => Record<IdProp, Entity>,
+  empty?: Entity | (() => Entity),
+): TableSelectors<Entity, S>;
+function tableSelectors<
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>(
+  selectTable: (s: S) => Record<IdProp, Entity>,
+  empty: Entity | (() => Entity) | undefined,
 ): TableSelectors<Entity, S> {
-  const must = mustSelectEntity(empty);
+  const must = empty ? mustSelectEntity(empty) : null;
   const tableAsList = (data: Record<IdProp, Entity>): Entity[] =>
     Object.values(data).filter(excludesFalse);
   const findById = (data: Record<IdProp, Entity>, { id }: PropId) => data[id];
@@ -69,7 +91,7 @@ function tableSelectors<
   };
 
   return {
-    findById: must(findById),
+    findById: must ? must(findById) : findById,
     findByIds,
     tableAsList,
     selectTable,
@@ -77,7 +99,7 @@ function tableSelectors<
       selectTable,
       (data): Entity[] => tableAsList(data),
     ),
-    selectById: must(selectById),
+    selectById: must ? must(selectById) : selectById,
     selectByIds: createSelector(
       selectTable,
       (_: S, p: PropIds) => p,
@@ -107,8 +129,8 @@ export const createTable = <
   initialState = {},
 }: {
   name: keyof S;
-  empty: Entity | (() => Entity);
   initialState?: Record<IdProp, Entity>;
+  empty?: Entity | (() => Entity);
 }): TableOutput<Entity, S> => {
   const selectors = tableSelectors<Entity, S>((s: S) => s[name], empty);
 
@@ -168,7 +190,7 @@ export function table<
   V extends AnyState = AnyState,
 >({ initialState, empty }: {
   initialState?: Record<IdProp, V>;
-  empty: V | (() => V);
+  empty?: V | (() => V);
 }) {
   return (name: string) => createTable<V>({ name, empty, initialState });
 }
