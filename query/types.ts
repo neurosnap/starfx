@@ -119,9 +119,10 @@ export type CreateActionFnWithPayload<P = any> = (
   p: P,
 ) => ActionWithPayload<CreateActionPayload<P>>;
 
-export interface CreateActionWithPayload<Ctx, P>
+export interface CreateActionWithPayload<Ctx extends ThunkCtx, P>
   extends CreateActionFnWithPayload<P> {
   run: (a: ActionWithPayload<CreateActionPayload<P>>) => Operation<Ctx>;
+  use: (mdw: Middleware<Ctx>) => void;
 }
 
 export type Supervisor<T = unknown> = (

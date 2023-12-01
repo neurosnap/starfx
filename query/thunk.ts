@@ -17,7 +17,7 @@ import type {
   ThunkCtx,
 } from "./types.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
-import { Callable, Ok } from "../deps.ts";
+import { Callable, Ok, Operation } from "../deps.ts";
 
 export interface ThunksApi<Ctx extends ThunkCtx> {
   use: (fn: Middleware<Ctx>) => void;
@@ -140,7 +140,9 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const createType = (post: string) =>
     `${API_ACTION_PREFIX}${post.startsWith("/") ? "" : "/"}${post}`;
 
-  function* onApi<P extends CreateActionPayload>(action: ActionWithPayload<P>) {
+  function* onApi<P extends CreateActionPayload>(
+    action: ActionWithPayload<P>,
+  ): Operation<Ctx> {
     const { name, key, options } = action.payload;
     const actionFn = actionMap[name];
     const ctx = {
