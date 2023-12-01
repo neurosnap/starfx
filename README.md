@@ -49,6 +49,9 @@ They also come with built-in support for a middleware stack (like `express`).
 This provides a familiar and powerful abstraction for async flow control for all
 thunks and endpoints.
 
+Each run of a thunk gets its own `ctx` object which provides a substrate to
+communicate between middleware.
+
 You didn't know you wanted express middleware for the front-end, but let me get
 you excited, it's powerful.
 
