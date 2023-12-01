@@ -15,7 +15,7 @@ import { safe } from "../fx/mod.ts";
 import { Next } from "../query/types.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { ActionContext, StoreContext, StoreUpdateContext } from "./context.ts";
-import { put } from "./fx.ts";
+import { emit } from "./fx.ts";
 import { log } from "../log.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
@@ -35,7 +35,7 @@ function observable() {
 export interface CreateStore<S extends AnyState> {
   scope?: Scope;
   initialState: S;
-  middleware?: BaseMiddleware[];
+  middleware?: BaseMiddleware<UpdaterCtx<S>>[];
 }
 
 export function createStore<S extends AnyState>({
@@ -54,6 +54,9 @@ export function createStore<S extends AnyState>({
   let state = initialState;
   const listeners = new Set<Listener>();
   enablePatches();
+
+  const signal = createSignal<AnyAction, void>();
+  scope.set(ActionContext, signal);
 
   function getScope() {
     return scope;
@@ -103,8 +106,8 @@ export function createStore<S extends AnyState>({
 
   function createUpdater() {
     const fn = compose<UpdaterCtx<S>>([
-      ...middleware,
       updateMdw,
+      ...middleware,
       notifyChannelMdw,
       notifyListenersMdw,
     ]);
@@ -119,8 +122,9 @@ export function createStore<S extends AnyState>({
       patches: [],
       result: Ok(undefined),
     };
+
     yield* mdw(ctx);
-    // TODO: dev mode only?
+
     if (!ctx.result.ok) {
       yield* log({
         type: "store:update",
@@ -130,25 +134,22 @@ export function createStore<S extends AnyState>({
         },
       });
     }
+
     return ctx;
   }
 
-  // deno-lint-ignore no-explicit-any
-  function dispatch(action: AnyAction | AnyAction[]): Task<any> {
-    return scope.run(function* () {
-      yield* put(action);
-    });
+  function dispatch(action: AnyAction | AnyAction[]) {
+    emit({ signal, action });
   }
 
   function run<T>(op: Callable<T>): Task<Result<T>> {
-    return scope.run(function* () {
-      return yield* safe(op);
-    });
+    return scope.run(() => safe(op));
   }
 
   function getInitialState() {
     return initialState;
   }
+
   return {
     getScope,
     getState,
@@ -174,9 +175,7 @@ export function configureStore<S extends AnyState>(
   props: CreateStore<S>,
 ): FxStore<S> {
   const store = createStore<S>(props);
-  const signal = createSignal<AnyAction, void>();
   // deno-lint-ignore no-explicit-any
   store.getScope().set(StoreContext, store as any);
-  store.getScope().set(ActionContext, signal);
   return store;
 }

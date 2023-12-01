@@ -24,7 +24,7 @@ export function* updateStore<S extends AnyState>(
   return ctx;
 }
 
-export function* emit({
+export function emit({
   signal,
   action,
 }: {
@@ -56,7 +56,7 @@ export function* select<S, R, P>(
 
 export function* put(action: AnyAction | AnyAction[]) {
   const signal = yield* ActionContext;
-  return yield* emit({
+  return emit({
     signal,
     action,
   });
