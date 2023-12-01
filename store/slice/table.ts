@@ -35,48 +35,13 @@ function mustSelectEntity<Entity extends AnyState = AnyState>(
   };
 }
 
-interface TableSelectors<
-  Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
-> {
-  findById: (d: Record<IdProp, Entity>, { id }: PropId) => Entity | undefined;
-  findByIds: (d: Record<IdProp, Entity>, { ids }: PropIds) => Entity[];
-  tableAsList: (d: Record<IdProp, Entity>) => Entity[];
-  selectTable: (s: S) => Record<IdProp, Entity>;
-  selectTableAsList: (state: S) => Entity[];
-  selectById: (s: S, p: PropId) => Entity | undefined;
-  selectByIds: (s: S, p: PropIds) => Entity[];
-}
-
-interface TableSelectorsMust<
-  Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
-> extends TableSelectors<Entity, S> {
-  findById: (d: Record<IdProp, Entity>, { id }: PropId) => Entity;
-  selectById: (s: S, p: PropId) => Entity;
-}
-
 function tableSelectors<
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
 >(
   selectTable: (s: S) => Record<IdProp, Entity>,
-  empty: Entity | (() => Entity),
-): TableSelectorsMust<Entity, S>;
-function tableSelectors<
-  Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
->(
-  selectTable: (s: S) => Record<IdProp, Entity>,
-  empty?: Entity | (() => Entity),
-): TableSelectors<Entity, S>;
-function tableSelectors<
-  Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
->(
-  selectTable: (s: S) => Record<IdProp, Entity>,
-  empty: Entity | (() => Entity) | undefined,
-): TableSelectors<Entity, S> {
+  empty?: Entity | (() => Entity) | undefined,
+) {
   const must = empty ? mustSelectEntity(empty) : null;
   const tableAsList = (data: Record<IdProp, Entity>): Entity[] =>
     Object.values(data).filter(excludesFalse);
@@ -85,10 +50,15 @@ function tableSelectors<
     data: Record<IdProp, Entity>,
     { ids }: PropIds,
   ): Entity[] => ids.map((id) => data[id]).filter(excludesFalse);
-  const selectById = (state: S, { id }: PropId): Entity | undefined => {
+  const selectById = (
+    state: S,
+    { id }: PropId,
+  ): typeof empty extends undefined ? (Entity | undefined) : Entity => {
     const data = selectTable(state);
     return findById(data, { id });
   };
+
+  const sbi = must ? must(selectById) : selectById;
 
   return {
     findById: must ? must(findById) : findById,
@@ -99,7 +69,7 @@ function tableSelectors<
       selectTable,
       (data): Entity[] => tableAsList(data),
     ),
-    selectById: must ? must(selectById) : selectById,
+    selectById: sbi,
     selectByIds: createSelector(
       selectTable,
       (_: S, p: PropIds) => p,
@@ -108,8 +78,11 @@ function tableSelectors<
   };
 }
 
-export interface TableOutput<Entity extends AnyState, S extends AnyState>
-  extends TableSelectors<Entity, S>, BaseSchema<Record<IdProp, Entity>> {
+export interface TableOutput<
+  Entity extends AnyState,
+  S extends AnyState,
+  Empty extends Entity | undefined = Entity | undefined,
+> extends BaseSchema<Record<IdProp, Entity>> {
   schema: "table";
   initialState: Record<IdProp, Entity>;
   add: (e: Record<IdProp, Entity>) => (s: S) => void;
@@ -118,9 +91,34 @@ export interface TableOutput<Entity extends AnyState, S extends AnyState>
   patch: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
   merge: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
   reset: () => (s: S) => void;
+  findById: (
+    d: Record<IdProp, Entity>,
+    { id }: PropId,
+  ) => Empty;
+  findByIds: (d: Record<IdProp, Entity>, { ids }: PropIds) => Entity[];
+  tableAsList: (d: Record<IdProp, Entity>) => Entity[];
+  selectTable: (s: S) => Record<IdProp, Entity>;
+  selectTableAsList: (state: S) => Entity[];
+  selectById: (
+    s: S,
+    p: PropId,
+  ) => Empty;
+  selectByIds: (s: S, p: PropIds) => Entity[];
 }
 
-export const createTable = <
+export function createTable<
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>({
+  name,
+  empty,
+  initialState = {},
+}: {
+  name: keyof S;
+  initialState?: Record<IdProp, Entity>;
+  empty: Entity | (() => Entity);
+}): TableOutput<Entity, S, Entity>;
+export function createTable<
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
 >({
@@ -131,7 +129,19 @@ export const createTable = <
   name: keyof S;
   initialState?: Record<IdProp, Entity>;
   empty?: Entity | (() => Entity);
-}): TableOutput<Entity, S> => {
+}): TableOutput<Entity, S, Entity | undefined>;
+export function createTable<
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>({
+  name,
+  empty,
+  initialState = {},
+}: {
+  name: keyof S;
+  initialState?: Record<IdProp, Entity>;
+  empty?: Entity | (() => Entity);
+}): TableOutput<Entity, S, Entity | undefined> {
   const selectors = tableSelectors<Entity, S>((s: S) => s[name], empty);
 
   return {
@@ -184,7 +194,7 @@ export const createTable = <
     },
     ...selectors,
   };
-};
+}
 
 export function table<
   V extends AnyState = AnyState,

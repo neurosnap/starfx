@@ -114,7 +114,7 @@ it(tests, "gets all rows", async () => {
 });
 
 it(tests, "optional empty", async () => {
-  const tbl = createTable<{ id: number; user: string }>({ name: "table" });
+  const tbl = createTable<TUser>({ name: "table" });
   const store = configureStore({
     initialState,
   });
@@ -126,4 +126,5 @@ it(tests, "optional empty", async () => {
     [first.id]: first,
   });
   const result = tbl.selectById(store.getState(), { id: 1 });
+  asserts.assertEquals(result, first);
 });
