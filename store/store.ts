@@ -1,6 +1,5 @@
 import {
   Callable,
-  action,
   createScope,
   createSignal,
   enablePatches,
