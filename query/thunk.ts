@@ -209,7 +209,12 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
       const key = createKey(name, options);
       return action({ name, key, options });
     };
-    actionFn.run = onApi;
+    actionFn.run = (action?: unknown): Operation<Ctx> => {
+      if (action && Object.hasOwn(action, "type")) {
+        return onApi(action as ActionWithPayload<CreateActionPayload>);
+      }
+      return onApi(actionFn(action));
+    };
     actionFn.use = (fn: Middleware<Ctx>) => {
       const cur = middlewareMap[name];
       if (cur) {
