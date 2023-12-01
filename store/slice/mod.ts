@@ -7,7 +7,6 @@ import {
   defaultLoader,
   defaultLoaderItem,
   loader,
-  loaderItem,
 } from "./loader.ts";
 export const slice = {
   str,
@@ -16,6 +15,5 @@ export const slice = {
   any,
   obj,
   loader,
-  loaderItem,
 };
 export { defaultLoader, defaultLoaderItem };

@@ -7,24 +7,29 @@ import { createPersistor, PersistAdapter, persistStoreMdw } from "./persist.ts";
 import { createSchema } from "./schema.ts";
 import { slice } from "./slice/mod.ts";
 import { AnyState } from "../redux/mod.ts";
-import { LoaderItemOutput } from "./slice/loader.ts";
+import { LoaderOutput } from "./slice/loader.ts";
 
 const tests = describe("store");
 
-function track<T>(loader: LoaderItemOutput<AnyState, AnyState>) {
-  return function* (op: () => Operation<Result<T>>) {
-    yield* updateStore(loader.start());
-    const result = yield* safe(op);
-    if (result.ok) {
-      yield* updateStore(loader.success());
-    } else {
-      yield* updateStore(
-        loader.error({
-          message: result.error.message,
-        }),
-      );
-    }
-    return result;
+function createTracker<T, M extends Record<string, unknown>>(
+  loader: LoaderOutput<M, AnyState>,
+) {
+  return (id: string) => {
+    return function* (op: () => Operation<Result<T>>) {
+      yield* updateStore(loader.start({ id }));
+      const result = yield* safe(op);
+      if (result.ok) {
+        yield* updateStore(loader.success({ id }));
+      } else {
+        yield* updateStore(
+          loader.error({
+            id,
+            message: result.error.message,
+          }),
+        );
+      }
+      return result;
+    };
   };
 }
 
@@ -32,7 +37,7 @@ it(tests, "can persist to storage adapters", async () => {
   const schema = createSchema({
     token: slice.str(),
     loaders: slice.loader(),
-    persist: slice.loaderItem(),
+    cache: slice.table({ empty: {} }),
   });
   const db = schema.db;
   type State = typeof schema.initialState;
@@ -57,7 +62,7 @@ it(tests, "can persist to storage adapters", async () => {
   });
 
   await store.run(function* (): Operation<void> {
-    const tracker = track(db.persist);
+    const tracker = createTracker(db.loaders)("persist");
     yield* tracker(persistor.rehydrate);
 
     const group = yield* parallel([
