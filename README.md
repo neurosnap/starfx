@@ -22,20 +22,35 @@ Read my introductory blog post:
 
 # design philosophy
 
-- side-effect management is a first-class citizen
+- side-effect management is the central processing unit for side-effects, state,
+  and the view
 - leverage structured concurrency to manage side-effects
-- business logic lives outside the view layer
-- state management is just a side-effect of user interaction
-- state management should not be coupled to the view
+- side-effect and state management decoupled from the view layer
 - full control over state management
+- state is just a side-effect of user interaction and app features
+- state management should not be coupled to the view
 
 # example: thunks are tasks for business logic
+
+Thunks are the foundational central processing units. They have access to all
+the actions being dispatched from thew view -- or other thunks. They also wield
+the full power of structured concurrency.
+
+Every thunk that is created requires a unique id -- user provided string. This
+provides us with a handful of benefits:
+
+- User hand-labels each task created (intention)
+- Better tracability (via labels)
+- Easier to debug async and side-effects in general (via labels)
+- Build abstractions off naming conventions (e.g. creating routers
+  `/users [GET]`)
 
 They also come with built-in support for a middleware stack (like `express`).
 This provides a familiar and powerful abstraction for async flow control for all
 thunks and endpoints.
 
-Why does the BE get to enjoy middleware but not the FE?
+You didn't know you wanted express middleware for the front-end, but let me get
+you excited, it's powerful.
 
 ```ts
 import { createThunks, mdw } from "starfx";
