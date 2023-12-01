@@ -3,6 +3,7 @@ import {
   call,
   each,
   Operation,
+  Result,
   Signal,
   SignalQueueFactory,
   spawn,
@@ -13,6 +14,8 @@ import type { ActionWPayload, AnyAction, AnyState } from "../types.ts";
 import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { ActionContext, StoreContext } from "./context.ts";
 import { createFilterQueue } from "../queue.ts";
+import { LoaderOutput } from "./slice/loader.ts";
+import { safe } from "../fx/mod.ts";
 
 export function* updateStore<S extends AnyState>(
   updater: StoreUpdater<S> | StoreUpdater<S>[],
@@ -127,3 +130,25 @@ export function* takeLeading<T>(
   });
 }
 export const leading = takeLeading;
+
+export function createTracker<T, M extends Record<string, unknown>>(
+  loader: LoaderOutput<M, AnyState>,
+) {
+  return (id: string) => {
+    return function* (op: () => Operation<Result<T>>) {
+      yield* updateStore(loader.start({ id }));
+      const result = yield* safe(op);
+      if (result.ok) {
+        yield* updateStore(loader.success({ id }));
+      } else {
+        yield* updateStore(
+          loader.error({
+            id,
+            message: result.error.message,
+          }),
+        );
+      }
+      return result;
+    };
+  };
+}

@@ -1,37 +1,18 @@
-import { Ok, Operation, Result } from "../deps.ts";
-import { parallel, safe } from "../fx/mod.ts";
+import { Ok, Operation } from "../deps.ts";
+import { parallel } from "../fx/mod.ts";
 import { asserts, describe, it } from "../test.ts";
-import { put, take, updateStore } from "./fx.ts";
+import { createTracker, put, take } from "./fx.ts";
 import { configureStore } from "./store.ts";
-import { createPersistor, PersistAdapter, persistStoreMdw } from "./persist.ts";
+import {
+  createPersistor,
+  PERSIST_LOADER_ID,
+  PersistAdapter,
+  persistStoreMdw,
+} from "./persist.ts";
 import { createSchema } from "./schema.ts";
 import { slice } from "./slice/mod.ts";
-import { AnyState } from "../redux/mod.ts";
-import { LoaderOutput } from "./slice/loader.ts";
 
 const tests = describe("store");
-
-function createTracker<T, M extends Record<string, unknown>>(
-  loader: LoaderOutput<M, AnyState>,
-) {
-  return (id: string) => {
-    return function* (op: () => Operation<Result<T>>) {
-      yield* updateStore(loader.start({ id }));
-      const result = yield* safe(op);
-      if (result.ok) {
-        yield* updateStore(loader.success({ id }));
-      } else {
-        yield* updateStore(
-          loader.error({
-            id,
-            message: result.error.message,
-          }),
-        );
-      }
-      return result;
-    };
-  };
-}
 
 it(tests, "can persist to storage adapters", async () => {
   const schema = createSchema({
@@ -62,7 +43,7 @@ it(tests, "can persist to storage adapters", async () => {
   });
 
   await store.run(function* (): Operation<void> {
-    const tracker = createTracker(db.loaders)("persist");
+    const tracker = createTracker(db.loaders)(PERSIST_LOADER_ID);
     yield* tracker(persistor.rehydrate);
 
     const group = yield* parallel([

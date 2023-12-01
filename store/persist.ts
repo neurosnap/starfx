@@ -4,6 +4,8 @@ import { AnyState } from "../types.ts";
 import { select, updateStore } from "./fx.ts";
 import { UpdaterCtx } from "./types.ts";
 
+export const PERSIST_LOADER_ID = "persist";
+
 export interface PersistAdapter<S extends AnyState> {
   getItem(key: string): Operation<Result<Partial<S>>>;
   setItem(key: string, item: Partial<S>): Operation<Result<unknown>>;
