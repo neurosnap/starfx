@@ -1,10 +1,11 @@
 import { React, useSelector } from "../deps.ts";
-import { QueryState, selectLoaderById } from "./selectors.ts";
 import { PERSIST_LOADER_ID } from "./persist.ts";
+import type { LoaderOutput } from "./slice/mod.ts";
 
 interface PersistGateProps {
   children: React.ReactNode;
   loading?: JSX.Element;
+  loader: LoaderOutput<any, any>;
 }
 
 function Loading({ text }: { text: string }) {
@@ -12,17 +13,18 @@ function Loading({ text }: { text: string }) {
 }
 
 export function PersistGate(
-  { loading = React.createElement(Loading), children }: PersistGateProps,
+  { loader, children, loading = React.createElement(Loading) }:
+    PersistGateProps,
 ) {
-  const loader = useSelector((s: QueryState) =>
-    selectLoaderById(s, { id: PERSIST_LOADER_ID })
+  const ldr = useSelector((s) =>
+    loader.selectById(s, { id: PERSIST_LOADER_ID })
   );
 
-  if (loader.status === "error") {
-    return React.createElement("div", null, loader.message);
+  if (ldr.status === "error") {
+    return React.createElement("div", null, ldr.message);
   }
 
-  if (loader.status !== "success") {
+  if (ldr.status !== "success") {
     return loading;
   }
 
