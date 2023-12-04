@@ -64,6 +64,7 @@ thunks.use(mdw.err);
 thunks.use(thunks.routes());
 thunks.use(function*(ctx, next) {
   console.log("last mdw in the stack");
+  yield* next();
 });
 
 // create a thunk
