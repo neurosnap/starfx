@@ -1,8 +1,7 @@
 import { asserts, describe, it } from "../../test.ts";
-import { configureStore, updateStore } from "../../store/mod.ts";
-import { createQueryState } from "../../action.ts";
-
-import { createTable } from "./table.ts";
+import { configureStore } from "../store.ts";
+import { updateStore } from "../fx.ts";
+import { createTable, table } from "./table.ts";
 
 const tests = describe("createTable()");
 
@@ -19,7 +18,6 @@ const slice = createTable<TUser>({
 });
 
 const initialState = {
-  ...createQueryState(),
   [NAME]: slice.initialState,
 };
 
@@ -113,8 +111,26 @@ it(tests, "gets all rows", async () => {
   asserts.assertEquals(store.getState()[NAME], data);
 });
 
-it(tests, "optional empty", async () => {
-  const tbl = createTable<TUser>({ name: "table" });
+// checking types of `result` here
+it(tests, "with empty", async () => {
+  const tbl = table<TUser>({ empty: first })("users");
+  const store = configureStore({
+    initialState,
+  });
+
+  await store.run(function* () {
+    yield* updateStore(tbl.set({ [first.id]: first }));
+  });
+  asserts.assertEquals(tbl.selectTable(store.getState()), {
+    [first.id]: first,
+  });
+  const result = tbl.selectById(store.getState(), { id: 1 });
+  asserts.assertEquals(result, first);
+});
+
+// checking types of `result` here
+it(tests, "with no empty", async () => {
+  const tbl = table<TUser>()("users");
   const store = configureStore({
     initialState,
   });

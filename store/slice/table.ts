@@ -109,11 +109,7 @@ export interface TableOutput<
 export function createTable<
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
->({
-  name,
-  empty,
-  initialState = {},
-}: {
+>(p: {
   name: keyof S;
   initialState?: Record<IdProp, Entity>;
   empty: Entity | (() => Entity);
@@ -121,11 +117,7 @@ export function createTable<
 export function createTable<
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
->({
-  name,
-  empty,
-  initialState = {},
-}: {
+>(p: {
   name: keyof S;
   initialState?: Record<IdProp, Entity>;
   empty?: Entity | (() => Entity);
@@ -197,10 +189,27 @@ export function createTable<
 }
 
 export function table<
-  V extends AnyState = AnyState,
->({ initialState, empty }: {
-  initialState?: Record<IdProp, V>;
-  empty?: V | (() => V);
-}) {
-  return (name: string) => createTable<V>({ name, empty, initialState });
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>(p: {
+  initialState?: Record<IdProp, Entity>;
+  empty: Entity | (() => Entity);
+}): (n: string) => TableOutput<Entity, S, Entity>;
+export function table<
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>(p?: {
+  initialState?: Record<IdProp, Entity>;
+  empty?: Entity | (() => Entity);
+}): (n: string) => TableOutput<Entity, S, Entity | undefined>;
+export function table<
+  Entity extends AnyState = AnyState,
+  S extends AnyState = AnyState,
+>(
+  { initialState, empty }: {
+    initialState?: Record<IdProp, Entity>;
+    empty?: Entity | (() => Entity);
+  } = {},
+): (n: string) => TableOutput<Entity, S, Entity | undefined> {
+  return (name: string) => createTable<Entity>({ name, empty, initialState });
 }
