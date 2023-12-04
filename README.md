@@ -175,8 +175,8 @@ Please see [examples repo](https://github.com/neurosnap/starfx-examples).
 # when to use this library?
 
 This primary target for this library are single-page apps (SPAs). This is for an
-app that might live as a simple web server that serves FE assets and all content
-is generated on the user's machine.
+app that might live inside an object store or as a simple web server that serves
+files and that's it.
 
 Is your app highly interactive, requiring it to persist data across pages? This
 is the sweet spot for `starfx`.
