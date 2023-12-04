@@ -55,22 +55,31 @@ You didn't know you wanted express middleware for the front-end, but let me get
 you excited, it's powerful.
 
 ```ts
-import { createThunks, mdw } from "starfx";
+import { createThunks, mdw, call } from "starfx";
 
 const thunks = createThunks();
 // catch errors from task and logs them with extra info
 thunks.use(mdw.err);
 // where all the thunks get called in the middleware stack
 thunks.use(thunks.routes());
+thunks.use(function*(ctx, next) {
+  console.log("last mdw in the stack");
+});
 
 // create a thunk
 const log = thunks.create("log", function* (ctx, next) {
+  const resp = yield* call(fetch("https"//bower.sh"));;
+  const data = yield* call(resp.json());
   console.log("before calling next middleware");
   yield* next();
   console.log("after all remaining middleware have run");
 });
 
 store.dispatch(log());
+// output:
+// before calling next middleware
+// last mdw in the stack
+// after all remaining middleware have run
 ```
 
 # example: endpoints are tasks for managing HTTP requests
