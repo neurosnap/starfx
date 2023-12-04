@@ -27,8 +27,7 @@ Read my introductory blog post:
 - leverage structured concurrency to manage side-effects
 - side-effect and state management decoupled from the view layer
 - full control over state management
-- state is just a side-effect of user interaction and app features
-- state management should not be coupled to the view
+- state is just a side-effect (of user interaction and app features)
 
 # example: thunks are tasks for business logic
 
@@ -172,6 +171,21 @@ function App() {
 # usage
 
 Please see [examples repo](https://github.com/neurosnap/starfx-examples).
+
+# when to use this library?
+
+This primary target for this library are single-page apps (SPAs). This is for an
+app that might live as a simple web server that serves FE assets and all content
+is generated on the user's machine.
+
+Is your app highly interactive, requiring it to persist data across pages? This
+is the sweet spot for `starfx`.
+
+You can use this library as general purpose structured concurrency, but
+[effection](https://github.com/thefrontside/effection) serves those needs well.
+
+You could use this library for SSR, but I don't heavily build SSR apps, so I
+cannot claim it'll work well.
 
 # what is structured concurrency?
 
