@@ -1,3 +1,5 @@
+import type { LoaderOutput } from "./slice/loader.ts";
+import type { TableOutput } from "./slice/table.ts";
 import type {
   Callable,
   Operation,
@@ -46,4 +48,9 @@ export interface FxStore<S extends AnyState> {
   getInitialState: () => S;
   // deno-lint-ignore no-explicit-any
   [Symbol.observable]: () => any;
+}
+
+export interface QueryState {
+  cache: TableOutput<any, any>["initialState"];
+  loaders: LoaderOutput<any, any>["initialState"];
 }
