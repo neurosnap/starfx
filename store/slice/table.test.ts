@@ -118,6 +118,7 @@ it(tests, "with empty", async () => {
     initialState,
   });
 
+  asserts.assertEquals(tbl.empty, first);
   await store.run(function* () {
     yield* updateStore(tbl.set({ [first.id]: first }));
   });
@@ -135,6 +136,7 @@ it(tests, "with no empty", async () => {
     initialState,
   });
 
+  asserts.assertEquals(tbl.empty, undefined);
   await store.run(function* () {
     yield* updateStore(tbl.set({ [first.id]: first }));
   });

@@ -85,6 +85,7 @@ export interface TableOutput<
 > extends BaseSchema<Record<IdProp, Entity>> {
   schema: "table";
   initialState: Record<IdProp, Entity>;
+  empty: Empty;
   add: (e: Record<IdProp, Entity>) => (s: S) => void;
   set: (e: Record<IdProp, Entity>) => (s: S) => void;
   remove: (ids: IdProp[]) => (s: S) => void;
@@ -140,6 +141,7 @@ export function createTable<
     schema: "table",
     name: name as string,
     initialState,
+    empty: typeof empty === "function" ? empty() : empty,
     add: (entities) => (s) => {
       const state = selectors.selectTable(s);
       Object.keys(entities).forEach((id) => {
