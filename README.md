@@ -242,11 +242,8 @@ function* supervisor() {
 }
 ```
 
-Here we call some task that should always be in a running and in a healthy
-state. If it raises an exception, we log it and try to run the task again.
-
-All thunks and endpoints do is listen for particular actions being emitted onto
-the `ActionContext`, which is just an event emitter.
+Here we call some task that should always be in a running and healthy state. If
+it raises an exception, we log it and try to run the task again.
 
 ```ts
 import { parallel, run, takeEvery } from "starfx";
@@ -288,9 +285,13 @@ function* watchFetch() {
 
 That's better, now only one task can be alive at one time.
 
+Both thunks and endpoints simply listen for particular actions being emitted
+onto the `ActionContext` -- which is just an event emitter -- and then call the
+middleware stack with that action.
+
 Both thunks and endpoints support overriding the default `takeEvery` supervisor
-for either our officially supported supervisors `takeLatest` and `takeLeading`
-or even a custom one!
+for either our officially supported supervisors `takeLatest` and `takeLeading`,
+or a user-defined supervisor.
 
 That's it. We are just leveraging the same tiny API that we are already using in
 `starfx`.
