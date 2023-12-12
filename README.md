@@ -32,13 +32,13 @@ Read my introductory blog post:
 # example: thunks are tasks for business logic
 
 Thunks are the foundational central processing units. They have access to all
-the actions being dispatched from thew view -- or other thunks. They also wield
-the full power of structured concurrency.
+the actions being dispatched from the view as well as your global state. They
+also wield the full power of structured concurrency.
 
 Every thunk that is created requires a unique id -- user provided string. This
 provides us with a handful of benefits:
 
-- User hand-labels each task created (intention)
+- User hand-labels each thunk created
 - Better tracability (via labels)
 - Easier to debug async and side-effects in general (via labels)
 - Build abstractions off naming conventions (e.g. creating routers
@@ -51,25 +51,22 @@ thunks and endpoints.
 Each run of a thunk gets its own `ctx` object which provides a substrate to
 communicate between middleware.
 
-You didn't know you wanted express middleware for the front-end, but let me get
-you excited, it's powerful.
-
 ```ts
-import { createThunks, mdw, call } from "starfx";
+import { call, createThunks, mdw } from "starfx";
 
 const thunks = createThunks();
 // catch errors from task and logs them with extra info
 thunks.use(mdw.err);
 // where all the thunks get called in the middleware stack
 thunks.use(thunks.routes());
-thunks.use(function*(ctx, next) {
+thunks.use(function* (ctx, next) {
   console.log("last mdw in the stack");
   yield* next();
 });
 
 // create a thunk
 const log = thunks.create("log", function* (ctx, next) {
-  const resp = yield* call(fetch("https"//bower.sh"));;
+  const resp = yield* call(fetch("https://bower.sh"));
   const data = yield* call(resp.json());
   console.log("before calling next middleware");
   yield* next();
@@ -97,7 +94,7 @@ api.use(api.routes());
 // calls `window.fetch` with `ctx.request` and sets to `ctx.response`
 api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
 
-// automatically cache results in datastore
+// automatically cache Response json in datastore as-is
 export const fetchUsers = api.get("/users", api.cache());
 
 store.dispatch(fetchUsers());
@@ -170,7 +167,7 @@ function App() {
     <div>
       {users.map((u) => <div key={u.id}>{u.name}</div>)}
       <div>
-        <button onClick={api.trigger()}>fetch users</button>
+        <button onClick={() => api.trigger()}>fetch users</button>
         {api.isLoading ? <div>Loading ...</div> : null}
       </div>
     </div>
@@ -184,9 +181,9 @@ Please see [examples repo](https://github.com/neurosnap/starfx-examples).
 
 # when to use this library?
 
-This primary target for this library are single-page apps (SPAs). This is for an
-app that might live inside an object store or as a simple web server that serves
-files and that's it.
+The primary target for this library are single-page apps (SPAs). This is for an
+app that might be hosted inside an object store (like s3) or with a simple web
+server that serves files and that's it.
 
 Is your app highly interactive, requiring it to persist data across pages? This
 is the sweet spot for `starfx`.
@@ -199,7 +196,7 @@ cannot claim it'll work well.
 
 # what is structured concurrency?
 
-This is a board term so I'll make this specific to how `starfx` works.
+This is a broadd term so I'll make this specific to how `starfx` works.
 
 Under-the-hood, thunks and endpoints are registered under the root task. Every
 thunk and endpoint has their own supervisor that manages them. As a result, what
@@ -222,6 +219,81 @@ In review:
 - An exception can be caught (e.g. `try`/`catch`) at any point in the task tree
 - Supervisor tasks are designed to monitor task health (and automatically
   recover in many cases)
+
+# what is a supervisor task?
+
+A supervisor task is a way to monitor children tasks and probably most
+importantly, manage their health. By structuring your side-effects and business
+logic around supervisor tasks, we gain very interesting coding paradigms that
+result is easier to read and manage code.
+
+The most basic version of a supervisor is simply an infinite loop that calls a
+child task:
+
+```ts
+function* supervisor() {
+  while (true) {
+    try {
+      yield* call(someTask);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+```
+
+Here we call some task that should always be in a running and in a healthy
+state. If it raises an exception, we log it and try to run the task again.
+
+All thunks and endpoints do is listen for particular actions being emitted onto
+the `ActionContext`, which is just an event emitter.
+
+```ts
+import { parallel, run, takeEvery } from "starfx";
+
+function* watchFetch() {
+  const task = yield* takeEvery("FETCH_USERS", function* (action) {
+    console.log(action);
+  });
+  yield* task;
+}
+
+function* send() {
+  yield* put({ type: "FETCH_USERS" });
+  yield* put({ type: "FETCH_USERS" });
+  yield* put({ type: "FETCH_USERS" });
+}
+
+await run(
+  parallel([watchFetch, send]),
+);
+```
+
+Here we create a supervisor function using a helper `takeEvery` to call a
+function for every `FETCH_USERS` event emitted.
+
+However, this means that we are going to make the same request 3 times, we need
+a throttle or debounce to prevent this issue.
+
+```ts
+import { parallel, run, takeLeading } from "starfx";
+
+function* watchFetch() {
+  const task = yield* takeLeading("FETCH_USERS", function* (action) {
+    console.log(action);
+  });
+  yield* task;
+}
+```
+
+That's better, now only one task can be alive at one time.
+
+Both thunks and endpoints support overriding the default `takeEvery` supervisor
+for either our officially supported supervisors `takeLatest` and `takeLeading`
+or even a custom one!
+
+That's it. We are just leveraging the same tiny API that we are already using in
+`starfx`.
 
 # talk
 
