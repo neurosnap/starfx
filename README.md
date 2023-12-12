@@ -276,7 +276,7 @@ However, this means that we are going to make the same request 3 times, we need
 a throttle or debounce to prevent this issue.
 
 ```ts
-import { parallel, run, takeLeading } from "starfx";
+import { takeLeading } from "starfx";
 
 function* watchFetch() {
   const task = yield* takeLeading("FETCH_USERS", function* (action) {
