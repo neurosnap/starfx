@@ -245,6 +245,9 @@ function* supervisor() {
 Here we call some task that should always be in a running and healthy state. If
 it raises an exception, we log it and try to run the task again.
 
+Building on top of that simple supervisor, we can have tasks that always listen
+for events and if they fail, restart them.
+
 ```ts
 import { parallel, run, takeEvery } from "starfx";
 
