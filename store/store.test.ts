@@ -136,3 +136,37 @@ it(tests, "emit Action and update store", async () => {
     dev: true,
   });
 });
+
+it(tests, "resets store", async () => {
+  const initialState: Partial<State> = {
+    users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
+    dev: false,
+    theme: "",
+    token: "",
+  };
+  const store = configureStore({ initialState });
+
+  await store.run(function* () {
+    yield* store.update((s) => {
+      s.users = { 3: { id: "3", name: "hehe" } };
+      s.dev = true;
+      s.theme = "darkness";
+    });
+  });
+
+  asserts.assertEquals(store.getState(), {
+    users: { 3: { id: "3", name: "hehe" } },
+    theme: "darkness",
+    token: "",
+    dev: true,
+  });
+
+  await store.run(store.reset(["users"]));
+
+  asserts.assertEquals(store.getState(), {
+    users: { 3: { id: "3", name: "hehe" } },
+    dev: false,
+    theme: "",
+    token: "",
+  });
+});

@@ -41,6 +41,7 @@ export interface FxStore<S extends AnyState> {
   getState: () => S;
   subscribe: (fn: Listener) => () => void;
   update: (u: StoreUpdater<S> | StoreUpdater<S>[]) => Operation<UpdaterCtx<S>>;
+  reset: (ignoreList?: (keyof S)[]) => Operation<UpdaterCtx<S>>;
   run: <T>(op: Callable<T>) => Task<Result<T>>;
   // deno-lint-ignore no-explicit-any
   dispatch: (a: AnyAction) => any;

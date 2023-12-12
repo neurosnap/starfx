@@ -150,11 +150,25 @@ export function createStore<S extends AnyState>({
     return initialState;
   }
 
+  function* reset(ignoreList: (keyof S)[] = []) {
+    return yield* update((s) => {
+      const keep = ignoreList.reduce<S>((acc, key) => {
+        acc[key] = s[key];
+        return acc;
+      }, { ...initialState });
+
+      Object.keys(s).forEach((key: keyof S) => {
+        s[key] = keep[key];
+      });
+    });
+  }
+
   return {
     getScope,
     getState,
     subscribe,
     update,
+    reset,
     run,
     // instead of actions relating to store mutation, they
     // refer to pieces of business logic -- that can also mutate state
