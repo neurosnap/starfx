@@ -6,9 +6,7 @@ import { BaseSchema, FxStore, StoreUpdater } from "./types.ts";
 
 export function createSchema<
   O extends {
-    loaders: <M extends AnyState>(s: string) => LoaderOutput<M, AnyState>;
-    cache: (s: string) => TableOutput<any, AnyState>;
-    [key: string]: (name: string) => BaseSchema<unknown>;
+    [key: string]: <GS extends AnyState, N extends keyof GS>(name: N) => BaseSchema<unknown, GS, N>;
   },
   S extends { [key in keyof O]: ReturnType<O[key]>["initialState"] },
 >(

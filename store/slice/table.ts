@@ -80,66 +80,70 @@ function tableSelectors<
 
 export interface TableOutput<
   Entity extends AnyState,
-  S extends AnyState,
+  GS extends AnyState,
+  N extends keyof GS,
   Empty extends Entity | undefined = Entity | undefined,
-> extends BaseSchema<Record<IdProp, Entity>> {
+> extends BaseSchema<Record<IdProp, Entity>, GS, N> {
   schema: "table";
   initialState: Record<IdProp, Entity>;
   empty: Empty;
-  add: (e: Record<IdProp, Entity>) => (s: S) => void;
-  set: (e: Record<IdProp, Entity>) => (s: S) => void;
-  remove: (ids: IdProp[]) => (s: S) => void;
-  patch: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
-  merge: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
-  reset: () => (s: S) => void;
+  add: (e: Record<IdProp, Entity>) => (s: GS) => void;
+  set: (e: Record<IdProp, Entity>) => (s: GS) => void;
+  remove: (ids: IdProp[]) => (s: GS) => void;
+  patch: (e: PatchEntity<Record<IdProp, Entity>>) => (s: GS) => void;
+  merge: (e: PatchEntity<Record<IdProp, Entity>>) => (s: GS) => void;
+  reset: () => (s: GS) => void;
   findById: (
     d: Record<IdProp, Entity>,
     { id }: PropId,
   ) => Empty;
   findByIds: (d: Record<IdProp, Entity>, { ids }: PropIds) => Entity[];
   tableAsList: (d: Record<IdProp, Entity>) => Entity[];
-  selectTable: (s: S) => Record<IdProp, Entity>;
-  selectTableAsList: (state: S) => Entity[];
+  selectTable: (s: GS) => Record<IdProp, Entity>;
+  selectTableAsList: (state: GS) => Entity[];
   selectById: (
-    s: S,
+    s: GS,
     p: PropId,
   ) => Empty;
-  selectByIds: (s: S, p: PropIds) => Entity[];
+  selectByIds: (s: GS, p: PropIds) => Entity[];
 }
 
 export function createTable<
   Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
+  GS extends AnyState = AnyState,
+  N extends keyof GS = keyof GS,
 >(p: {
-  name: keyof S;
+  name: N;
   initialState?: Record<IdProp, Entity>;
   empty: Entity | (() => Entity);
-}): TableOutput<Entity, S, Entity>;
+}): TableOutput<Entity, GS, N, Entity>;
 export function createTable<
   Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
+  GS extends AnyState = AnyState,
+  N extends keyof GS = keyof GS,
 >(p: {
-  name: keyof S;
+  name: N;
   initialState?: Record<IdProp, Entity>;
   empty?: Entity | (() => Entity);
-}): TableOutput<Entity, S, Entity | undefined>;
+}): TableOutput<Entity, GS, N, Entity | undefined>;
 export function createTable<
   Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
+  GS extends AnyState = AnyState,
+  N extends keyof GS = keyof GS,
 >({
   name,
   empty,
   initialState = {},
 }: {
-  name: keyof S;
+  name: N;
   initialState?: Record<IdProp, Entity>;
   empty?: Entity | (() => Entity);
-}): TableOutput<Entity, S, Entity | undefined> {
-  const selectors = tableSelectors<Entity, S>((s: S) => s[name], empty);
+}): TableOutput<Entity, GS, N, Entity | undefined> {
+  const selectors = tableSelectors<Entity, Pick<GS, N>>((s: Pick<GS, N>) => s[name], empty);
 
   return {
     schema: "table",
-    name: name as string,
+    name: name,
     initialState,
     empty: typeof empty === "function" ? empty() : empty,
     add: (entities) => (s) => {
@@ -192,26 +196,23 @@ export function createTable<
 
 export function table<
   Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
 >(p: {
   initialState?: Record<IdProp, Entity>;
   empty: Entity | (() => Entity);
-}): (n: string) => TableOutput<Entity, S, Entity>;
+}): <S extends AnyState, N extends keyof S>(n: N) => TableOutput<Entity, S, N, Entity>;
 export function table<
   Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
 >(p?: {
   initialState?: Record<IdProp, Entity>;
   empty?: Entity | (() => Entity);
-}): (n: string) => TableOutput<Entity, S, Entity | undefined>;
+}): <S extends AnyState, N extends keyof S>(n: N) => TableOutput<Entity, S, N, Entity | undefined>;
 export function table<
   Entity extends AnyState = AnyState,
-  S extends AnyState = AnyState,
 >(
   { initialState, empty }: {
     initialState?: Record<IdProp, Entity>;
     empty?: Entity | (() => Entity);
   } = {},
-): (n: string) => TableOutput<Entity, S, Entity | undefined> {
-  return (name: string) => createTable<Entity>({ name, empty, initialState });
+): <S extends AnyState, N extends keyof S>(n: N) => TableOutput<Entity, S, N, Entity | undefined> {
+  return <S extends AnyState, N extends keyof S>(name: N) => createTable<Entity, S, N>({ name, empty, initialState });
 }

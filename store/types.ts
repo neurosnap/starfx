@@ -26,15 +26,11 @@ declare global {
   }
 }
 
-export interface BaseSchema<TOutput> {
+export interface BaseSchema<TOutput, GS extends AnyState, N extends keyof GS> {
   initialState: TOutput;
   schema: string;
-  name: string;
+  name: N;
 }
-
-export type Output<O extends { [key: string]: BaseSchema<unknown> }> = {
-  [key in keyof O]: O[key]["initialState"];
-};
 
 export interface FxStore<S extends AnyState> {
   getScope: () => Scope;
@@ -52,6 +48,6 @@ export interface FxStore<S extends AnyState> {
 }
 
 export interface QueryState {
-  cache: TableOutput<any, any>["initialState"];
+  cache: TableOutput<any, any, any, any>["initialState"];
   loaders: LoaderOutput<any, any>["initialState"];
 }

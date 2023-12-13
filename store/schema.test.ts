@@ -3,6 +3,7 @@ import { select } from "./fx.ts";
 import { configureStore } from "./store.ts";
 import { slice } from "./slice/mod.ts";
 import { createSchema } from "./schema.ts";
+import { createSelector } from "../deps.ts";
 
 const tests = describe("createSchema()");
 
@@ -102,4 +103,20 @@ it(tests, "can work with a nested object", async () => {
       roles: ["admin", "users"],
     });
   });
+});
+
+it(tests, "works with createSelector", async () => {
+  const schema = createSchema({
+    users: slice.table<User>({ empty: { id: "", name: "" } }),
+    cache: slice.table({ empty: {} }),
+    loaders: slice.loader(),
+  });
+  const db = schema.db;
+  const store = configureStore(schema);
+  db.users.selectTableAsList(store.getState())
+  const selector = createSelector(db.users.selectTableAsList, (_: typeof schema.initialState, p: { id: string }) => p.id, (users, id) => {
+    const res = users.find((u) => u.id === id)
+    return res;
+  });
+  selector(store.getState(), { id: "2" });
 });

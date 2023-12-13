@@ -115,7 +115,7 @@ it(tests, "gets all rows", async () => {
 it(tests, "with empty", async () => {
   const tbl = table<TUser>({ empty: first })("users");
   const store = configureStore({
-    initialState,
+    initialState: { users: tbl.initialState },
   });
 
   asserts.assertEquals(tbl.empty, first);
@@ -133,7 +133,7 @@ it(tests, "with empty", async () => {
 it(tests, "with no empty", async () => {
   const tbl = table<TUser>()("users");
   const store = configureStore({
-    initialState,
+    initialState: { users: tbl.initialState },
   });
 
   asserts.assertEquals(tbl.empty, undefined);
