@@ -93,6 +93,14 @@ export function createStore<S extends AnyState>({
     yield* next();
   }
 
+  function* logMdw(ctx: UpdaterCtx<S>, next: Next) {
+    yield* log({
+      type: "store",
+      payload: { ctx },
+    });
+    yield* next();
+  }
+
   function* notifyChannelMdw(_: UpdaterCtx<S>, next: Next) {
     const chan = yield* StoreUpdateContext;
     yield* chan.send();
@@ -108,6 +116,7 @@ export function createStore<S extends AnyState>({
     const fn = compose<UpdaterCtx<S>>([
       updateMdw,
       ...middleware,
+      logMdw,
       notifyChannelMdw,
       notifyListenersMdw,
     ]);
@@ -127,7 +136,7 @@ export function createStore<S extends AnyState>({
 
     if (!ctx.result.ok) {
       yield* log({
-        type: "store:update",
+        type: "error:store",
         payload: {
           message: `Exception raised when calling store updaters`,
           error: ctx.result.error,

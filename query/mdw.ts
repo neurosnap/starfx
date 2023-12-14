@@ -32,7 +32,7 @@ export function* err<Ctx extends ThunkCtx = ThunkCtx>(
   ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
     yield* log({
-      type: "query:err",
+      type: "error:query",
       payload: {
         message:
           `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,

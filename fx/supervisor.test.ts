@@ -55,15 +55,15 @@ it(test, "should recover with backoff pressure", async () => {
   });
 
   expect(actions.length).toEqual(3);
-  expect(actions[0].type).toEqual("fx:supervise");
+  expect(actions[0].type).toEqual("error:supervise");
   expect(actions[0].payload.message).toEqual(
     "Exception caught, waiting 1ms before restarting operation",
   );
-  expect(actions[1].type).toEqual("fx:supervise");
+  expect(actions[1].type).toEqual("error:supervise");
   expect(actions[1].payload.message).toEqual(
     "Exception caught, waiting 2ms before restarting operation",
   );
-  expect(actions[2].type).toEqual("fx:supervise");
+  expect(actions[2].type).toEqual("error:supervise");
   expect(actions[2].payload.message).toEqual(
     "Exception caught, waiting 3ms before restarting operation",
   );

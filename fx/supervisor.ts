@@ -31,12 +31,12 @@ export function supervise<T>(
         attempt = 0;
       } else {
         yield* log({
-          type: "fx:supervise",
+          type: "error:supervise",
           payload: {
             message:
               `Exception caught, waiting ${waitFor}ms before restarting operation`,
-            op,
             error: res.error,
+            op,
           },
         });
         yield* sleep(waitFor);
