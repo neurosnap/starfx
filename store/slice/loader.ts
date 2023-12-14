@@ -85,10 +85,11 @@ function loaderSelectors<
     { ids }: PropIds,
   ): LoaderState<M>[] =>
     ids.map((id) => defaultLoader<M>(data[id])).filter(excludesFalse);
-  const selectById = (state: S, { id }: PropId): LoaderState<M> => {
-    const data = selectTable(state);
-    return defaultLoader<M>(findById(data, { id })) || empty;
-  };
+  const selectById = createSelector(
+    selectTable,
+    (_: S, p: PropId) => p.id,
+    (loaders, id): LoaderState<M> => findById(loaders, { id }),
+  );
 
   return {
     findById,
@@ -101,8 +102,8 @@ function loaderSelectors<
     selectById,
     selectByIds: createSelector(
       selectTable,
-      (_: S, p: PropIds) => p,
-      findByIds,
+      (_: S, p: PropIds) => p.ids,
+      (loaders, ids) => findByIds(loaders, { ids }),
     ),
   };
 }
