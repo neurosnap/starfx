@@ -5,7 +5,7 @@ import type { BaseSchema } from "../types.ts";
 export interface AnyOutput<V, S extends AnyState> extends BaseSchema<V> {
   schema: "any";
   initialState: V;
-  set: (v: string) => (s: S) => void;
+  set: (v: V) => (s: S) => void;
   reset: () => (s: S) => void;
   select: (s: S) => V;
 }
