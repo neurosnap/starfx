@@ -24,7 +24,6 @@ export {
   createSignal,
   each,
   Err,
-  getframe,
   Ok,
   resource,
   run,
