@@ -23,6 +23,7 @@ export {
   createScope,
   createSignal,
   each,
+  ensure,
   Err,
   Ok,
   resource,

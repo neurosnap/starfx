@@ -1,5 +1,5 @@
 import { Callable, Operation, Result, sleep } from "../deps.ts";
-import { safe } from "./call.ts";
+import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
 import { log } from "../log.ts";
 
