@@ -38,6 +38,12 @@ Thunks are the foundational central processing units. They have access to all
 the actions being dispatched from the view as well as your global state. They
 also wield the full power of structured concurrency.
 
+As I've been developing these specialized thunks, I'm starting to think of them
+more like micro-controllers. Only thunks and endpoints have the ability to
+update state. However, thunks are not tied to any particular view and in that
+way are more composable. Thunks can call other thunks and you have the async
+flow control tools from effection to faciliate coordination.
+
 Every thunk that is created requires a unique id -- user provided string. This
 provides us with a handful of benefits:
 
