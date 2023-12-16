@@ -49,9 +49,7 @@ export function timer(timer: number = 5 * MINUTES) {
     const map: { [key: string]: Task<unknown> } = {};
 
     function* activate(action: ActionWPayload<CreateActionPayload>) {
-      yield* call(function* () {
-        return op(action);
-      });
+      yield* call(() => op(action));
       yield* sleep(timer);
       delete map[action.payload.key];
     }
