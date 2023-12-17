@@ -4,7 +4,7 @@ import { AnyState } from "../types.ts";
 import { select, updateStore } from "./fx.ts";
 import { UpdaterCtx } from "./types.ts";
 
-export const PERSIST_LOADER_ID = "persist";
+export const PERSIST_LOADER_ID = "@@starfx/persist";
 
 export interface PersistAdapter<S extends AnyState> {
   getItem(key: string): Operation<Result<Partial<S>>>;
@@ -38,8 +38,12 @@ export function createPersistor<S extends AnyState>(
       return Err(persistedState.error);
     }
 
+    const state = yield* select((s) => s);
+    const nextState = reconciler(state as S, persistedState.value);
     yield* updateStore<S>(function (state) {
-      state = reconciler(state, persistedState.value);
+      Object.keys(nextState).forEach((key: keyof S) => {
+        state[key] = nextState[key];
+      });
     });
 
     return Ok(undefined);
