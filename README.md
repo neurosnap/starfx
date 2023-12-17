@@ -205,7 +205,7 @@ cannot claim it'll work well.
 
 # what is structured concurrency?
 
-This is a broadd term so I'll make this specific to how `starfx` works.
+This is a broad term so I'll make this specific to how `starfx` works.
 
 Under-the-hood, thunks and endpoints are registered under the root task. Every
 thunk and endpoint has their own supervisor that manages them. As a result, what
@@ -226,8 +226,6 @@ In review:
 - If a child task is halted or raises exception, it propagates error up the task
   tree
 - An exception can be caught (e.g. `try`/`catch`) at any point in the task tree
-- Supervisor tasks are designed to monitor task health (and automatically
-  recover in many cases)
 
 # what is a supervisor task?
 
