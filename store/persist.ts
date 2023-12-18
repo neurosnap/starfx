@@ -20,6 +20,30 @@ export interface PersistProps<S extends AnyState> {
   rehydrate: () => Operation<Result<unknown>>;
 }
 
+export function createLocalStorageAdapter<S extends AnyState>(): PersistAdapter<
+  S
+> {
+  return {
+    getItem: function* (key: string) {
+      const storage = localStorage.getItem(key) || "{}";
+      return Ok(JSON.parse(storage));
+    },
+    setItem: function* (key: string, s: Partial<S>) {
+      const state = JSON.stringify(s);
+      try {
+        localStorage.setItem(key, state);
+      } catch (err: any) {
+        return Err(err);
+      }
+      return Ok(undefined);
+    },
+    removeItem: function* (key: string) {
+      localStorage.removeItem(key);
+      return Ok(undefined);
+    },
+  };
+}
+
 export function shallowReconciler<S extends AnyState>(
   original: S,
   persisted: Partial<S>,
