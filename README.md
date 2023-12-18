@@ -42,13 +42,13 @@ As I've been developing these specialized thunks, I'm starting to think of them
 more like micro-controllers. Only thunks and endpoints have the ability to
 update state. However, thunks are not tied to any particular view and in that
 way are more composable. Thunks can call other thunks and you have the async
-flow control tools from effection to faciliate coordination.
+flow control tools from effection to facilitate coordination.
 
 Every thunk that is created requires a unique id -- user provided string. This
 provides us with a handful of benefits:
 
 - User hand-labels each thunk created
-- Better tracability (via labels)
+- Better traceability (via labels)
 - Easier to debug async and side-effects in general (via labels)
 - Build abstractions off naming conventions (e.g. creating routers
   `/users [GET]`)
@@ -74,15 +74,19 @@ thunks.use(function* (ctx, next) {
 });
 
 // create a thunk
-const log = thunks.create("log", function* (ctx, next) {
-  const resp = yield* call(fetch("https://bower.sh"));
-  const data = yield* call(resp.json());
+const log = thunks.create<string>("log", function* (ctx, next) {
+  const resp = yield* call(
+    fetch("https://log-drain.com", {
+      method: "POST",
+      body: JSON.stringify({ message: ctx.payload }),
+    }),
+  );
   console.log("before calling next middleware");
   yield* next();
   console.log("after all remaining middleware have run");
 });
 
-store.dispatch(log());
+store.dispatch(log("sending log message"));
 // output:
 // before calling next middleware
 // last mdw in the stack
@@ -112,6 +116,42 @@ store.dispatch(fetchUsers());
 
 # example: an immutable store that acts like a reactive, in-memory database
 
+I love `redux`. I know it gets sniped for having too much boilerplate when
+alternatives like `zustand` and `react-query` exist that cut through the
+ceremony of managing state. However, `redux` was never designed to be easy to
+use, it was designed to be scalable, debuggable, and maintainable. Yes, setting
+up a `redux` store is work, but that is in an effort to serve its
+maintainability.
+
+Having said that, the core abstraction in `redux` is a reducer. Reducers were
+originally designed to contain isolated business logic of updating sections of
+state (also known as state slices). They were also designed to make it easier to
+sustain state immutability.
+
+Fast forward to `redux-toolkit` and we have `createSlice` which leverages
+`immer` under-the-hood to ensure immutability. So we no longer need reducers for
+immutability.
+
+Further, I argue, placing the business logic for updating state inside reducers
+(via switch-cases) makes understanding business logic harder. Instead of having
+a single function that updates X state slices, we have X functions (reducers)
+that we need to piece together in our heads to understand what is being updated
+when an action is dispatched.
+
+Therefore, reducers are not great containers for business logic. They are rigid
+and require the end-developer to piece them together in their head to fully
+understand the ramifications of dispatching an action.
+
+With all of this in mind, `starfx/store` takes all the good parts of `redux` and
+removes the need for reducers entirely. We still have a single state object that
+contains everything from data fetched from an API, UX, and a way to create
+memoized functions (e.g. selectors). We maintain immutability (using `immer`)
+and also have a middleware system to extend it.
+
+Finally, we bring the utility of creating a schema (like `zod` or a traditional
+database) to make it plainly obvious what the state shape looks like as well as
+reusable utilities to make it easy to update and query state.
+
 ```ts
 import { configureStore, createSchema, select, slice } from "starfx/store";
 
@@ -127,6 +167,7 @@ const { db, initialState, update } = createSchema({
   loaders: slice.loader(),
 });
 
+// just a normal endpoint
 const fetchUsers = api.get<never, User[]>(
   "/users",
   function* (ctx, next) {
@@ -146,7 +187,7 @@ const fetchUsers = api.get<never, User[]>(
     }, {});
 
     // update the store and trigger a re-render in react
-    yield* update(db.users.add(users));
+    yield* schema.update(db.users.add(users));
 
     // User[]
     const users = yield* select(db.users.selectTableAsList);
@@ -308,10 +349,10 @@ That's it. We are just leveraging the same tiny API that we are already using in
 
 # talk
 
-I recently gave a talk about deliminited continuations where I also discuss this
+I recently gave a talk about delimited continuations where I also discuss this
 library:
 
-[![Delminited continuations are all you need](http://img.youtube.com/vi/uRbqLGj_6mI/0.jpg)](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
+[![Delimited continuations are all you need](http://img.youtube.com/vi/uRbqLGj_6mI/0.jpg)](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
 
 # resources
 
