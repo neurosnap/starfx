@@ -108,7 +108,7 @@ export type CreateActionFn = () => ActionWithPayload<
 export interface CreateAction<Ctx extends ThunkCtx = ThunkCtx>
   extends CreateActionFn {
   run: (
-    p: ActionWithPayload<
+    p?: ActionWithPayload<
       CreateActionPayload<Record<string | number | symbol, never>>
     >,
   ) => Operation<Ctx>;
