@@ -364,9 +364,9 @@ That's it. We are just leveraging the same tiny API that we are already using in
 
 # example: test that doesn't need an http interceptor
 
-Need to write tests? Users to libraries like `msw` or `nock`? Well you don't
-need them with `starfx`. If the `mdw.fetch()` middleware detects `ctx.response`
-is already filled then it skips making the request. Let's take the update user
+Need to write tests? Use libraries like `msw` or `nock`? Well you don't need
+them with `starfx`. If the `mdw.fetch()` middleware detects `ctx.response` is
+already filled then it skips making the request. Let's take the update user
 endpoint example and provide stubbed data for our tests.
 
 ```ts
