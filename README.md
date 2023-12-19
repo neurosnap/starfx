@@ -16,7 +16,6 @@ Read my introductory blog post:
 
 # features
 
-- async flow control library for `deno`, `node`, and browser
 - task tree side-effect management system (like `redux-saga`)
 - simple immutable data store (like `redux`)
 - traceability throughout the entire system (event logs via dispatching actions)
@@ -242,8 +241,8 @@ function App() {
 
 # usage
 
-- [examples repo](https://github.com/neurosnap/starfx-examples).
-- [production example repo](https://github.com/aptible/app-ui);
+- [examples repo](https://github.com/neurosnap/starfx-examples)
+- [production example repo](https://github.com/aptible/app-ui)
 
 # when to use this library?
 
