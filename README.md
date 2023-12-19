@@ -369,7 +369,7 @@ them with `starfx`. If the `mdw.fetch()` middleware detects `ctx.response` is
 already filled then it skips making the request. Let's take the update user
 endpoint example and provide stubbed data for our tests.
 
-```ts
+```tsx
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useDispatch, useSelector } from "starfx/react";
 import { db } from "./schema.ts";
