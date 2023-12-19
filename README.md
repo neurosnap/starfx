@@ -12,6 +12,8 @@ and state management.
 Read my introductory blog post:
 [what is starfx?](https://bower.sh/what-is-starfx)
 
+[Discord](https://discord.gg/frontside)
+
 # features
 
 - async flow control library for `deno`, `node`, and browser
