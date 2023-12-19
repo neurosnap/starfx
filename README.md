@@ -17,6 +17,7 @@ Read my introductory blog post:
 # features
 
 - task tree side-effect management system (like `redux-saga`)
+- task management and fault-tolerance via supervisors
 - simple immutable data store (like `redux`)
 - traceability throughout the entire system (event logs via dispatching actions)
 - data synchronization and caching for `react` (like `react-query`, `rtk-query`)
