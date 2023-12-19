@@ -180,7 +180,13 @@ const { db, initialState, update } = createSchema({
   users: slice.table<User>(),
   cache: slice.table(),
   loaders: slice.loader(),
+  // -- more slice examples --
+  // token: slice.str(),
+  // nav: slice.obj<{ collapsed: boolean }>(),
+  // counter: slice.num(0),
+  // userIds: slice.any<string[]>(),
 });
+type AppState = typeof initialState;
 
 // just a normal endpoint
 const fetchUsers = api.get<never, User[]>(
@@ -202,7 +208,7 @@ const fetchUsers = api.get<never, User[]>(
     }, {});
 
     // update the store and trigger a re-render in react
-    yield* schema.update(db.users.add(users));
+    yield* update(db.users.add(users));
 
     // User[]
     const users = yield* select(db.users.selectTableAsList);
