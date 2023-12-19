@@ -124,7 +124,7 @@ up a `redux` store is work, but that is in an effort to serve its
 maintainability.
 
 Having said that, the core abstraction in `redux` is a reducer. Reducers were
-originally designed to contain isolated business logic of updating sections of
+originally designed to contain isolated business logic for updating sections of
 state (also known as state slices). They were also designed to make it easier to
 sustain state immutability.
 
@@ -138,19 +138,18 @@ a single function that updates X state slices, we have X functions (reducers)
 that we need to piece together in our heads to understand what is being updated
 when an action is dispatched.
 
-Therefore, reducers are not great containers for business logic. They are rigid
-and require the end-developer to piece them together in their head to fully
-understand the ramifications of dispatching an action.
-
 With all of this in mind, `starfx/store` takes all the good parts of `redux` and
 removes the need for reducers entirely. We still have a single state object that
-contains everything from data fetched from an API, UX, and a way to create
-memoized functions (e.g. selectors). We maintain immutability (using `immer`)
-and also have a middleware system to extend it.
+contains everything from API data, UX, and a way to create memoized functions
+(e.g. selectors). We maintain immutability (using `immer`) and also have a
+middleware system to extend it.
 
 Finally, we bring the utility of creating a schema (like `zod` or a traditional
 database) to make it plainly obvious what the state shape looks like as well as
 reusable utilities to make it easy to update and query state.
+
+This gets us closer to treating our store like a traditional database while
+still being flexible for our needs on the FE.
 
 ```ts
 import { configureStore, createSchema, select, slice } from "starfx/store";
