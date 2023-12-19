@@ -12,7 +12,7 @@ and state management.
 Read my introductory blog post:
 [what is starfx?](https://bower.sh/what-is-starfx)
 
-[Discord](https://discord.gg/frontside)
+- [Discord](https://discord.gg/frontside)
 
 # features
 
@@ -242,7 +242,8 @@ function App() {
 
 # usage
 
-Please see [examples repo](https://github.com/neurosnap/starfx-examples).
+- [examples repo](https://github.com/neurosnap/starfx-examples).
+- [production example repo](https://github.com/aptible/app-ui);
 
 # when to use this library?
 
