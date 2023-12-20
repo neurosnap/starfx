@@ -9,7 +9,7 @@ and state management.
 > This project is under active development, there are zero guarantees for API
 > stability.
 
-- [blog posts starfx](https://bower.sh/?tag=starfx)
+- [blog posts about starfx](https://bower.sh/?tag=starfx)
 - [discord](https://discord.gg/frontside)
 
 # features
