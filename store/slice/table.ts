@@ -72,8 +72,8 @@ function tableSelectors<
     selectById: sbi,
     selectByIds: createSelector(
       selectTable,
-      (_: S, p: PropIds) => p,
-      findByIds,
+      (_: S, p: PropIds) => p.ids,
+      (data, ids) => findByIds(data, { ids }),
     ),
   };
 }
