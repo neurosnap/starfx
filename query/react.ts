@@ -1,5 +1,6 @@
 import type { LoaderState, QueryState } from "../types.ts";
 import { React, useDispatch, useSelector } from "../deps.ts";
+import { ThunkAction } from "./types.ts";
 const { useEffect, useRef } = React;
 
 // TODO: remove store deps
@@ -7,11 +8,6 @@ import { selectDataById, selectLoaderById } from "../redux/mod.ts";
 
 type ActionFn<P = any> = (p: P) => { toString: () => string };
 type ActionFnSimple = () => { toString: () => string };
-
-interface ThunkAction<P = any> {
-  type: string;
-  payload: { key: string; options: P };
-}
 
 export interface UseApiProps<P = any> extends LoaderState {
   trigger: (p: P) => void;
@@ -31,7 +27,7 @@ export type UseApiResult<P, A extends ThunkAction = ThunkAction> =
   | UseApiSimpleProps
   | UseApiAction<A>;
 
-interface UseCacheResult<D = any, A extends ThunkAction = ThunkAction>
+export interface UseCacheResult<D = any, A extends ThunkAction = ThunkAction>
   extends UseApiAction<A> {
   data: D | null;
 }

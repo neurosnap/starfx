@@ -101,6 +101,8 @@ export interface CreateActionPayload<P = any> {
   options: P;
 }
 
+export type ThunkAction<P = any> = ActionWithPayload<CreateActionPayload<P>>;
+
 export type CreateActionFn = () => ActionWithPayload<
   CreateActionPayload<Record<string | number | symbol, never>>
 >;
