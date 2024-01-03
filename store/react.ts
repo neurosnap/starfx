@@ -28,5 +28,5 @@ export function PersistGate(
     return loading;
   }
 
-  return React.createElement("div", null, children);
+  return children;
 }
