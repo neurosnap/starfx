@@ -4,6 +4,7 @@ import type {
   ApiCtx,
   ApiRequest,
   FetchJsonCtx,
+  MiddlewareApi,
   Next,
   PerfCtx,
   RequiredApiRequest,
@@ -12,6 +13,7 @@ import type {
 import { mergeRequest } from "./util.ts";
 import * as fetchMdw from "./fetch.ts";
 import { log } from "../log.ts";
+import { call, Operation } from "../deps.ts";
 export * from "./fetch.ts";
 
 /**
@@ -138,4 +140,30 @@ export function fetch<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     fetchMdw.request,
     fetchMdw.json,
   ]);
+}
+
+type Callable<T> =
+  | (() => Operation<T>)
+  | (() => Promise<T>)
+  | (() => T)
+  | Operation<T>
+  | Promise<T>;
+
+/**
+ * This middleware will only be activated if predicate is true.
+ */
+export function predicate<Ctx extends ApiCtx = ApiCtx>(
+  predicate: ((ctx: Ctx) => boolean) | ((ctx: Ctx) => Callable<boolean>),
+) {
+  return (mdw: MiddlewareApi) => {
+    return function* (ctx: Ctx, next: Next) {
+      const valid = yield* call(() => predicate(ctx));
+      if (!valid) {
+        yield* next();
+        return;
+      }
+
+      yield* mdw(ctx, next);
+    };
+  };
 }

@@ -61,7 +61,11 @@ export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   extends FetchJsonCtx<Payload, ApiSuccess, ApiError> {
   actions: Action[];
   loader: Omit<LoaderPayload<any>, "id"> | null;
+  // should we cache ctx.json?
   cache: boolean;
+  // should we use mdw.stub?
+  stub: boolean;
+  // previously cached data
   cacheData: any;
 }
 

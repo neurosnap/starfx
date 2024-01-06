@@ -546,3 +546,42 @@ it(tests, "errorHandler", () => {
   });
   expect(a).toEqual(2);
 });
+
+it(tests, "stub predicate", async () => {
+  let actual = null;
+  const api = createApi();
+  api.use(function* (ctx, next) {
+    ctx.stub = true;
+    yield* next();
+  });
+  api.use(mdw.api());
+  api.use(api.routes());
+  api.use(mdw.fetch({ baseUrl: "http://nowhere.com" }));
+
+  const stub = mdw.predicate((ctx) => ctx.stub === true);
+
+  const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
+    function* (ctx, next) {
+      yield* next();
+      actual = ctx.json;
+    },
+    stub(function* (ctx, next) {
+      ctx.response = new Response(JSON.stringify({ frodo: "shire" }));
+      yield* next();
+    }),
+  ]);
+
+  const store = configureStore({
+    initialState: {
+      ...createQueryState(),
+    },
+  });
+  store.run(api.bootup);
+  store.dispatch(fetchUsers());
+  await sleep(150);
+  expect(actual).toEqual({
+    ok: true,
+    value: { frodo: "shire" },
+    data: { frodo: "shire" },
+  });
+});
