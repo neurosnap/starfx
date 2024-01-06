@@ -1,4 +1,4 @@
-import type { ApiCtx, Next } from "../query/mod.ts";
+import type { ApiCtx, Next, ThunkCtx } from "../query/mod.ts";
 import { compose } from "../compose.ts";
 import type { AnyAction, AnyState } from "../types.ts";
 
@@ -59,6 +59,42 @@ export function* dispatchActions(ctx: { actions: AnyAction[] }, next: Next) {
   yield* next();
   if (ctx.actions.length === 0) return;
   yield* put(ctx.actions);
+}
+
+/**
+ * This middleware will track the status of a middleware fn
+ */
+export function* loader<
+  Ctx extends ThunkCtx = ThunkCtx,
+  M extends AnyState = AnyState,
+>(
+  loaderSchema: LoaderOutput<M, AnyState>,
+) {
+  return function* (ctx: Ctx, next: Next) {
+    yield* updateStore([
+      loaderSchema.start({ id: ctx.name }),
+      loaderSchema.start({ id: ctx.key }),
+    ]);
+
+    try {
+      yield* next();
+      yield* updateStore([
+        loaderSchema.success({ id: ctx.name }),
+        loaderSchema.success({ id: ctx.key }),
+      ]);
+    } catch (err) {
+      yield* updateStore([
+        loaderSchema.error({
+          id: ctx.name,
+          message: err.message,
+        }),
+        loaderSchema.error({
+          id: ctx.key,
+          message: err.message,
+        }),
+      ]);
+    }
+  };
 }
 
 /**
