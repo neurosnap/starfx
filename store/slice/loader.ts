@@ -144,31 +144,31 @@ export const createLoader = <
     start: (e) => (s) => {
       const table = selectors.selectTable(s);
       const loader = table[e.id];
-      table[e.id] = {
+      table[e.id] = defaultLoaderItem({
         ...loader,
         ...e,
         status: "loading",
         lastRun: ts(),
-      };
+      });
     },
     success: (e) => (s) => {
       const table = selectors.selectTable(s);
       const loader = table[e.id];
-      table[e.id] = {
+      table[e.id] = defaultLoaderItem({
         ...loader,
         ...e,
         status: "success",
         lastSuccess: ts(),
-      };
+      });
     },
     error: (e) => (s) => {
       const table = selectors.selectTable(s);
       const loader = table[e.id];
-      table[e.id] = {
+      table[e.id] = defaultLoaderItem({
         ...loader,
         ...e,
         status: "error",
-      };
+      });
     },
     reset: () => (s) => {
       // deno-lint-ignore no-explicit-any
