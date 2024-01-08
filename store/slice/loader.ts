@@ -143,7 +143,7 @@ export const createLoader = <
     initialState,
     start: (e) => (s) => {
       const table = selectors.selectTable(s);
-      const loader = selectors.selectById(s, { id: e.id });
+      const loader = table[e.id];
       table[e.id] = {
         ...loader,
         ...e,
@@ -153,7 +153,7 @@ export const createLoader = <
     },
     success: (e) => (s) => {
       const table = selectors.selectTable(s);
-      const loader = selectors.selectById(s, { id: e.id });
+      const loader = table[e.id];
       table[e.id] = {
         ...loader,
         ...e,
@@ -163,7 +163,7 @@ export const createLoader = <
     },
     error: (e) => (s) => {
       const table = selectors.selectTable(s);
-      const loader = selectors.selectById(s, { id: e.id });
+      const loader = table[e.id];
       table[e.id] = {
         ...loader,
         ...e,
