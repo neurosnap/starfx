@@ -452,6 +452,11 @@ library:
 
 [![Delimited continuations are all you need](http://img.youtube.com/vi/uRbqLGj_6mI/0.jpg)](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
 
+Here is another talk I helped facilitate about `effection` with the library
+creator:
+
+[![effection with Charles Lowell](http://img.youtube.com/vi/lJDgpxRw5WA/0.jpg)](https://youtu.be/lJDgpxRw5WA?si=cCHZiKqNO7vIUhPc)
+
 # resources
 
 This library is not possible without these foundational libraries:
