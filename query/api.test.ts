@@ -239,7 +239,7 @@ it(tests, "createApi with hash key on a large post", async () => {
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.api());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw.store(schema.db));
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const data = {
@@ -308,7 +308,7 @@ it(tests, "createApi - two identical endpoints", async () => {
   const { store, schema } = testStore();
   const api = createApi();
   api.use(mdw.api());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw.store(schema.db));
   api.use(mdw.nameParser);
   api.use(api.routes());
 
@@ -462,7 +462,7 @@ it(tests, "should bubble up error", () => {
     }
   });
   api.use(mdw.queryCtx);
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw.store(schema.db));
   api.use(api.routes());
 
   const fetchUser = api.get(

@@ -3,7 +3,6 @@ import { createApi, createKey, mdw } from "../query/mod.ts";
 import type { ApiCtx, Next, ThunkCtx } from "../query/mod.ts";
 import { createQueryState } from "../action.ts";
 import { sleep } from "../test.ts";
-
 import {
   configureStore,
   createSchema,
@@ -110,7 +109,7 @@ it(tests, "with loader", () => {
   const { schema, store } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw.store(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
@@ -153,7 +152,7 @@ it(tests, "with item loader", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw.store(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
@@ -250,7 +249,7 @@ it(tests, "simpleCache", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw.store(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
@@ -280,7 +279,7 @@ it(tests, "overriding default loader behavior", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api());
-  api.use(storeMdw(schema.db));
+  api.use(storeMdw.store(schema.db));
   api.use(api.routes());
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
@@ -337,7 +336,7 @@ it(tests, "mdw.api() - error handler", () => {
   const { schema, store } = testStore();
   const query = createApi<ApiCtx>();
   query.use(mdw.api());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw.store(schema.db));
   query.use(query.routes());
   query.use(function* () {
     throw new Error("something happened");
@@ -353,7 +352,7 @@ it(tests, "createApi with own key", async () => {
   const { schema, store } = testStore();
   const query = createApi();
   query.use(mdw.api());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw.store(schema.db));
   query.use(query.routes());
   query.use(mdw.customKey);
   query.use(function* fetchApi(ctx, next) {
@@ -424,7 +423,7 @@ it(tests, "createApi with custom key but no payload", async () => {
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.api());
-  query.use(storeMdw(schema.db));
+  query.use(storeMdw.store(schema.db));
   query.use(query.routes());
   query.use(mdw.customKey);
   query.use(function* fetchApi(ctx, next) {

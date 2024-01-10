@@ -6,18 +6,18 @@ import { put, select, updateStore } from "./fx.ts";
 import { LoaderOutput } from "./slice/loader.ts";
 import { TableOutput } from "./slice/table.ts";
 
-export function storeMdw<
+export function store<
   Ctx extends ApiCtx = ApiCtx,
   M extends AnyState = AnyState,
->({ cache, loaders, errorFn }: {
+>(props: {
   loaders: LoaderOutput<M, AnyState>;
   cache: TableOutput<any, AnyState>;
   errorFn?: (ctx: Ctx) => string;
 }) {
   return compose<Ctx>([
-    dispatchActions,
-    loadingMonitor(loaders, errorFn),
-    simpleCache(cache),
+    actions,
+    loaderApi(props.loaders, props.errorFn),
+    cache(props.cache),
   ]);
 }
 
@@ -25,7 +25,7 @@ export function storeMdw<
  * This middleware will automatically cache any data found inside `ctx.json`
  * which is where we store JSON data from the {@link mdw.fetch} middleware.
  */
-export function simpleCache<Ctx extends ApiCtx = ApiCtx>(
+export function cache<Ctx extends ApiCtx = ApiCtx>(
   dataSchema: TableOutput<any, AnyState>,
 ) {
   return function* (
@@ -54,7 +54,7 @@ export function simpleCache<Ctx extends ApiCtx = ApiCtx>(
  * within the pipeline of the middleware and instead of dispatching them serially this
  * improves performance by only hitting the reducers once.
  */
-export function* dispatchActions(ctx: { actions: AnyAction[] }, next: Next) {
+export function* actions(ctx: { actions: AnyAction[] }, next: Next) {
   if (!ctx.actions) ctx.actions = [];
   yield* next();
   if (ctx.actions.length === 0) return;
@@ -100,7 +100,7 @@ export function loader<
 /**
  * This middleware will track the status of a fetch request.
  */
-export function loadingMonitor<
+export function loaderApi<
   Ctx extends ApiCtx = ApiCtx,
   M extends AnyState = AnyState,
 >(
