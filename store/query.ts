@@ -64,7 +64,7 @@ export function* dispatchActions(ctx: { actions: AnyAction[] }, next: Next) {
 /**
  * This middleware will track the status of a middleware fn
  */
-export function* loader<
+export function loader<
   Ctx extends ThunkCtx = ThunkCtx,
   M extends AnyState = AnyState,
 >(
