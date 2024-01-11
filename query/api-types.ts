@@ -33,14 +33,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     get<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     get<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -57,15 +68,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     get<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     get<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -89,16 +117,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     get<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     get<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -110,14 +155,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     post<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     post<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -134,15 +190,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     post<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     post<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -166,16 +239,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     post<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     post<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -187,14 +277,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     put<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     put<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -211,15 +312,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     put<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     put<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -243,16 +361,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     put<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     put<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -264,14 +399,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     patch<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     patch<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -288,15 +434,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     patch<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     patch<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -320,16 +483,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     patch<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     patch<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -341,14 +521,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     delete<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     delete<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -365,15 +556,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     delete<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     delete<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -397,16 +605,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     delete<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     delete<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -418,14 +643,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     options<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     options<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -442,15 +678,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     options<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     options<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -474,16 +727,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     options<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     options<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -495,14 +765,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     head<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     head<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -519,15 +800,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     head<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     head<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -551,16 +849,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     head<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     head<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -572,14 +887,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     connect<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     connect<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -596,15 +922,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     connect<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     connect<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -628,16 +971,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     connect<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     connect<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -649,14 +1009,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
     trace<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     trace<P, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -673,15 +1044,32 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
       fn: MiddlewareApiCo<Gtx>,
     ): CreateActionWithPayload<Gtx, P>;
     trace<P extends never, ApiSuccess, ApiError = unknown>(
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     trace<P, ApiSuccess, ApiError = unknown>(
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
 
     /**
@@ -705,16 +1093,33 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
     ): CreateActionWithPayload<Gtx, P>;
     trace<P extends never, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
-      fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-    ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+      fn: MiddlewareApiCo<
+        & Omit<Ctx, "json">
+        & FetchJson<
+          ApiSuccess,
+          ApiError extends unknown ? Ctx["_error"] : ApiError
+        >
+      >,
+    ): CreateAction<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      ApiSuccess
+    >;
     trace<P, ApiSuccess, ApiError = unknown>(
       req: { supervisor?: Supervisor },
       fn: MiddlewareApiCo<Ctx>,
     ): CreateActionWithPayload<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>,
-      P
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >,
+      P,
+      ApiSuccess
     >;
   };
 
@@ -727,14 +1132,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   get<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   get<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -752,15 +1168,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   get<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   get<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -781,20 +1208,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   get<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   get<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -823,21 +1270,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   get<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   get<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -849,14 +1316,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   post<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   post<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -874,15 +1352,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   post<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   post<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -903,20 +1392,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   post<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   post<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -945,21 +1454,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   post<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   post<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -971,14 +1500,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   put<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   put<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -996,15 +1536,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   put<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   put<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1025,20 +1576,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   put<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   put<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1067,21 +1638,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   put<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   put<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1093,14 +1684,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   patch<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   patch<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1118,15 +1720,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   patch<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   patch<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1147,20 +1760,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   patch<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   patch<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1189,21 +1822,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   patch<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   patch<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1215,14 +1868,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   delete<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   delete<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1240,15 +1904,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   delete<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   delete<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1269,20 +1944,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   delete<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   delete<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1311,21 +2006,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   delete<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   delete<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1337,14 +2052,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   options<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   options<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1362,15 +2088,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   options<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   options<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1391,20 +2128,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   options<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   options<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1433,21 +2190,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   options<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   options<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1459,14 +2236,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   head<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   head<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1484,15 +2272,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   head<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   head<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1513,20 +2312,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   head<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   head<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1555,21 +2374,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   head<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   head<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1581,14 +2420,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   connect<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   connect<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1606,15 +2456,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   connect<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   connect<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1635,20 +2496,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   connect<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   connect<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1677,21 +2558,41 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   connect<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   connect<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1703,14 +2604,25 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   trace<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   trace<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1728,15 +2640,26 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   trace<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   trace<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1757,20 +2680,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   ): CreateActionWithPayload<Gtx, P>;
   trace<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   trace<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 
   /**
@@ -1799,20 +2742,40 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
   trace<P extends never, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareApiCo<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>,
-  ): CreateAction<Omit<Ctx, "json"> & FetchJson<ApiSuccess, ApiError>>;
+    fn: MiddlewareApiCo<
+      & Omit<Ctx, "json">
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
+    >,
+  ): CreateAction<
+    & Omit<Ctx, "json">
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    ApiSuccess
+  >;
   trace<P, ApiSuccess, ApiError = unknown>(
     name: ApiName,
     req: { supervisor?: Supervisor },
     fn: MiddlewareApiCo<
       & Omit<Ctx, "payload" | "json">
       & Payload<P>
-      & FetchJson<ApiSuccess, ApiError>
+      & FetchJson<
+        ApiSuccess,
+        ApiError extends unknown ? Ctx["_error"] : ApiError
+      >
     >,
   ): CreateActionWithPayload<
     & Omit<Ctx, "payload" | "json">
     & Payload<P>
-    & FetchJson<ApiSuccess, ApiError>,
-    P
+    & FetchJson<
+      ApiSuccess,
+      ApiError extends unknown ? Ctx["_error"] : ApiError
+    >,
+    P,
+    ApiSuccess
   >;
 }

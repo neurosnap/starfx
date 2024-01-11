@@ -224,6 +224,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
       }
     };
     actionFn.toString = () => name;
+    actionFn._success = {};
+    actionFn._error = {};
     actionMap[name] = actionFn;
 
     return actionFn;

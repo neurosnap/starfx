@@ -158,9 +158,9 @@ export function useQuery<P = any, A extends ThunkAction = ThunkAction<P>>(
  * }
  * ```
  */
-export function useCache<D = any, A extends ThunkAction = ThunkAction>(
-  action: A,
-): UseCacheResult<D, A> {
+export function useCache<P = any, ApiSuccess = any>(
+  action: ThunkAction<P, ApiSuccess>,
+): UseCacheResult<typeof action.payload._result, ThunkAction<P, ApiSuccess>> {
   const id = action.payload.key;
   const data: any = useSelector((s: any) => selectDataById(s, { id }));
   const query = useQuery(action);

@@ -67,6 +67,8 @@ export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   stub: boolean;
   // previously cached data
   cacheData: any;
+  _success: ApiSuccess;
+  _error: ApiError;
 }
 
 export interface PerfCtx<P = unknown> extends ThunkCtx<P> {
@@ -99,37 +101,47 @@ export interface ActionWithPayload<P> extends Action {
   payload: P;
 }
 
-export interface CreateActionPayload<P = any> {
+export interface CreateActionPayload<P = any, ApiSuccess = any> {
   name: string;
   key: string;
   options: P;
+  _result: ApiSuccess;
 }
 
-export type ThunkAction<P = any> = ActionWithPayload<CreateActionPayload<P>>;
-
-export type CreateActionFn = () => ActionWithPayload<
-  CreateActionPayload<Record<string | number | symbol, never>>
+export type CreateActionFn<ApiSuccess = any> = () => ActionWithPayload<
+  CreateActionPayload<Record<string | number | symbol, never>, ApiSuccess>
 >;
 
-export interface CreateAction<Ctx extends ThunkCtx = ThunkCtx>
-  extends CreateActionFn {
+export interface CreateAction<
+  Ctx extends ThunkCtx = ThunkCtx,
+  ApiSuccess = any,
+> extends CreateActionFn<ApiSuccess> {
   run: (
     p?: ActionWithPayload<
-      CreateActionPayload<Record<string | number | symbol, never>>
+      CreateActionPayload<Record<string | number | symbol, never>, ApiSuccess>
     >,
   ) => Operation<Ctx>;
   use: (mdw: Middleware<Ctx>) => void;
 }
 
-export type CreateActionFnWithPayload<P = any> = (
+export type CreateActionFnWithPayload<P = any, ApiSuccess = any> = (
   p: P,
-) => ActionWithPayload<CreateActionPayload<P>>;
+) => ActionWithPayload<CreateActionPayload<P, ApiSuccess>>;
 
-export interface CreateActionWithPayload<Ctx extends ThunkCtx, P>
-  extends CreateActionFnWithPayload<P> {
-  run: (a: ActionWithPayload<CreateActionPayload<P>> | P) => Operation<Ctx>;
+export interface CreateActionWithPayload<
+  Ctx extends ThunkCtx,
+  P,
+  ApiSuccess = any,
+> extends CreateActionFnWithPayload<P, ApiSuccess> {
+  run: (
+    a: ActionWithPayload<CreateActionPayload<P, ApiSuccess>> | P,
+  ) => Operation<Ctx>;
   use: (mdw: Middleware<Ctx>) => void;
 }
+
+export type ThunkAction<P = any, ApiSuccess = any> = ActionWithPayload<
+  CreateActionPayload<P, ApiSuccess>
+>;
 
 export type Supervisor<T = unknown> = (
   pattern: string,
