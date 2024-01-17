@@ -15,7 +15,7 @@ import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
 import { call } from "../deps.ts";
-import { useCache } from "./react.ts";
+import { useCache } from "../store/react.ts";
 
 interface User {
   id: string;
