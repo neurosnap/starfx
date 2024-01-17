@@ -15,7 +15,7 @@ import { createApi } from "./api.ts";
 import { createKey } from "./create-key.ts";
 import type { ApiCtx } from "./types.ts";
 import { call } from "../deps.ts";
-import { useCache } from "./react.ts";
+import { useCache } from "../store/react.ts";
 
 interface User {
   id: string;
@@ -32,7 +32,7 @@ const testStore = () => {
     loaders: slice.loader(),
     cache: slice.table({ empty: {} }),
   });
-  const store = configureStore(schema);
+  const store = configureStore({ schema });
   return { schema, store };
 };
 
@@ -96,7 +96,7 @@ it(tests, "createApi - POST", async () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const { store } = testStore();
   store.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
@@ -148,7 +148,7 @@ it(tests, "POST with uri", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const { store } = testStore();
   store.run(query.bootup);
   store.dispatch(createUser({ email: mockUser.email }));
 });
@@ -168,7 +168,7 @@ it(tests, "middleware - with request fn", () => {
     { supervisor: takeEvery },
     query.request({ method: "POST" }),
   );
-  const store = configureStore({ initialState: { users: {} } });
+  const { store } = testStore();
   store.run(query.bootup);
   store.dispatch(createUser());
 });
@@ -196,7 +196,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const { store } = testStore();
   store.run(api.bootup);
   store.dispatch(action2());
 });
@@ -231,7 +231,7 @@ it(tests, "run() from a normal saga", () => {
     yield* task;
   }
 
-  const store = configureStore({ initialState: { users: {} } });
+  const { store } = testStore();
   store.run(() => keepAlive([api.bootup, watchAction]));
   store.dispatch(action2());
 });
@@ -370,7 +370,7 @@ it(tests, "ensure types for get() endpoint", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const { store } = testStore();
   store.run(api.bootup);
 
   store.dispatch(action1({ id: "1" }));
@@ -408,7 +408,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const { store } = testStore();
   store.run(api.bootup);
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
@@ -444,7 +444,7 @@ it(
       },
     );
 
-    const store = configureStore({ initialState: { users: {} } });
+    const { store } = testStore();
     store.run(api.bootup);
     store.dispatch(action1());
     expect(acc).toEqual(["wow"]);
@@ -513,7 +513,7 @@ it(
       },
     );
 
-    const store = configureStore({ initialState: { users: {} } });
+    const { store } = testStore();
     store.run(api.bootup);
 
     function _App() {

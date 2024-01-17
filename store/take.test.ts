@@ -2,6 +2,8 @@ import { describe, expect, it } from "../test.ts";
 import { sleep, spawn } from "../deps.ts";
 import type { AnyAction } from "../types.ts";
 
+import { slice } from "./slice/mod.ts";
+import { createSchema } from "./schema.ts";
 import { put, take } from "./mod.ts";
 import { configureStore } from "./store.ts";
 
@@ -26,7 +28,11 @@ it(
       actual.push(yield* take("action-1"));
     }
 
-    const store = configureStore({ initialState: {} });
+    const schema = createSchema({
+      cache: slice.table(),
+      loaders: slice.loader(),
+    });
+    const store = configureStore({ schema });
     await store.run(root);
 
     expect(actual).toEqual([
@@ -86,7 +92,11 @@ it(takeTests, "take from default channel", async () => {
     }
   }
 
-  const store = configureStore({ initialState: {} });
+  const schema = createSchema({
+    cache: slice.table(),
+    loaders: slice.loader(),
+  });
+  const store = configureStore({ schema });
   await store.run(genFn);
 
   const expected = [

@@ -36,8 +36,24 @@ export type Output<O extends { [key: string]: BaseSchema<unknown> }> = {
   [key in keyof O]: O[key]["initialState"];
 };
 
+export interface FxSchemaMap {
+  loaders: <M extends AnyState>(s: string) => LoaderOutput<M, AnyState>;
+  cache: (s: string) => TableOutput<any, AnyState>;
+  [key: string]: (name: string) => BaseSchema<unknown>;
+}
+
+export interface FxSchema<
+  S extends AnyState,
+  O extends FxSchemaMap = FxSchemaMap,
+> {
+  db: { [key in keyof O]: ReturnType<O[key]> };
+  initialState: S;
+  update: FxStore<S>["update"];
+}
+
 export interface FxStore<S extends AnyState> {
   getScope: () => Scope;
+  getSchema: () => FxSchema<S>;
   getState: () => S;
   subscribe: (fn: Listener) => () => void;
   update: (u: StoreUpdater<S> | StoreUpdater<S>[]) => Operation<UpdaterCtx<S>>;

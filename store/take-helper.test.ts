@@ -2,12 +2,23 @@ import { describe, expect, it } from "../test.ts";
 import { sleep } from "../deps.ts";
 import type { AnyAction } from "../types.ts";
 
-import { configureStore } from "./mod.ts";
 import { take, takeEvery, takeLatest, takeLeading } from "./fx.ts";
+import { createSchema } from "./schema.ts";
+import { createStore } from "./store.ts";
+import { slice } from "./slice/mod.ts";
 
 const testEvery = describe("takeEvery()");
 const testLatest = describe("takeLatest()");
 const testLeading = describe("takeLeading()");
+
+function testStore() {
+  const schema = createSchema({
+    cache: slice.table(),
+    loaders: slice.loader(),
+  });
+  const store = createStore({ schema });
+  return store;
+}
 
 it(testLatest, "should cancel previous tasks and only use latest", async () => {
   const actual: string[] = [];
@@ -23,7 +34,8 @@ it(testLatest, "should cancel previous tasks and only use latest", async () => {
     yield* take("CANCEL_WATCHER");
     yield* task.halt();
   }
-  const store = configureStore({ initialState: {} });
+
+  const store = testStore();
   const task = store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
@@ -50,7 +62,7 @@ it(testLeading, "should keep first action and discard the rest", async () => {
     yield* sleep(150);
     yield* task.halt();
   }
-  const store = configureStore({ initialState: {} });
+  const store = testStore();
   const task = store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
@@ -81,7 +93,7 @@ it(testEvery, "should receive all actions", async () => {
     actual.push([arg1, arg2, action.payload]);
   }
 
-  const store = configureStore({ initialState: {} });
+  const store = testStore();
   const task = store.run(root);
 
   for (let i = 1; i <= loop / 2; i += 1) {

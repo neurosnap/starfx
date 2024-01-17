@@ -17,6 +17,7 @@ import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { ActionContext, StoreContext, StoreUpdateContext } from "./context.ts";
 import { emit } from "./fx.ts";
 import { log } from "../log.ts";
+import type { FxSchema } from "./types.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
 
@@ -33,13 +34,13 @@ function observable() {
 }
 
 export interface CreateStore<S extends AnyState> {
+  schema: FxSchema<S>;
   scope?: Scope;
-  initialState: S;
   middleware?: BaseMiddleware<UpdaterCtx<S>>[];
 }
 
 export function createStore<S extends AnyState>({
-  initialState,
+  schema,
   scope: initScope,
   middleware = [],
 }: CreateStore<S>): FxStore<S> {
@@ -51,7 +52,7 @@ export function createStore<S extends AnyState>({
     scope = tuple[0];
   }
 
-  let state = initialState;
+  let state = schema.initialState;
   const listeners = new Set<Listener>();
   enablePatches();
 
@@ -64,6 +65,10 @@ export function createStore<S extends AnyState>({
 
   function getState() {
     return state;
+  }
+
+  function getSchema() {
+    return schema;
   }
 
   function subscribe(fn: Listener) {
@@ -156,7 +161,7 @@ export function createStore<S extends AnyState>({
   }
 
   function getInitialState() {
-    return initialState;
+    return schema.initialState;
   }
 
   function* reset(ignoreList: (keyof S)[] = []) {
@@ -164,7 +169,7 @@ export function createStore<S extends AnyState>({
       const keep = ignoreList.reduce<S>((acc, key) => {
         acc[key] = s[key];
         return acc;
-      }, { ...initialState });
+      }, { ...schema.initialState });
 
       Object.keys(s).forEach((key: keyof S) => {
         s[key] = keep[key];
@@ -174,6 +179,7 @@ export function createStore<S extends AnyState>({
 
   return {
     getScope,
+    getSchema,
     getState,
     subscribe,
     update,
