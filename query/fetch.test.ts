@@ -25,7 +25,7 @@ const testStore = () => {
     loaders: slice.loader(),
     cache: slice.table({ empty: {} }),
   });
-  const store = configureStore(schema);
+  const store = configureStore({ schema });
   return { schema, store };
 };
 

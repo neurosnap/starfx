@@ -13,7 +13,7 @@ it(batch, "should batch notify subscribers based on mdw", async () => {
     loaders: slice.loader(),
   });
   const store = configureStore({
-    initialState: schema.initialState,
+    schema,
     middleware: [createBatchMdw(queueMicrotask)],
   });
   let counter = 0;

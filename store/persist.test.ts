@@ -38,7 +38,7 @@ it(tests, "can persist to storage adapters", async () => {
   const persistor = createPersistor<State>({ adapter, allowlist: ["token"] });
   const mdw = persistStoreMdw(persistor);
   const store = configureStore({
-    initialState: schema.initialState,
+    schema,
     middleware: [mdw],
   });
 
@@ -87,7 +87,7 @@ it(tests, "rehydrates state", async () => {
   const persistor = createPersistor<State>({ adapter, allowlist: ["token"] });
   const mdw = persistStoreMdw(persistor);
   const store = configureStore({
-    initialState: schema.initialState,
+    schema,
     middleware: [mdw],
   });
 

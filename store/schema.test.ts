@@ -29,7 +29,7 @@ it(tests, "general types and functionality", async () => {
     loaders: slice.loader(),
   });
   const db = schema.db;
-  const store = configureStore(schema);
+  const store = configureStore({ schema });
 
   asserts.assertEquals(store.getState(), {
     users: { "1": { id: "1", name: "wow" } },
@@ -80,7 +80,7 @@ it(tests, "can work with a nested object", async () => {
     loaders: slice.loader(),
   });
   const db = schema.db;
-  const store = configureStore(schema);
+  const store = configureStore({ schema });
   await store.run(function* () {
     yield* schema.update(db.currentUser.update({ key: "name", value: "vvv" }));
     const curUser = yield* select(db.currentUser.select);

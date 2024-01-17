@@ -3,8 +3,19 @@ import { each, sleep, spawn } from "../deps.ts";
 
 import { ActionContext, put, take } from "./mod.ts";
 import { configureStore } from "./store.ts";
+import { createSchema } from "./schema.ts";
+import { slice } from "./slice/mod.ts";
 
 const putTests = describe("put()");
+
+function testStore() {
+  const schema = createSchema({
+    loaders: slice.loader(),
+    cache: slice.table(),
+  });
+  const store = configureStore({ schema });
+  return store;
+}
 
 it(putTests, "should send actions through channel", async () => {
   const actual: string[] = [];
@@ -28,7 +39,7 @@ it(putTests, "should send actions through channel", async () => {
     yield* task;
   }
 
-  const store = configureStore({ initialState: {} });
+  const store = testStore();
   await store.run(() => genFn("arg"));
 
   const expected = ["arg", "2"];
@@ -58,7 +69,7 @@ it(putTests, "should handle nested puts", async () => {
     yield* spawn(genA);
   }
 
-  const store = configureStore({ initialState: {} });
+  const store = testStore();
   await store.run(() => root());
 
   const expected = ["put b", "put a"];
@@ -76,7 +87,7 @@ it(
       yield* sleep(0);
     }
 
-    const store = configureStore({ initialState: {} });
+    const store = testStore();
     await store.run(() => root());
     expect(true).toBe(true);
   },
@@ -104,7 +115,7 @@ it(
       yield* tsk;
     }
 
-    const store = configureStore({ initialState: {} });
+    const store = testStore();
     await store.run(() => root());
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);

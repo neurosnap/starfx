@@ -35,7 +35,7 @@ const testStore = () => {
     loaders: slice.loader(),
     cache: slice.table({ empty: {} }),
   });
-  const store = configureStore(schema);
+  const store = configureStore({ schema });
   return { schema, store };
 };
 
@@ -531,12 +531,7 @@ it(tests, "errorHandler", () => {
     },
   );
 
-  const store = configureStore({
-    initialState: {
-      ...createQueryState(),
-      users: {},
-    },
-  });
+  const { store } = testStore();
   store.run(query.bootup);
   store.dispatch(fetchUsers());
   expect(store.getState()).toEqual({
@@ -570,11 +565,7 @@ it(tests, "stub predicate", async () => {
     }),
   ]);
 
-  const store = configureStore({
-    initialState: {
-      ...createQueryState(),
-    },
-  });
+  const { store } = testStore();
   store.run(api.bootup);
   store.dispatch(fetchUsers());
   await sleep(150);
