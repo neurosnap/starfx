@@ -1,5 +1,4 @@
 import {
-  Action,
   call,
   each,
   Operation,
@@ -16,6 +15,7 @@ import { ActionContext, StoreContext } from "./context.ts";
 import { createFilterQueue } from "../queue.ts";
 import { LoaderOutput } from "./slice/loader.ts";
 import { safe } from "../fx/mod.ts";
+import { Action } from "../query/types.ts";
 
 export function* updateStore<S extends AnyState>(
   updater: StoreUpdater<S> | StoreUpdater<S>[],
