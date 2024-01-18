@@ -1,8 +1,8 @@
-import { race } from "../fx/mod.ts";
-import { take } from "../action.ts";
-import { call, Callable, Operation, sleep, spawn, Task } from "../deps.ts";
-import type { ActionWithPayload, AnyAction } from "../types.ts";
-import type { CreateActionPayload } from "../query/mod.ts";
+import { race } from "./fx/mod.ts";
+import { take } from "./action.ts";
+import { call, Callable, Operation, sleep, spawn, Task } from "./deps.ts";
+import type { ActionWithPayload, AnyAction } from "./types.ts";
+import type { CreateActionPayload } from "./query/mod.ts";
 
 const MS = 1000;
 const SECONDS = 1 * MS;
