@@ -1,9 +1,7 @@
 import { describe, expect, it } from "../test.ts";
-import { sleep, spawn } from "../deps.ts";
-import type { AnyAction } from "../types.ts";
-
-import { put, take } from "./mod.ts";
-import { createTestStore } from "./util.ts";
+import type { AnyAction } from "../mod.ts";
+import { put, sleep, spawn, take } from "../mod.ts";
+import { configureStore } from "../store/mod.ts";
 
 const takeTests = describe("take()");
 
@@ -26,8 +24,8 @@ it(
       actual.push(yield* take("action-1"));
     }
 
-    const { fx } = createTestStore();
-    await fx.run(root);
+    const store = configureStore({ initialState: {} });
+    await store.run(root);
 
     expect(actual).toEqual([
       { type: "action-1", payload: 1 },
@@ -86,8 +84,8 @@ it(takeTests, "take from default channel", async () => {
     }
   }
 
-  const { fx } = createTestStore();
-  await fx.run(genFn);
+  const store = configureStore({ initialState: {} });
+  await store.run(genFn);
 
   const expected = [
     {

@@ -1,28 +1,17 @@
-import { AnyState } from "../types.ts";
 import { updateStore } from "./fx.ts";
-import { LoaderOutput } from "./slice/loader.ts";
-import { TableOutput } from "./slice/table.ts";
-import { BaseSchema, FxStore, StoreUpdater } from "./types.ts";
+import { FxMap, FxSchema, StoreUpdater } from "./types.ts";
 
 export function createSchema<
-  O extends {
-    loaders: <M extends AnyState>(s: string) => LoaderOutput<M, AnyState>;
-    cache: (s: string) => TableOutput<any, AnyState>;
-    [key: string]: (name: string) => BaseSchema<unknown>;
-  },
+  O extends FxMap,
   S extends { [key in keyof O]: ReturnType<O[key]>["initialState"] },
 >(
   slices: O,
-): {
-  db: { [key in keyof O]: ReturnType<O[key]> };
-  initialState: S;
-  update: FxStore<S>["update"];
-} {
-  const db = Object.keys(slices).reduce((acc, key) => {
+): [FxSchema<S, O>, S] {
+  const db = Object.keys(slices).reduce<FxSchema<S, O>>((acc, key) => {
     // deno-lint-ignore no-explicit-any
     (acc as any)[key] = slices[key](key);
     return acc;
-  }, {} as { [key in keyof O]: ReturnType<O[key]> });
+  }, {} as FxSchema<S, O>);
 
   const initialState = Object.keys(db).reduce((acc, key) => {
     // deno-lint-ignore no-explicit-any
@@ -38,5 +27,7 @@ export function createSchema<
     return yield* updateStore(ups);
   }
 
-  return { db, initialState, update };
+  db.update = update;
+
+  return [db, initialState];
 }

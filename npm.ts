@@ -25,10 +25,6 @@ async function init() {
         name: "./store",
         path: "./store/mod.ts",
       },
-      {
-        name: "./redux",
-        path: "./redux/mod.ts",
-      },
     ],
     mappings: {
       "https://deno.land/x/effection@3.0.0-beta.3/mod.ts": {
@@ -51,18 +47,6 @@ async function init() {
       "https://esm.sh/reselect@4.1.8?pin=v122": {
         name: "reselect",
         version: "^4.1.8",
-      },
-      "https://esm.sh/robodux@15.0.2?pin=v122": {
-        name: "robodux",
-        version: "^15.0.2",
-      },
-      "https://esm.sh/redux@4.2.1?pin=v122": {
-        name: "redux",
-        version: "^4.2.1",
-      },
-      "https://esm.sh/redux-batched-actions@0.5.0?pin=v122": {
-        name: "redux-batched-actions",
-        version: "^0.5.0",
       },
     },
     outDir: "./npm",

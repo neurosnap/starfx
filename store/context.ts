@@ -1,15 +1,10 @@
-import { Channel, createChannel, createContext, Signal } from "../deps.ts";
-import type { AnyAction, AnyState } from "../types.ts";
-
+import { Channel, createChannel, createContext } from "../deps.ts";
+import type { AnyState } from "../types.ts";
 import type { FxStore } from "./types.ts";
 
-export const ActionContext = createContext<Signal<AnyAction, void>>(
-  "store:action",
-);
-
 export const StoreUpdateContext = createContext<Channel<void, void>>(
-  "store:update",
+  "starfx:store:update",
   createChannel<void, void>(),
 );
 
-export const StoreContext = createContext<FxStore<AnyState>>("store");
+export const StoreContext = createContext<FxStore<AnyState>>("starfx:store");

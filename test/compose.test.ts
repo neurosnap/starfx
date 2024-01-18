@@ -1,8 +1,5 @@
-import { asserts, describe, expect, it } from "./test.ts";
-
-import { Err, Ok, Result, run, sleep } from "./deps.ts";
-import { compose } from "./compose.ts";
-import { safe } from "./mod.ts";
+import { asserts, describe, expect, it } from "../test.ts";
+import { compose, Err, Ok, Result, run, safe, sleep } from "../mod.ts";
 
 const tests = describe("compose()");
 

@@ -1,8 +1,5 @@
 import { asserts, describe, it } from "../test.ts";
-import { select } from "./fx.ts";
-import { configureStore } from "./store.ts";
-import { slice } from "./slice/mod.ts";
-import { createSchema } from "./schema.ts";
+import { configureStore, createSchema, select, slice } from "../store/mod.ts";
 
 const tests = describe("createSchema()");
 
@@ -16,7 +13,7 @@ interface UserWithRoles extends User {
 
 const emptyUser = { id: "", name: "" };
 it(tests, "general types and functionality", async () => {
-  const schema = createSchema({
+  const [db, initialState] = createSchema({
     users: slice.table<User>({
       initialState: { "1": { id: "1", name: "wow" } },
       empty: emptyUser,
@@ -28,8 +25,7 @@ it(tests, "general types and functionality", async () => {
     cache: slice.table({ empty: {} }),
     loaders: slice.loader(),
   });
-  const db = schema.db;
-  const store = configureStore(schema);
+  const store = configureStore({ initialState });
 
   asserts.assertEquals(store.getState(), {
     users: { "1": { id: "1", name: "wow" } },
@@ -40,11 +36,11 @@ it(tests, "general types and functionality", async () => {
     cache: {},
     loaders: {},
   });
-  const userMap = schema.db.users.selectTable(store.getState());
+  const userMap = db.users.selectTable(store.getState());
   asserts.assertEquals(userMap, { "1": { id: "1", name: "wow" } });
 
   await store.run(function* () {
-    yield* schema.update([
+    yield* db.update([
       db.users.add({ "2": { id: "2", name: "bob" } }),
       db.users.patch({ "1": { name: "zzz" } }),
     ]);
@@ -55,15 +51,15 @@ it(tests, "general types and functionality", async () => {
       "2": { id: "2", name: "bob" },
     });
 
-    yield* schema.update(db.counter.increment());
+    yield* db.update(db.counter.increment());
     const counter = yield* select(db.counter.select);
     asserts.assertEquals(counter, 1);
 
-    yield* schema.update(db.currentUser.update({ key: "name", value: "vvv" }));
+    yield* db.update(db.currentUser.update({ key: "name", value: "vvv" }));
     const curUser = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser, { id: "", name: "vvv" });
 
-    yield* schema.update(db.loaders.start({ id: "fetch-users" }));
+    yield* db.update(db.loaders.start({ id: "fetch-users" }));
     const fetchLoader = yield* select(db.loaders.selectById, {
       id: "fetch-users",
     });
@@ -74,25 +70,24 @@ it(tests, "general types and functionality", async () => {
 });
 
 it(tests, "can work with a nested object", async () => {
-  const schema = createSchema({
+  const [db, initialState] = createSchema({
     currentUser: slice.obj<UserWithRoles>({ id: "", name: "", roles: [] }),
     cache: slice.table({ empty: {} }),
     loaders: slice.loader(),
   });
-  const db = schema.db;
-  const store = configureStore(schema);
+  const store = configureStore({ initialState });
   await store.run(function* () {
-    yield* schema.update(db.currentUser.update({ key: "name", value: "vvv" }));
+    yield* db.update(db.currentUser.update({ key: "name", value: "vvv" }));
     const curUser = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser, { id: "", name: "vvv", roles: [] });
 
-    yield* schema.update(
+    yield* db.update(
       db.currentUser.update({ key: "roles", value: ["admin"] }),
     );
     const curUser2 = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser2, { id: "", name: "vvv", roles: ["admin"] });
 
-    yield* schema.update(
+    yield* db.update(
       db.currentUser.update({ key: "roles", value: ["admin", "users"] }),
     );
     const curUser3 = yield* select(db.currentUser.select);

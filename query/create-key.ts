@@ -20,7 +20,8 @@ function padStart(hash: string, len: number) {
   }
   return hash;
 }
-//credit to Ivan Perelivskiy: https://gist.github.com/iperelivskiy/4110988
+
+// https://gist.github.com/iperelivskiy/4110988
 const tinySimpleHash = (s: string) => {
   let h = 9;
   for (let i = 0; i < s.length;) {

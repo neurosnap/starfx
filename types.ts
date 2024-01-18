@@ -5,11 +5,6 @@ export interface Computation<T = unknown> {
   [Symbol.iterator](): Iterator<Instruction, T, any>;
 }
 
-export interface QueryState {
-  "@@starfx/loaders": Record<string, LoaderItemState>;
-  "@@starfx/data": Record<string, unknown>;
-}
-
 export type IdProp = string | number;
 export type LoadingStatus = "loading" | "success" | "error" | "idle";
 export interface LoaderItemState<
@@ -51,7 +46,10 @@ export interface AnyAction {
   [key: string]: any;
 }
 
-export interface ActionWPayload<P> {
+export interface Action {
   type: string;
+}
+
+export interface ActionWithPayload<P> extends Action {
   payload: P;
 }

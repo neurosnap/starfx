@@ -1,8 +1,6 @@
 import { describe, expect, it } from "../test.ts";
-import { each, sleep, spawn } from "../deps.ts";
-
-import { ActionContext, put, take } from "./mod.ts";
-import { createTestStore } from "./util.ts";
+import { ActionContext, each, put, sleep, spawn, take } from "../mod.ts";
+import { configureStore } from "../store/mod.ts";
 
 const putTests = describe("put()");
 
@@ -10,8 +8,8 @@ it(putTests, "should send actions through channel", async () => {
   const actual: string[] = [];
 
   function* genFn(arg: string) {
-    yield* spawn(function* () {
-      const actions = yield* ActionContext;
+    const actions = yield* ActionContext;
+    const task = yield* spawn(function* () {
       for (const action of yield* each(actions)) {
         actual.push(action.type);
         yield* each.next();
@@ -24,10 +22,12 @@ it(putTests, "should send actions through channel", async () => {
     yield* put({
       type: "2",
     });
+    actions.close();
+    yield* task;
   }
 
-  const { fx } = createTestStore();
-  await fx.run(() => genFn("arg"));
+  const store = configureStore({ initialState: {} });
+  await store.run(() => genFn("arg"));
 
   const expected = ["arg", "2"];
   expect(actual).toEqual(expected);
@@ -56,8 +56,8 @@ it(putTests, "should handle nested puts", async () => {
     yield* spawn(genA);
   }
 
-  const { fx } = createTestStore();
-  await fx.run(root);
+  const store = configureStore({ initialState: {} });
+  await store.run(() => root());
 
   const expected = ["put b", "put a"];
   expect(actual).toEqual(expected);
@@ -68,14 +68,14 @@ it(
   "should not cause stack overflow when puts are emitted while dispatching saga",
   async () => {
     function* root() {
-      for (let i = 0; i < 5_000; i += 1) {
+      for (let i = 0; i < 40_000; i += 1) {
         yield* put({ type: "test" });
       }
       yield* sleep(0);
     }
 
-    const { fx } = createTestStore();
-    await fx.run(root);
+    const store = configureStore({ initialState: {} });
+    await store.run(() => root());
     expect(true).toBe(true);
   },
 );
@@ -102,8 +102,8 @@ it(
       yield* tsk;
     }
 
-    const { fx } = createTestStore();
-    await fx.run(root);
+    const store = configureStore({ initialState: {} });
+    await store.run(() => root());
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
   },

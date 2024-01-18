@@ -1,12 +1,7 @@
-import { assertLike, asserts, describe, it } from "../test.ts";
-import { configureStore, put, takeEvery } from "../store/mod.ts";
-import { call, sleep as delay } from "../deps.ts";
-import type { QueryState } from "../types.ts";
-import { createQueryState } from "../action.ts";
-import { sleep } from "../test.ts";
-import { createThunks } from "./thunk.ts";
-import type { Next, ThunkCtx } from "./types.ts";
-import { updateStore } from "../store/fx.ts";
+import { assertLike, asserts, describe, it, sleep } from "../test.ts";
+import { configureStore, updateStore } from "../store/mod.ts";
+import { call, createThunks, put, sleep as delay, takeEvery } from "../mod.ts";
+import type { Next, ThunkCtx } from "../mod.ts";
 
 // deno-lint-ignore no-explicit-any
 interface RoboCtx<D = Record<string, unknown>, P = any> extends ThunkCtx<P> {
@@ -52,7 +47,7 @@ const deserializeTicket = (u: TicketResponse): Ticket => {
   };
 };
 
-interface TestState extends QueryState {
+interface TestState {
   users: { [key: string]: User };
   tickets: { [key: string]: Ticket };
 }
@@ -134,14 +129,13 @@ it(
     const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
 
     const store = configureStore<TestState>({
-      initialState: { ...createQueryState(), users: {}, tickets: {} },
+      initialState: { users: {}, tickets: {} },
     });
     store.run(api.bootup);
 
     store.dispatch(fetchUsers());
 
     asserts.assertEquals(store.getState(), {
-      ...createQueryState(),
       users: { [mockUser.id]: deserializeUser(mockUser) },
       tickets: {},
     });
@@ -172,13 +166,12 @@ it(
     });
 
     const store = configureStore<TestState>({
-      initialState: { ...createQueryState(), users: {}, tickets: {} },
+      initialState: { users: {}, tickets: {} },
     });
     store.run(api.bootup);
 
     store.dispatch(fetchTickets());
     asserts.assertEquals(store.getState(), {
-      ...createQueryState(),
       users: { [mockUser.id]: deserializeUser(mockUser) },
       tickets: { [mockTicket.id]: deserializeTicket(mockTicket) },
     });
@@ -256,7 +249,6 @@ it(tests, "error inside endpoint mdw", () => {
 
   const store = configureStore({
     initialState: {
-      ...createQueryState(),
       users: {},
     },
   });

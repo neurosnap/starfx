@@ -1,8 +1,8 @@
 import type { ApiCtx, Next, ThunkCtx } from "../query/mod.ts";
 import { compose } from "../compose.ts";
 import type { AnyAction, AnyState } from "../types.ts";
-
-import { put, select, updateStore } from "./fx.ts";
+import { put } from "../action.ts";
+import { select, updateStore } from "./fx.ts";
 import { LoaderOutput } from "./slice/loader.ts";
 import { TableOutput } from "./slice/table.ts";
 

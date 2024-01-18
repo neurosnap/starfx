@@ -1,8 +1,6 @@
 import { describe, expect, it } from "../test.ts";
-import type { Operation, Result } from "../deps.ts";
-import { each, Err, Ok, run, sleep, spawn } from "../deps.ts";
-
-import { parallel } from "./parallel.ts";
+import type { Operation, Result } from "../mod.ts";
+import { each, Err, Ok, parallel, run, sleep, spawn } from "../mod.ts";
 
 const test = describe("parallel()");
 

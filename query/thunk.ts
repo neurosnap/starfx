@@ -1,12 +1,10 @@
 import { compose } from "../compose.ts";
-import type { Payload } from "../types.ts";
+import type { ActionWithPayload, Payload } from "../types.ts";
 import { keepAlive } from "../mod.ts";
-// TODO: remove store deps
-import { takeEvery } from "../redux/mod.ts";
+import { takeEvery } from "../action.ts";
 import { isFn, isObject } from "./util.ts";
 import { createKey } from "./create-key.ts";
 import type {
-  ActionWithPayload,
   CreateAction,
   CreateActionPayload,
   CreateActionWithPayload,
