@@ -1,5 +1,5 @@
-import type { Next } from "./query/mod.ts";
 import { Instruction, Operation } from "./deps.ts";
+import type { Next } from "./types.ts";
 
 export interface BaseCtx {
   // deno-lint-ignore no-explicit-any

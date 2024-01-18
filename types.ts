@@ -1,9 +1,11 @@
-import type { Instruction } from "./deps.ts";
+import type { Instruction, Operation } from "./deps.ts";
 
 export interface Computation<T = unknown> {
   // deno-lint-ignore no-explicit-any
   [Symbol.iterator](): Iterator<Instruction, T, any>;
 }
+
+export type Next = () => Operation<void>;
 
 export type IdProp = string | number;
 export type LoadingStatus = "loading" | "success" | "error" | "idle";

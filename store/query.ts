@@ -1,6 +1,6 @@
-import type { ApiCtx, Next, ThunkCtx } from "../query/mod.ts";
+import type { ApiCtx, ThunkCtx } from "../query/mod.ts";
 import { compose } from "../compose.ts";
-import type { AnyAction, AnyState } from "../types.ts";
+import type { AnyAction, AnyState, Next } from "../types.ts";
 import { put } from "../action.ts";
 import { select, updateStore } from "./fx.ts";
 import { LoaderOutput } from "./slice/loader.ts";
