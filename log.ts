@@ -1,10 +1,10 @@
 import { createChannel, createContext } from "./deps.ts";
-import type { ActionWPayload } from "./types.ts";
+import type { ActionWithPayload } from "./types.ts";
 
 export interface LogMessage {
   [key: string]: any;
 }
-export type LogAction = ActionWPayload<LogMessage>;
+export type LogAction = ActionWithPayload<LogMessage>;
 
 export function createLogger(type: string) {
   return function (payload: LogMessage) {

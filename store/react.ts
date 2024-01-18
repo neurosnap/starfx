@@ -1,6 +1,6 @@
 import { PERSIST_LOADER_ID } from "./persist.ts";
 import type { LoaderOutput } from "./slice/mod.ts";
-import type { AnyState, LoaderState, QueryState } from "../types.ts";
+import type { AnyState, LoaderState } from "../types.ts";
 import {
   Provider as ReduxProvider,
   React,
@@ -84,7 +84,7 @@ export function useSchema<S extends AnyState>() {
  * }
  * ```
  */
-export function useLoader<S extends QueryState = QueryState>(
+export function useLoader<S extends AnyState>(
   action: ThunkAction | ActionFn,
 ) {
   const schema = useSchema();

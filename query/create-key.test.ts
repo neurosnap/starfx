@@ -1,6 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-
-import type { ActionWithPayload } from "./types.ts";
+import type { ActionWithPayload } from "../types.ts";
 import { createApi } from "./api.ts";
 
 const getKeyOf = (action: ActionWithPayload<{ key: string }>): string =>

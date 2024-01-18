@@ -1,7 +1,7 @@
 import { race } from "../fx/mod.ts";
 import { take } from "../action.ts";
 import { call, Callable, Operation, sleep, spawn, Task } from "../deps.ts";
-import type { ActionWPayload, AnyAction } from "../types.ts";
+import type { ActionWithPayload, AnyAction } from "../types.ts";
 import type { CreateActionPayload } from "../query/mod.ts";
 
 const MS = 1000;
@@ -48,7 +48,7 @@ export function timer(timer: number = 5 * MINUTES) {
   ) {
     const map: { [key: string]: Task<unknown> } = {};
 
-    function* activate(action: ActionWPayload<CreateActionPayload>) {
+    function* activate(action: ActionWithPayload<CreateActionPayload>) {
       yield* call(() => op(action));
       yield* sleep(timer);
       delete map[action.payload.key];

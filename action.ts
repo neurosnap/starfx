@@ -9,9 +9,8 @@ import {
   Stream,
 } from "./deps.ts";
 import { ActionPattern, matcher } from "./matcher.ts";
-import type { ActionWPayload, AnyAction } from "./types.ts";
+import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";
-import { Action } from "./query/types.ts";
 
 export const ActionContext = createContext<Signal<AnyAction, void>>(
   "store:action",
@@ -53,7 +52,9 @@ export function* put(action: AnyAction | AnyAction[]) {
   });
 }
 
-export function take<P>(pattern: ActionPattern): Operation<ActionWPayload<P>>;
+export function take<P>(
+  pattern: ActionPattern,
+): Operation<ActionWithPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
   const fd = useActions(pattern);
   for (const action of yield* each(fd)) {

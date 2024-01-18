@@ -1,5 +1,11 @@
 import type { Operation, Result } from "../deps.ts";
-import type { LoaderItemState, LoaderPayload, Payload } from "../types.ts";
+import type {
+  Action,
+  ActionWithPayload,
+  LoaderItemState,
+  LoaderPayload,
+  Payload,
+} from "../types.ts";
 
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 
@@ -92,14 +98,6 @@ export type MiddlewareApiCo<Ctx extends ApiCtx = ApiCtx> =
   | Middleware<Ctx>[];
 
 export type Next = () => Operation<void>;
-
-export interface Action {
-  type: string;
-}
-
-export interface ActionWithPayload<P> extends Action {
-  payload: P;
-}
 
 export interface CreateActionPayload<P = any, ApiSuccess = any> {
   name: string;
