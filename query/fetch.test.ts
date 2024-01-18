@@ -1,10 +1,5 @@
 import { describe, expect, install, it, mock } from "../test.ts";
-import {
-  configureStore,
-  createSchema,
-  slice,
-  storeMdw,
-} from "../store/mod.ts";
+import { configureStore, createSchema, slice, storeMdw } from "../store/mod.ts";
 import { takeEvery } from "../action.ts";
 import * as fetchMdw from "./fetch.ts";
 import { createApi } from "./api.ts";
