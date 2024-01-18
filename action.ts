@@ -13,7 +13,7 @@ import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";
 
 export const ActionContext = createContext<Signal<AnyAction, void>>(
-  "store:action",
+  "starfx:action",
 );
 
 export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
