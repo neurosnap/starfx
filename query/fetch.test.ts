@@ -4,8 +4,8 @@ import {
   createSchema,
   slice,
   storeMdw,
-  takeEvery,
 } from "../store/mod.ts";
+import { takeEvery } from "../action.ts";
 import * as fetchMdw from "./fetch.ts";
 import { createApi } from "./api.ts";
 import * as mdw from "./mdw.ts";

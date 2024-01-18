@@ -1,7 +1,6 @@
 import { describe, expect, it } from "../test.ts";
 import { each, sleep, spawn } from "../deps.ts";
-
-import { ActionContext, put, take } from "./mod.ts";
+import { ActionContext, put, take } from "../action.ts";
 import { configureStore } from "./store.ts";
 
 const putTests = describe("put()");

@@ -1,7 +1,7 @@
 import { Ok, Operation } from "../deps.ts";
 import { parallel } from "../fx/mod.ts";
 import { asserts, describe, it } from "../test.ts";
-import { put, take } from "./fx.ts";
+import { put, take } from "../action.ts";
 import { configureStore } from "./store.ts";
 import {
   createPersistor,

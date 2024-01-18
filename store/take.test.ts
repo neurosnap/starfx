@@ -1,8 +1,7 @@
 import { describe, expect, it } from "../test.ts";
 import { sleep, spawn } from "../deps.ts";
 import type { AnyAction } from "../types.ts";
-
-import { put, take } from "./mod.ts";
+import { put, take } from "../action.ts";
 import { configureStore } from "./store.ts";
 
 const takeTests = describe("take()");

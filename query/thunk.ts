@@ -1,7 +1,7 @@
 import { compose } from "../compose.ts";
 import type { Payload } from "../types.ts";
 import { keepAlive } from "../mod.ts";
-import { takeEvery } from "../store/mod.ts";
+import { takeEvery } from "../action.ts";
 import { isFn, isObject } from "./util.ts";
 import { createKey } from "./create-key.ts";
 import type {

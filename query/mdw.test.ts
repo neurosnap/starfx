@@ -1,15 +1,13 @@
 import { assertLike, asserts, describe, expect, it } from "../test.ts";
 import { createApi, createKey, mdw } from "../query/mod.ts";
 import type { ApiCtx, Next, ThunkCtx } from "../query/mod.ts";
-import { createQueryState } from "../action.ts";
+import { takeEvery, takeLatest } from "../action.ts";
 import { sleep } from "../test.ts";
 import {
   configureStore,
   createSchema,
   slice,
   storeMdw,
-  takeEvery,
-  takeLatest,
   updateStore,
 } from "../store/mod.ts";
 import { safe } from "../mod.ts";
@@ -533,14 +531,12 @@ it(tests, "errorHandler", () => {
 
   const store = configureStore({
     initialState: {
-      ...createQueryState(),
       users: {},
     },
   });
   store.run(query.bootup);
   store.dispatch(fetchUsers());
   expect(store.getState()).toEqual({
-    ...createQueryState(),
     users: {},
   });
   expect(a).toEqual(2);
@@ -571,9 +567,7 @@ it(tests, "stub predicate", async () => {
   ]);
 
   const store = configureStore({
-    initialState: {
-      ...createQueryState(),
-    },
+    initialState: {},
   });
   store.run(api.bootup);
   store.dispatch(fetchUsers());

@@ -14,9 +14,9 @@ import type { AnyAction, AnyState } from "../types.ts";
 import { safe } from "../fx/mod.ts";
 import { Next } from "../query/types.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
-import { ActionContext, StoreContext, StoreUpdateContext } from "./context.ts";
-import { emit } from "./fx.ts";
+import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { log } from "../log.ts";
+import { ActionContext, emit } from "../action.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
 

@@ -5,9 +5,9 @@ import {
   createSchema,
   slice,
   storeMdw,
-  takeEvery,
   updateStore,
 } from "../store/mod.ts";
+import { takeEvery } from "../action.ts";
 import { sleep } from "../test.ts";
 import { safe } from "../mod.ts";
 import * as mdw from "./mdw.ts";
