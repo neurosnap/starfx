@@ -27,12 +27,12 @@ const emptyUser: User = { id: "", name: "", email: "" };
 const mockUser: User = { id: "1", name: "test", email: "test@test.com" };
 
 const testStore = () => {
-  const schema = createSchema({
+  const [schema, initialState] = createSchema({
     users: slice.table<User>({ empty: emptyUser }),
     loaders: slice.loader(),
     cache: slice.table({ empty: {} }),
   });
-  const store = configureStore(schema);
+  const store = configureStore({ initialState });
   return { schema, store };
 };
 
@@ -240,7 +240,7 @@ it(tests, "createApi with hash key on a large post", async () => {
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.api());
-  query.use(storeMdw.store(schema.db));
+  query.use(storeMdw.store(schema));
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const data = {
@@ -309,7 +309,7 @@ it(tests, "createApi - two identical endpoints", async () => {
   const { store, schema } = testStore();
   const api = createApi();
   api.use(mdw.api());
-  api.use(storeMdw.store(schema.db));
+  api.use(storeMdw.store(schema));
   api.use(mdw.nameParser);
   api.use(api.routes());
 
@@ -463,7 +463,7 @@ it(tests, "should bubble up error", () => {
     }
   });
   api.use(mdw.queryCtx);
-  api.use(storeMdw.store(schema.db));
+  api.use(storeMdw.store(schema));
   api.use(api.routes());
 
   const fetchUser = api.get(

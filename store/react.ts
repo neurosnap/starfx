@@ -89,7 +89,7 @@ export function useLoader<S extends QueryState = QueryState>(
 ) {
   const schema = useSchema();
   const id = typeof action === "function" ? `${action}` : action.payload.key;
-  return useSelector((s: S) => schema.db.loaders.selectById(s, { id }));
+  return useSelector((s: S) => schema.loaders.selectById(s, { id }));
 }
 
 /**
@@ -193,9 +193,7 @@ export function useCache<P = any, ApiSuccess = any>(
 ): UseCacheResult<typeof action.payload._result, ThunkAction<P, ApiSuccess>> {
   const schema = useSchema();
   const id = action.payload.key;
-  const data: any = useSelector((s: any) =>
-    schema.db.cache.selectById(s, { id })
-  );
+  const data: any = useSelector((s: any) => schema.cache.selectById(s, { id }));
   const query = useQuery(action);
   return { ...query, data: data || null };
 }
@@ -253,11 +251,11 @@ function Loading({ text }: { text: string }) {
 }
 
 export function PersistGate(
-  { loader, children, loading = React.createElement(Loading) }:
-    PersistGateProps,
+  { children, loading = React.createElement(Loading) }: PersistGateProps,
 ) {
-  const ldr = useSelector((s) =>
-    loader.selectById(s, { id: PERSIST_LOADER_ID })
+  const schema = useSchema();
+  const ldr = useSelector((s: any) =>
+    schema.loaders.selectById(s, { id: PERSIST_LOADER_ID })
   );
 
   if (ldr.status === "error") {

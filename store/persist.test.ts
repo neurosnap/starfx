@@ -15,13 +15,12 @@ import { slice } from "./slice/mod.ts";
 const tests = describe("store");
 
 it(tests, "can persist to storage adapters", async () => {
-  const schema = createSchema({
+  const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loader(),
     cache: slice.table({ empty: {} }),
   });
-  const db = schema.db;
-  type State = typeof schema.initialState;
+  type State = typeof initialState;
   let ls = "{}";
   const adapter: PersistAdapter<State> = {
     getItem: function* (_: string) {
@@ -38,7 +37,7 @@ it(tests, "can persist to storage adapters", async () => {
   const persistor = createPersistor<State>({ adapter, allowlist: ["token"] });
   const mdw = persistStoreMdw(persistor);
   const store = configureStore({
-    initialState: schema.initialState,
+    initialState,
     middleware: [mdw],
   });
 
@@ -48,7 +47,7 @@ it(tests, "can persist to storage adapters", async () => {
     const group = yield* parallel([
       function* (): Operation<void> {
         const action = yield* take<string>("SET_TOKEN");
-        yield* schema.update(db.token.set(action.payload));
+        yield* schema.update(schema.token.set(action.payload));
       },
       function* () {
         yield* put({ type: "SET_TOKEN", payload: "1234" });
@@ -64,13 +63,12 @@ it(tests, "can persist to storage adapters", async () => {
 });
 
 it(tests, "rehydrates state", async () => {
-  const schema = createSchema({
+  const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loader(),
     cache: slice.table({ empty: {} }),
   });
-  const db = schema.db;
-  type State = typeof schema.initialState;
+  type State = typeof initialState;
   let ls = JSON.stringify({ token: "123" });
   const adapter: PersistAdapter<State> = {
     getItem: function* (_: string) {
@@ -87,13 +85,13 @@ it(tests, "rehydrates state", async () => {
   const persistor = createPersistor<State>({ adapter, allowlist: ["token"] });
   const mdw = persistStoreMdw(persistor);
   const store = configureStore({
-    initialState: schema.initialState,
+    initialState,
     middleware: [mdw],
   });
 
   await store.run(function* (): Operation<void> {
     yield* persistor.rehydrate();
-    yield* schema.update(db.loaders.success({ id: PERSIST_LOADER_ID }));
+    yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
   });
 
   asserts.assertEquals(
