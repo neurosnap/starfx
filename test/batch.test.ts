@@ -1,9 +1,11 @@
-import { createBatchMdw } from "./batch.ts";
-import { configureStore } from "./store.ts";
 import { describe, expect, it } from "../test.ts";
-import { createSchema } from "./schema.ts";
-import { slice } from "./slice/mod.ts";
-import { parallel } from "../fx/mod.ts";
+import {
+  configureStore,
+  createBatchMdw,
+  createSchema,
+  slice,
+} from "../store/mod.ts";
+import { parallel } from "../mod.ts";
 
 const batch = describe("batch mdw");
 

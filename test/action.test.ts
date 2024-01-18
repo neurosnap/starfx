@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { API_ACTION_PREFIX, createAction } from "../action.ts";
+import { API_ACTION_PREFIX, createAction } from "../mod.ts";
 
 const tests = describe("createAction()");
 

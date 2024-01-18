@@ -1,9 +1,6 @@
 import { describe, expect, install, it, mock } from "../test.ts";
 import { configureStore, createSchema, slice, storeMdw } from "../store/mod.ts";
-import { takeEvery } from "../action.ts";
-import * as fetchMdw from "./fetch.ts";
-import { createApi } from "./api.ts";
-import * as mdw from "./mdw.ts";
+import { createApi, mdw, takeEvery } from "../mod.ts";
 
 install();
 
@@ -39,7 +36,7 @@ it(
     api.use(mdw.api());
     api.use(storeMdw.store(schema));
     api.use(api.routes());
-    api.use(fetchMdw.headers);
+    api.use(mdw.headers);
     api.use(mdw.fetch({ baseUrl }));
 
     const actual: any[] = [];
@@ -245,7 +242,7 @@ it(tests, "POST", async () => {
   api.use(mdw.api());
   api.use(storeMdw.store(schema));
   api.use(api.routes());
-  api.use(fetchMdw.headers);
+  api.use(mdw.headers);
   api.use(mdw.fetch({ baseUrl }));
 
   const fetchUsers = api.post(
@@ -288,7 +285,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
   api.use(mdw.api());
   api.use(storeMdw.store(schema));
   api.use(api.routes());
-  api.use(fetchMdw.headers);
+  api.use(mdw.headers);
   api.use(mdw.fetch({ baseUrl }));
 
   const fetchUsers = api.post<{ id: string }>(

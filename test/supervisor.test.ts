@@ -1,7 +1,15 @@
 import { describe, expect, it } from "../test.ts";
-import { call, each, Operation, run, spawn } from "../deps.ts";
-import { supervise, superviseBackoff } from "./supervisor.ts";
-import { LogAction, LogContext } from "../log.ts";
+import {
+  call,
+  each,
+  LogAction,
+  LogContext,
+  Operation,
+  run,
+  spawn,
+  supervise,
+  superviseBackoff,
+} from "../mod.ts";
 
 const test = describe("supervise()");
 

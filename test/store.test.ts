@@ -1,10 +1,12 @@
-import { createScope, Operation, Result } from "../deps.ts";
-import { parallel } from "../fx/mod.ts";
 import { asserts, describe, it } from "../test.ts";
-import { StoreContext, StoreUpdateContext } from "./context.ts";
-import { updateStore } from "./fx.ts";
-import { configureStore, createStore } from "./store.ts";
-import { put, take } from "../action.ts";
+import {
+  configureStore,
+  createStore,
+  StoreContext,
+  StoreUpdateContext,
+  updateStore,
+} from "../store/mod.ts";
+import { createScope, Operation, parallel, put, Result, take } from "../mod.ts";
 
 const tests = describe("store");
 

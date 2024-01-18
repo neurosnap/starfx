@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { call, run } from "../deps.ts";
+import { call, run } from "../mod.ts";
 
 const tests = describe("call()");
 

@@ -1,8 +1,5 @@
 import { asserts, describe, it } from "../test.ts";
-import { select } from "./fx.ts";
-import { configureStore } from "./store.ts";
-import { slice } from "./slice/mod.ts";
-import { createSchema } from "./schema.ts";
+import { configureStore, createSchema, select, slice } from "../store/mod.ts";
 
 const tests = describe("createSchema()");
 

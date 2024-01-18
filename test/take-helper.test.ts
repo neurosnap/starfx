@@ -1,8 +1,7 @@
 import { describe, expect, it } from "../test.ts";
-import { sleep } from "../deps.ts";
-import type { AnyAction } from "../types.ts";
-import { configureStore } from "./mod.ts";
-import { take, takeEvery, takeLatest, takeLeading } from "../action.ts";
+import { configureStore } from "../store/mod.ts";
+import type { AnyAction } from "../mod.ts";
+import { sleep, take, takeEvery, takeLatest, takeLeading } from "../mod.ts";
 
 const testEvery = describe("takeEvery()");
 const testLatest = describe("takeLatest()");

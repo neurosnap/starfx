@@ -1,11 +1,7 @@
-import { assertLike, asserts, describe, it } from "../test.ts";
-import { configureStore } from "../store/mod.ts";
-import { put, takeEvery } from "../action.ts";
-import { call, sleep as delay } from "../deps.ts";
-import { sleep } from "../test.ts";
-import { createThunks } from "./thunk.ts";
-import type { Next, ThunkCtx } from "./types.ts";
-import { updateStore } from "../store/fx.ts";
+import { assertLike, asserts, describe, it, sleep } from "../test.ts";
+import { configureStore, updateStore } from "../store/mod.ts";
+import { call, createThunks, put, sleep as delay, takeEvery } from "../mod.ts";
+import type { Next, ThunkCtx } from "../mod.ts";
 
 // deno-lint-ignore no-explicit-any
 interface RoboCtx<D = Record<string, unknown>, P = any> extends ThunkCtx<P> {

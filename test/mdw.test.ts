@@ -1,8 +1,4 @@
-import { assertLike, asserts, describe, expect, it } from "../test.ts";
-import { createApi, createKey, mdw } from "../query/mod.ts";
-import type { ApiCtx, Next, ThunkCtx } from "../query/mod.ts";
-import { takeEvery, takeLatest } from "../action.ts";
-import { sleep } from "../test.ts";
+import { assertLike, asserts, describe, expect, it, sleep } from "../test.ts";
 import {
   configureStore,
   createSchema,
@@ -10,7 +6,15 @@ import {
   storeMdw,
   updateStore,
 } from "../store/mod.ts";
-import { safe } from "../mod.ts";
+import {
+  createApi,
+  createKey,
+  mdw,
+  safe,
+  takeEvery,
+  takeLatest,
+} from "../mod.ts";
+import type { ApiCtx, Next, ThunkCtx } from "../mod.ts";
 
 interface User {
   id: string;

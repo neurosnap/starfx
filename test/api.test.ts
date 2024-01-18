@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { keepAlive } from "../fx/mod.ts";
+import { sleep } from "../test.ts";
 import {
   configureStore,
   createSchema,
@@ -7,15 +7,17 @@ import {
   storeMdw,
   updateStore,
 } from "../store/mod.ts";
-import { takeEvery } from "../action.ts";
-import { sleep } from "../test.ts";
-import { safe } from "../mod.ts";
-import * as mdw from "./mdw.ts";
-import { createApi } from "./api.ts";
-import { createKey } from "./create-key.ts";
-import type { ApiCtx } from "./types.ts";
-import { call } from "../deps.ts";
-import { useCache } from "../store/react.ts";
+import {
+  type ApiCtx,
+  call,
+  createApi,
+  createKey,
+  keepAlive,
+  mdw,
+  safe,
+  takeEvery,
+} from "../mod.ts";
+import { useCache } from "../react.ts";
 
 interface User {
   id: string;

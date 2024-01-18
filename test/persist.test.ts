@@ -1,16 +1,14 @@
-import { Ok, Operation } from "../deps.ts";
-import { parallel } from "../fx/mod.ts";
 import { asserts, describe, it } from "../test.ts";
-import { put, take } from "../action.ts";
-import { configureStore } from "./store.ts";
 import {
+  configureStore,
   createPersistor,
+  createSchema,
   PERSIST_LOADER_ID,
   PersistAdapter,
   persistStoreMdw,
-} from "./persist.ts";
-import { createSchema } from "./schema.ts";
-import { slice } from "./slice/mod.ts";
+  slice,
+} from "../store/mod.ts";
+import { Ok, Operation, parallel, put, take } from "../mod.ts";
 
 const tests = describe("store");
 
