@@ -46,11 +46,7 @@ export type FxSchema<S extends AnyState, O extends FxMap = FxMap> =
   & {
     [key in keyof O]: ReturnType<O[key]>;
   }
-  & {
-    update: (
-      u: StoreUpdater<S> | StoreUpdater<S>[],
-    ) => Operation<UpdaterCtx<S>>;
-  };
+  & FxStore<S>["update"];
 
 export interface FxStore<S extends AnyState> {
   getScope: () => Scope;
