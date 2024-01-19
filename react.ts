@@ -45,12 +45,12 @@ export interface UseCacheResult<D = any, A extends ThunkAction = ThunkAction>
   data: D | null;
 }
 
-const SchemaContext = createContext<FxSchema<any> | null>(null);
+const SchemaContext = createContext<FxSchema<any, any> | null>(null);
 
-export function Provider<S extends AnyState>(
+export function Provider(
   { store, schema, children }: {
-    store: FxStore<S>;
-    schema: FxSchema<S>;
+    store: FxStore<any>;
+    schema: FxSchema<any, any>;
     children: React.ReactNode;
   },
 ) {
