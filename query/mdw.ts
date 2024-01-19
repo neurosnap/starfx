@@ -5,11 +5,11 @@ import type {
   ApiRequest,
   FetchJsonCtx,
   MiddlewareApi,
-  Next,
   PerfCtx,
   RequiredApiRequest,
   ThunkCtx,
 } from "./types.ts";
+import type { Next } from "../types.ts";
 import { mergeRequest } from "./util.ts";
 import * as fetchMdw from "./fetch.ts";
 import { log } from "../log.ts";

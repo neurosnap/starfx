@@ -4,6 +4,7 @@ import type {
   ActionWithPayload,
   LoaderItemState,
   LoaderPayload,
+  Next,
   Payload,
 } from "../types.ts";
 
@@ -96,8 +97,6 @@ export type MiddlewareApi<Ctx extends ApiCtx = ApiCtx> = (
 export type MiddlewareApiCo<Ctx extends ApiCtx = ApiCtx> =
   | Middleware<Ctx>
   | Middleware<Ctx>[];
-
-export type Next = () => Operation<void>;
 
 export interface CreateActionPayload<P = any, ApiSuccess = any> {
   name: string;

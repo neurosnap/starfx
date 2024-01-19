@@ -9,10 +9,9 @@ import type {
   CreateActionWithPayload,
   FetchJson,
   MiddlewareApiCo,
-  Next,
   Supervisor,
 } from "./types.ts";
-import type { Payload } from "../types.ts";
+import type { Next, Payload } from "../types.ts";
 import type { Operation } from "../deps.ts";
 
 export type ApiName = string | string[];

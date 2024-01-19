@@ -1,7 +1,8 @@
 import { sleep } from "../deps.ts";
 import { safe } from "../fx/mod.ts";
-import type { FetchCtx, FetchJsonCtx, Next } from "./types.ts";
+import type { FetchCtx, FetchJsonCtx } from "./types.ts";
 import { isObject, noop } from "./util.ts";
+import type { Next } from "../types.ts";
 
 /**
  * This middleware converts the name provided to {@link createApi}

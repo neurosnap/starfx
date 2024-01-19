@@ -10,9 +10,8 @@ import {
   Task,
 } from "../deps.ts";
 import { BaseMiddleware, compose } from "../compose.ts";
-import type { AnyAction, AnyState } from "../types.ts";
+import type { AnyAction, AnyState, Next } from "../types.ts";
 import { safe } from "../fx/mod.ts";
-import { Next } from "../query/types.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { log } from "../log.ts";

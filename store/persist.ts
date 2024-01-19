@@ -1,8 +1,7 @@
-import { Err, Ok, Operation, Result } from "../deps.ts";
-import { Next } from "../query/types.ts";
-import { AnyState } from "../types.ts";
+import { Err, Ok, type Operation, type Result } from "../deps.ts";
+import type { AnyState, Next } from "../types.ts";
 import { select, updateStore } from "./fx.ts";
-import { UpdaterCtx } from "./types.ts";
+import type { UpdaterCtx } from "./types.ts";
 
 export const PERSIST_LOADER_ID = "@@starfx/persist";
 

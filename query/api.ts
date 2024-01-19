@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
-import type { ApiCtx, ApiRequest, Next } from "./types.ts";
+import type { ApiCtx, ApiRequest } from "./types.ts";
+import type { Next } from "../types.ts";
 import { createThunks } from "./thunk.ts";
 import type { ThunksApi } from "./thunk.ts";
 import type { ApiName, QueryApi } from "./api-types.ts";

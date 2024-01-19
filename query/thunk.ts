@@ -1,5 +1,5 @@
 import { compose } from "../compose.ts";
-import type { ActionWithPayload, Payload } from "../types.ts";
+import type { ActionWithPayload, Next, Payload } from "../types.ts";
 import { keepAlive } from "../mod.ts";
 import { takeEvery } from "../action.ts";
 import { isFn, isObject } from "./util.ts";
@@ -10,7 +10,6 @@ import type {
   CreateActionWithPayload,
   Middleware,
   MiddlewareCo,
-  Next,
   Supervisor,
   ThunkCtx,
 } from "./types.ts";
