@@ -1,11 +1,10 @@
-import { createThunks } from "./thunk.ts";
-export * from "./thunk.ts";
+import { createThunks, type ThunksApi } from "./thunk.ts";
 export * from "./api.ts";
 export * from "./types.ts";
 export * from "./create-key.ts";
 import * as mdw from "./mdw.ts";
 
-export { mdw };
+export { createThunks, mdw, ThunksApi };
 
 /**
  * @deprecated Use {@link createThunks} instead;
