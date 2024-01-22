@@ -1,6 +1,7 @@
 import { createSelector } from "../../deps.ts";
 import type { AnyState, IdProp } from "../../types.ts";
 import { BaseSchema } from "../types.ts";
+import { createUpdater, UpdaterFnWithIterator } from "../util.ts";
 
 interface PropId {
   id: IdProp;
@@ -86,12 +87,12 @@ export interface TableOutput<
   schema: "table";
   initialState: Record<IdProp, Entity>;
   empty: Empty;
-  add: (e: Record<IdProp, Entity>) => (s: S) => void;
-  set: (e: Record<IdProp, Entity>) => (s: S) => void;
-  remove: (ids: IdProp[]) => (s: S) => void;
-  patch: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
-  merge: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
-  reset: () => (s: S) => void;
+  add: (e: Record<IdProp, Entity>) => UpdaterFnWithIterator<S>;
+  set: (e: Record<IdProp, Entity>) => UpdaterFnWithIterator<S>;
+  remove: (ids: IdProp[]) => UpdaterFnWithIterator<S>;
+  patch: (e: PatchEntity<Record<IdProp, Entity>>) => UpdaterFnWithIterator<S>;
+  merge: (e: PatchEntity<Record<IdProp, Entity>>) => UpdaterFnWithIterator<S>;
+  reset: () => UpdaterFnWithIterator<S>;
   findById: (
     d: Record<IdProp, Entity>,
     { id }: PropId,
@@ -142,50 +143,56 @@ export function createTable<
     name: name as string,
     initialState,
     empty: typeof empty === "function" ? empty() : empty,
-    add: (entities) => (s) => {
-      const state = selectors.selectTable(s);
-      Object.keys(entities).forEach((id) => {
-        state[id] = entities[id];
-      });
-    },
-    set: (entities) => (s) => {
-      // deno-lint-ignore no-explicit-any
-      (s as any)[name] = entities;
-    },
-    remove: (ids) => (s) => {
-      const state = selectors.selectTable(s);
-      ids.forEach((id) => {
-        delete state[id];
-      });
-    },
-    patch: (entities) => (s) => {
-      const state = selectors.selectTable(s);
-      Object.keys(entities).forEach((id) => {
-        state[id] = { ...state[id], ...entities[id] };
-      });
-    },
-    merge: (entities) => (s) => {
-      const state = selectors.selectTable(s);
-      Object.keys(entities).forEach((id) => {
-        const entity = entities[id];
-        Object.keys(entity).forEach((prop) => {
-          const val = entity[prop];
-          if (Array.isArray(val)) {
-            // deno-lint-ignore no-explicit-any
-            const list = val as any[];
-            // deno-lint-ignore no-explicit-any
-            (state as any)[id][prop].push(...list);
-          } else {
-            // deno-lint-ignore no-explicit-any
-            (state as any)[id][prop] = entities[id][prop];
-          }
+    add: (entities) =>
+      createUpdater<S>((s) => {
+        const state = selectors.selectTable(s);
+        Object.keys(entities).forEach((id) => {
+          state[id] = entities[id];
         });
-      });
-    },
-    reset: () => (s) => {
-      // deno-lint-ignore no-explicit-any
-      (s as any)[name] = initialState;
-    },
+      }),
+    set: (entities) =>
+      createUpdater((s) => {
+        // deno-lint-ignore no-explicit-any
+        (s as any)[name] = entities;
+      }),
+    remove: (ids) =>
+      createUpdater<S>((s) => {
+        const state = selectors.selectTable(s);
+        ids.forEach((id) => {
+          delete state[id];
+        });
+      }),
+    patch: (entities) =>
+      createUpdater<S>((s) => {
+        const state = selectors.selectTable(s);
+        Object.keys(entities).forEach((id) => {
+          state[id] = { ...state[id], ...entities[id] };
+        });
+      }),
+    merge: (entities) =>
+      createUpdater<S>((s) => {
+        const state = selectors.selectTable(s);
+        Object.keys(entities).forEach((id) => {
+          const entity = entities[id];
+          Object.keys(entity).forEach((prop) => {
+            const val = entity[prop];
+            if (Array.isArray(val)) {
+              // deno-lint-ignore no-explicit-any
+              const list = val as any[];
+              // deno-lint-ignore no-explicit-any
+              (state as any)[id][prop].push(...list);
+            } else {
+              // deno-lint-ignore no-explicit-any
+              (state as any)[id][prop] = entities[id][prop];
+            }
+          });
+        });
+      }),
+    reset: () =>
+      createUpdater((s) => {
+        // deno-lint-ignore no-explicit-any
+        (s as any)[name] = initialState;
+      }),
     ...selectors,
   };
 }

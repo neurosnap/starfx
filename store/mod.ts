@@ -7,5 +7,6 @@ export * from "./slice/mod.ts";
 export * from "./schema.ts";
 export * from "./batch.ts";
 export * from "./persist.ts";
+export * from "./util.ts";
 import * as storeMdw from "./query.ts";
 export { storeMdw };
