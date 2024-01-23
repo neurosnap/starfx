@@ -38,7 +38,7 @@ jobs:
         working-directory: starfx-examples/vite-react
         run: |
           corepack enable
-          yarn install --no-lockfile
+          npm install
 
       # symlink example repos
       - name: symlink built assets
@@ -48,4 +48,4 @@ jobs:
       # run build and test in example repos
       - name: build vite-react
         working-directory: starfx-examples/vite-react
-        run: yarn build
+        run: npm build
