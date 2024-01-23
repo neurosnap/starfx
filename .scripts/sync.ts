@@ -1,4 +1,4 @@
-import { main, call, Operation } from "./deps.ts";
+import { call, main, Operation } from "./deps.ts";
 
 await main(function* (): Operation<void> {
   const os = Deno.build.os;
