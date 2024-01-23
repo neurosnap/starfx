@@ -1,7 +1,7 @@
 import { Callable, Operation, Result, sleep } from "../deps.ts";
 import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
-import { log } from "../log.ts";
+import { put } from "../action.ts";
 
 export function superviseBackoff(attempt: number, max = 10): number {
   if (attempt > max) return -1;
@@ -30,7 +30,7 @@ export function supervise<T>(
       if (res.ok) {
         attempt = 0;
       } else {
-        yield* log({
+        yield* put({
           type: "error:supervise",
           payload: {
             message:

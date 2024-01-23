@@ -197,8 +197,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     const tt = req ? (req as any).supervisor : supervisor;
     function* curVisor() {
-      const task = yield* tt(type, onApi);
-      yield* task;
+      yield* tt(type, onApi);
     }
     visors[name] = curVisor;
 

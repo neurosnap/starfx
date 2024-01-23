@@ -1,15 +1,14 @@
 import { describe, expect, it } from "../test.ts";
 import {
   call,
-  each,
-  LogAction,
-  LogContext,
   Operation,
   run,
   spawn,
   supervise,
   superviseBackoff,
 } from "../mod.ts";
+import { ActionWithPayload } from "../types.ts";
+import { take } from "../action.ts";
 
 const test = describe("supervise()");
 
@@ -38,6 +37,8 @@ describe("superviseBackoff", () => {
   });
 });
 
+type LogAction = ActionWithPayload<{ message: string }>;
+
 it(test, "should recover with backoff pressure", async () => {
   const err = console.error;
   console.error = () => {};
@@ -53,10 +54,9 @@ it(test, "should recover with backoff pressure", async () => {
       throw new Error("boom!");
     }
     yield* spawn(function* () {
-      const chan = yield* LogContext;
-      for (const action of yield* each(chan)) {
+      while (true) {
+        const action = yield* take<LogAction["payload"]>("*");
         actions.push(action);
-        yield* each.next();
       }
     });
     yield* call(supervise(op, backoff));

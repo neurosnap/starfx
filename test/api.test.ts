@@ -229,8 +229,7 @@ it(tests, "run() from a normal saga", () => {
   }
 
   function* watchAction() {
-    const task = yield* takeEvery(`${action2}`, onAction);
-    yield* task;
+    yield* takeEvery(`${action2}`, onAction);
   }
 
   const store = configureStore({ initialState: { users: {} } });
