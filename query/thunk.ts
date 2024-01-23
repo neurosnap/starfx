@@ -135,7 +135,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   const createType = (post: string) =>
-    `${API_ACTION_PREFIX}${post.startsWith("/") ? "" : "/"}${post}`;
+    `${API_ACTION_PREFIX}:${post}`;
 
   function* onApi<P extends CreateActionPayload>(
     action: ActionWithPayload<P>,

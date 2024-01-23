@@ -2,6 +2,7 @@ import { Callable, Operation, Result, sleep } from "../deps.ts";
 import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
 import { put } from "../action.ts";
+import { API_ACTION_PREFIX } from "../action.ts";
 
 export function superviseBackoff(attempt: number, max = 10): number {
   if (attempt > max) return -1;
@@ -31,13 +32,8 @@ export function supervise<T>(
         attempt = 0;
       } else {
         yield* put({
-          type: "error:supervise",
-          payload: {
-            message:
-              `Exception caught, waiting ${waitFor}ms before restarting operation`,
-            error: res.error,
-            op,
-          },
+          type: `${API_ACTION_PREFIX}:supervise`,
+          payload: res.error,
         });
         yield* sleep(waitFor);
       }
