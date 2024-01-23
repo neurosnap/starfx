@@ -24,8 +24,6 @@ jobs:
           repository: "neurosnap/starfx-examples"
           path: "starfx-examples"
 
-      - run: ls
-
       - name: setup deno
         uses: denoland/setup-deno@v1
         with:
@@ -40,7 +38,7 @@ jobs:
         working-directory: starfx-examples/vite-react
         run: |
           corepack enable
-          yarn install --refresh-lockfile
+          npm install
 
       # symlink example repos
       - name: symlink built assets
