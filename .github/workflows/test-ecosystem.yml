@@ -1,4 +1,4 @@
-name: ecosystem-test
+name: test-ecosystem
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  ecosystem-test:
+  test-ecosystem:
     runs-on: ubuntu-latest
     steps:
       - name: checkout main repo
