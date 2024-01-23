@@ -30,16 +30,23 @@ jobs:
         with:
           repository: "neurosnap/starfx"
           path: "starfx"
-      - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ matrix.example.owner }}/${{ matrix.example.repo }}
-          path: ${{ matrix.example.repo }}
 
       - name: setup deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+
+      - id: conditionalBranch
+        run: deno run -A ./.scripts/branch-exists.ts >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+          path: ${{ matrix.example.repo }}
+          ref: ${{ steps.conditionalBranch.branch }}
 
       - name: npm
         run: deno task npm 0.0.0
