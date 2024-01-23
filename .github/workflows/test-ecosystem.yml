@@ -1,0 +1,36 @@
+name: test
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout main repo
+        uses: actions/checkout@v4
+        with:
+          repository: "neurosnap/starfx"
+          path: "starfx"
+      - name: checkout example repo
+        uses: actions/checkout@v4
+        with:
+          repository: "neurosnap/starfx-examples"
+          path: "starfx-examples"
+
+      - run: ls
+
+      - name: setup deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: npm
+        run: deno task npm 0.0.0
+        working-directory: starfx
