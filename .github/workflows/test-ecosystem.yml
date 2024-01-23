@@ -34,3 +34,20 @@ jobs:
       - name: npm
         run: deno task npm 0.0.0
         working-directory: starfx
+
+      # install in example repos
+      - name: install vite-starfx
+        working-directory: starfx-examples/vite-starfx
+        run: |
+          corepack enable
+          yarn install
+
+      # symlink example repos
+      - name: symlink built assets
+        run: deno task sync-build-to starfx-examples/vite-starfx
+        working-directory: starfx
+
+      # run build and test in example repos
+      - name: build vite-starfx
+        working-directory: starfx-examples/vite-starfx
+        run: yarn build
