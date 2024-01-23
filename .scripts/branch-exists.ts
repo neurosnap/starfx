@@ -23,5 +23,8 @@ await main(function* (): Operation<void> {
     } else {
       console.log(`branch=main`);
     }
+  } else {
+    const text = yield* call(response.text());
+    throw new Error(text);
   }
 });
