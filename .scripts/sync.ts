@@ -1,12 +1,12 @@
 import { call, main, Operation } from "./deps.ts";
 
 await main(function* (): Operation<void> {
-  const [folderFromArgs] = Deno.args;
+  const [syncMethod, folderFromArgs] = Deno.args;
   const folder = folderFromArgs ?? "starfx-examples/vite-react";
   const dir = `../${folder}/node_modules/starfx`;
   const npmAssets = yield* call(Deno.realPath("./npm"));
 
-  if (folder.includes("parcel")) {
+  if (syncMethod === "install") {
     // parcel doesn't handle symlinks well, do a `file:` install instead
     const command = new Deno.Command("npm", {
       args: ["add", "starfx@file:../../starfx/npm", "--install-links"],
@@ -15,7 +15,7 @@ await main(function* (): Operation<void> {
       stdout: "piped",
     });
     yield* call(command.output());
-  } else {
+  } else if (syncMethod === "symlink") {
     try {
       yield* call(Deno.remove(dir, { recursive: true }));
     } catch (_error) {
