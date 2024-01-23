@@ -3,7 +3,6 @@ export * from "./query/mod.ts";
 export * from "./types.ts";
 export * from "./compose.ts";
 export * from "./action.ts";
-export * from "./log.ts";
 export * from "./supervisor.ts";
 export {
   action,

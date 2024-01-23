@@ -2,6 +2,7 @@ import { describe, expect, it } from "../test.ts";
 import { configureStore } from "../store/mod.ts";
 import type { AnyAction } from "../mod.ts";
 import { sleep, take, takeEvery, takeLatest, takeLeading } from "../mod.ts";
+import { spawn } from "../deps.ts";
 
 const testEvery = describe("takeEvery()");
 const testLatest = describe("takeLatest()");
@@ -17,7 +18,7 @@ it(testLatest, "should cancel previous tasks and only use latest", async () => {
   }
 
   function* root() {
-    const task = yield* takeLatest("ACTION", worker);
+    const task = yield* spawn(() => takeLatest("ACTION", worker));
     yield* take("CANCEL_WATCHER");
     yield* task.halt();
   }
@@ -44,7 +45,7 @@ it(testLeading, "should keep first action and discard the rest", async () => {
   }
 
   function* root() {
-    const task = yield* takeLeading("ACTION", worker);
+    const task = yield* spawn(() => takeLeading("ACTION", worker));
     yield* sleep(150);
     yield* task.halt();
   }
@@ -66,9 +67,11 @@ it(testEvery, "should receive all actions", async () => {
   const actual: string[][] = [];
 
   function* root() {
-    const task = yield* takeEvery(
-      "ACTION",
-      (action) => worker("a1", "a2", action),
+    const task = yield* spawn(() =>
+      takeEvery(
+        "ACTION",
+        (action) => worker("a1", "a2", action),
+      )
     );
     yield* take("CANCEL_WATCHER");
     yield* task.halt();

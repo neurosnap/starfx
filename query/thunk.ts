@@ -134,8 +134,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     yield* next();
   }
 
-  const createType = (post: string) =>
-    `${API_ACTION_PREFIX}${post.startsWith("/") ? "" : "/"}${post}`;
+  const createType = (post: string) => `${API_ACTION_PREFIX}:${post}`;
 
   function* onApi<P extends CreateActionPayload>(
     action: ActionWithPayload<P>,
@@ -197,8 +196,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     const tt = req ? (req as any).supervisor : supervisor;
     function* curVisor() {
-      const task = yield* tt(type, onApi);
-      yield* task;
+      yield* tt(type, onApi);
     }
     visors[name] = curVisor;
 

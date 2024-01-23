@@ -12,8 +12,8 @@ import type {
 import type { Next } from "../types.ts";
 import { mergeRequest } from "./util.ts";
 import * as fetchMdw from "./fetch.ts";
-import { log } from "../log.ts";
 import { call, Callable } from "../deps.ts";
+import { put } from "../action.ts";
 export * from "./fetch.ts";
 
 /**
@@ -33,7 +33,7 @@ export function* err<Ctx extends ThunkCtx = ThunkCtx>(
 ) {
   ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
-    yield* log({
+    yield* put({
       type: "error:query",
       payload: {
         message:

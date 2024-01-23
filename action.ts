@@ -1,6 +1,7 @@
 import {
   call,
   createContext,
+  createSignal,
   each,
   Operation,
   Signal,
@@ -12,8 +13,9 @@ import { ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";
 
-export const ActionContext = createContext<Signal<AnyAction, void>>(
+export const ActionContext = createContext(
   "starfx:action",
+  createSignal<AnyAction, void>(),
 );
 
 export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
@@ -68,51 +70,43 @@ export function* takeEvery<T>(
   pattern: ActionPattern,
   op: (action: Action) => Operation<T>,
 ) {
-  return yield* spawn(function* (): Operation<void> {
-    const fd = useActions(pattern);
-    for (const action of yield* each(fd)) {
-      yield* spawn(() => op(action));
-      yield* each.next();
-    }
-  });
+  const fd = useActions(pattern);
+  for (const action of yield* each(fd)) {
+    yield* spawn(() => op(action));
+    yield* each.next();
+  }
 }
 
 export function* takeLatest<T>(
   pattern: ActionPattern,
   op: (action: Action) => Operation<T>,
 ) {
-  return yield* spawn(function* (): Operation<void> {
-    const fd = useActions(pattern);
-    let lastTask;
+  const fd = useActions(pattern);
+  let lastTask;
 
-    for (const action of yield* each(fd)) {
-      if (lastTask) {
-        yield* lastTask.halt();
-      }
-      lastTask = yield* spawn(() => op(action));
-      yield* each.next();
+  for (const action of yield* each(fd)) {
+    if (lastTask) {
+      yield* lastTask.halt();
     }
-  });
+    lastTask = yield* spawn(() => op(action));
+    yield* each.next();
+  }
 }
-export const latest = takeLatest;
 
 export function* takeLeading<T>(
   pattern: ActionPattern,
   op: (action: Action) => Operation<T>,
 ) {
-  return yield* spawn(function* (): Operation<void> {
-    while (true) {
-      const action = yield* take(pattern);
-      yield* call(() => op(action));
-    }
-  });
+  while (true) {
+    const action = yield* take(pattern);
+    yield* call(() => op(action));
+  }
 }
-export const leading = takeLeading;
 
 export const API_ACTION_PREFIX = "@@starfx";
 export const createAction = (curType: string) => {
   if (!curType) throw new Error("createAction requires non-empty string");
-  const type = `${API_ACTION_PREFIX}/${curType}`;
+  const type = `${API_ACTION_PREFIX}:${curType}`;
   const action = () => ({ type });
   action.toString = () => type;
   return action;

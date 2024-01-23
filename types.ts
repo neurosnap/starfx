@@ -42,16 +42,17 @@ export interface Payload<P = any> {
   payload: P;
 }
 
-export interface AnyAction {
-  type: string;
-  // deno-lint-ignore no-explicit-any
-  [key: string]: any;
-}
-
 export interface Action {
   type: string;
 }
 
-export interface ActionWithPayload<P> extends Action {
+// https://github.com/redux-utilities/flux-standard-action
+export interface AnyAction extends Action {
+  payload?: any;
+  meta?: any;
+  error?: boolean;
+}
+
+export interface ActionWithPayload<P> extends AnyAction {
   payload: P;
 }

@@ -14,8 +14,8 @@ import type { AnyAction, AnyState, Next } from "../types.ts";
 import { safe } from "../fx/mod.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
-import { log } from "../log.ts";
 import { ActionContext, emit } from "../action.ts";
+import { API_ACTION_PREFIX } from "../action.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
 
@@ -93,9 +93,9 @@ export function createStore<S extends AnyState>({
   }
 
   function* logMdw(ctx: UpdaterCtx<S>, next: Next) {
-    yield* log({
-      type: "store",
-      payload: { ctx },
+    dispatch({
+      type: `${API_ACTION_PREFIX}:store`,
+      payload: ctx,
     });
     yield* next();
   }
@@ -134,12 +134,9 @@ export function createStore<S extends AnyState>({
     yield* mdw(ctx);
 
     if (!ctx.result.ok) {
-      yield* log({
-        type: "error:store",
-        payload: {
-          message: `Exception raised when calling store updaters`,
-          error: ctx.result.error,
-        },
+      dispatch({
+        type: `${API_ACTION_PREFIX}:store`,
+        payload: ctx.result.error,
       });
     }
 
