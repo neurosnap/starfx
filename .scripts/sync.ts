@@ -7,14 +7,25 @@ await main(function* (): Operation<void> {
   const dir = `../${folder}/node_modules/starfx`;
   const npmAssets = yield* call(Deno.realPath("./npm"));
 
-  try {
-    // yield* call(Deno.remove("./npm/node_modules", { recursive: true }));
-    yield* call(Deno.remove(dir, { recursive: true }));
-  } catch (error) {
-    // assume that it doesn't exist
-  }
+  if (folder.includes("parcel")) {
+    // parcel doesn't handle symlinks well, do a `file:` install instead
+    const command = new Deno.Command("npm", {
+      args: ["add", "starfx@file:../../starfx/npm", "--install-links"],
+      cwd: `../${folder}`,
+      stderr: "piped",
+      stdout: "piped",
+    });
+    yield* call(command.output());
+  } else {
+    try {
+      yield* call(Deno.remove("./npm/node_modules", { recursive: true }));
+      yield* call(Deno.remove(dir, { recursive: true }));
+    } catch (error) {
+      // assume that it doesn't exist
+    }
 
-  // create a symlink to the `dir` which should allow
-  // this example to run with the build assets
-  yield* call(Deno.symlink(npmAssets, dir));
+    // create a symlink to the `dir` which should allow
+    // this example to run with the build assets
+    yield* call(Deno.symlink(npmAssets, dir));
+  }
 });
