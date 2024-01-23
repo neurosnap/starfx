@@ -36,7 +36,8 @@ jobs:
         with:
           deno-version: v1.x
 
-      - id: conditionalBranch
+      - name: dynamically determine ${{ matrix.example.owner }}/${{ matrix.example.repo }} branch
+        id: conditionalBranch
         run: deno run -Aq ./starfx/.scripts/branch-exists.ts $GITHUB_HEAD_REF neurosnap/starfx-examples >> "$GITHUB_OUTPUT"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
