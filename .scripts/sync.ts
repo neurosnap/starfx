@@ -1,7 +1,6 @@
 import { call, main, Operation } from "./deps.ts";
 
 await main(function* (): Operation<void> {
-  const os = Deno.build.os;
   const [folderFromArgs] = Deno.args;
   const folder = folderFromArgs ?? "starfx-examples/vite-react";
   const dir = `../${folder}/node_modules/starfx`;
@@ -19,7 +18,7 @@ await main(function* (): Operation<void> {
   } else {
     try {
       yield* call(Deno.remove(dir, { recursive: true }));
-    } catch (error) {
+    } catch (_error) {
       // assume that the folder does not exist
     }
 
