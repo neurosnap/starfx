@@ -8,7 +8,7 @@ await main(function* (): Operation<void> {
   const npmAssets = yield* call(Deno.realPath("./npm"));
 
   try {
-    yield* call(Deno.remove("./npm/node_modules", { recursive: true }));
+    // yield* call(Deno.remove("./npm/node_modules", { recursive: true }));
     yield* call(Deno.remove(dir, { recursive: true }));
   } catch (error) {
     // assume that it doesn't exist
