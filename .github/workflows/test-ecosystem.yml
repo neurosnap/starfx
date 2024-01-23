@@ -17,8 +17,12 @@ jobs:
       fail-fast: false
       matrix:
         example:
-          - starfx-examples/vite-react
-          - starfx-examples/parcel-react
+          - owner: neurosnap
+            repo: starfx-examples
+            folder: vite-react
+          - owner: neurosnap
+            repo: starfx-examples
+            folder: parcel-react
 
     steps:
       - name: checkout main repo
@@ -26,11 +30,11 @@ jobs:
         with:
           repository: "neurosnap/starfx"
           path: "starfx"
-      - name: checkout example repo
+      - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }}
         uses: actions/checkout@v4
         with:
-          repository: "neurosnap/starfx-examples"
-          path: "starfx-examples"
+          repository: ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+          path: ${{ matrix.example.repo }}
 
       - name: setup deno
         uses: denoland/setup-deno@v1
@@ -42,16 +46,16 @@ jobs:
         working-directory: starfx
 
       # install in example repos
-      - name: install ${{ matrix.example }}
-        working-directory: ${{ matrix.example }}
+      - name: install ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+        working-directory: ${{ matrix.example.repo }}/${{ matrix.example.folder }}
         run: npm install
 
       # symlink example repos
       - name: symlink built assets
-        run: deno task sync-build-to ${{ matrix.example }}
+        run: deno task sync-build-to ${{ matrix.example.repo }}/${{ matrix.example.folder }}
         working-directory: starfx
 
       # run build and test in example repos
-      - name: build ${{ matrix.example }}
-        working-directory: ${{ matrix.example }}
+      - name: build ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+        working-directory: ${{ matrix.example.repo }}/${{ matrix.example.folder }}
         run: npm run build
