@@ -11,7 +11,14 @@ permissions:
 
 jobs:
   test-ecosystem:
+    name: ${{ matrix.example }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        example:
+          - starfx-examples/vite-react
+          - starfx-examples/parcel-react
+
     steps:
       - name: checkout main repo
         uses: actions/checkout@v4
@@ -34,18 +41,16 @@ jobs:
         working-directory: starfx
 
       # install in example repos
-      - name: install vite-react
-        working-directory: starfx-examples/vite-react
-        run: |
-          corepack enable
-          npm install
+      - name: install ${{ matrix.example }}
+        working-directory: ${{ matrix.example }}
+        run: npm install
 
       # symlink example repos
       - name: symlink built assets
-        run: deno task sync-build-to starfx-examples/vite-react
+        run: deno task sync-build-to ${{ matrix.example }}
         working-directory: starfx
 
       # run build and test in example repos
-      - name: build vite-react
-        working-directory: starfx-examples/vite-react
+      - name: build ${{ matrix.example }}
+        working-directory: ${{ matrix.example }}
         run: npm run build
