@@ -9,6 +9,7 @@ import {
 } from "../mod.ts";
 import { ActionWithPayload } from "../types.ts";
 import { take } from "../action.ts";
+import { API_ACTION_PREFIX } from "../action.ts";
 
 const test = describe("supervise()");
 
@@ -63,16 +64,16 @@ it(test, "should recover with backoff pressure", async () => {
   });
 
   expect(actions.length).toEqual(3);
-  expect(actions[0].type).toEqual("error:supervise");
-  expect(actions[0].payload.message).toEqual(
+  expect(actions[0].type).toEqual(`${API_ACTION_PREFIX}:supervise`);
+  expect(actions[0].meta).toEqual(
     "Exception caught, waiting 1ms before restarting operation",
   );
-  expect(actions[1].type).toEqual("error:supervise");
-  expect(actions[1].payload.message).toEqual(
+  expect(actions[1].type).toEqual(`${API_ACTION_PREFIX}:supervise`);
+  expect(actions[1].meta).toEqual(
     "Exception caught, waiting 2ms before restarting operation",
   );
-  expect(actions[2].type).toEqual("error:supervise");
-  expect(actions[2].payload.message).toEqual(
+  expect(actions[2].type).toEqual(`${API_ACTION_PREFIX}:supervise`);
+  expect(actions[2].meta).toEqual(
     "Exception caught, waiting 3ms before restarting operation",
   );
 

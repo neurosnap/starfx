@@ -134,8 +134,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     yield* next();
   }
 
-  const createType = (post: string) =>
-    `${API_ACTION_PREFIX}:${post}`;
+  const createType = (post: string) => `${API_ACTION_PREFIX}:${post}`;
 
   function* onApi<P extends CreateActionPayload>(
     action: ActionWithPayload<P>,
