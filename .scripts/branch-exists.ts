@@ -24,6 +24,9 @@ await main(function* (): Operation<void> {
       console.log(`branch=main`);
     }
   } else {
+    console.error(
+      `Error trying to fetch https://api.github.com/repos/${ownerRepo}/branches and check for ${branch}`
+    );
     const text = yield* call(response.text());
     throw new Error(text);
   }
