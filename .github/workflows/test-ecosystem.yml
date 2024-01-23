@@ -37,7 +37,7 @@ jobs:
           deno-version: v1.x
 
       - id: conditionalBranch
-        run: deno run -A ./.scripts/branch-exists.ts >> "$GITHUB_OUTPUT"
+        run: deno run -A ./starfx/.scripts/branch-exists.ts >> "$GITHUB_OUTPUT"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
