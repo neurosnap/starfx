@@ -12,7 +12,7 @@ await main(function* (): Operation<void> {
         "X-GitHub-Api-Version": "2022-11-28",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-    })
+    }),
   );
 
   if (response.ok) {
@@ -25,7 +25,7 @@ await main(function* (): Operation<void> {
     }
   } else {
     console.error(
-      `Error trying to fetch https://api.github.com/repos/${ownerRepo}/branches and check for ${branch}`
+      `Error trying to fetch https://api.github.com/repos/${ownerRepo}/branches and check for ${branch}`,
     );
     const text = yield* call(response.text());
     throw new Error(text);
