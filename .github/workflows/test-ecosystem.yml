@@ -23,7 +23,9 @@ jobs:
           - owner: neurosnap
             repo: starfx-examples
             folder: parcel-react
-
+          - owner: neurosnap
+            repo: starfx-examples
+            folder: tests-rtl
     steps:
       - name: checkout main repo
         uses: actions/checkout@v4
@@ -42,7 +44,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+      - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }} on ${{ steps.conditionalBranch.branch }}
         uses: actions/checkout@v4
         with:
           repository: ${{ matrix.example.owner }}/${{ matrix.example.repo }}
@@ -66,4 +68,8 @@ jobs:
       # run build and test in example repos
       - name: build ${{ matrix.example.owner }}/${{ matrix.example.repo }}
         working-directory: ${{ matrix.example.repo }}/${{ matrix.example.folder }}
-        run: npm run build
+        run: npm run build --if-present
+
+      - name: test ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+        working-directory: ${{ matrix.example.repo }}/${{ matrix.example.folder }}
+        run: npm run test --if-present
