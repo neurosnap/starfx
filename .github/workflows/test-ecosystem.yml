@@ -41,7 +41,10 @@ jobs:
       - name: dynamically determine ${{ matrix.example.owner }}/${{ matrix.example.repo }} branch
         id: conditionalBranch
         run: deno run -A ./starfx/.scripts/branch-exists.ts $GITHUB_HEAD_REF neurosnap/starfx-examples
-      - run: cat $GITHUB_OUTPUT
+      - name: dump covector output
+        env:
+          OUTPUT_CXT: ${{ toJson(steps.conditionalBranch) }}
+        run: echo "$OUTPUT_CXT"
 
       - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }} on ${{ steps.conditionalBranch.branch }}
         uses: actions/checkout@v4
