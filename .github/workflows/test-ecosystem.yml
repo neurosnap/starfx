@@ -40,7 +40,7 @@ jobs:
 
       - name: dynamically determine ${{ matrix.example.owner }}/${{ matrix.example.repo }} branch
         id: conditionalBranch
-        run: deno run -Aq ./starfx/.scripts/branch-exists.ts $GITHUB_HEAD_REF neurosnap/starfx-examples >> "$GITHUB_OUTPUT"
+        run: deno run -A ./starfx/.scripts/branch-exists.ts $GITHUB_HEAD_REF neurosnap/starfx-examples
 
       - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }} on ${{ steps.conditionalBranch.branch }}
         uses: actions/checkout@v4

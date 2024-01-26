@@ -12,20 +12,33 @@ await main(function* (): Operation<void> {
         "X-GitHub-Api-Version": "2022-11-28",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-    }),
+    })
   );
 
   if (response.ok) {
     const branches = yield* call(response.json());
     const branchList = branches.map((branch: { name: string }) => branch.name);
-    if (branchList.includes(branch)) {
-      console.log(`branch=${branch}`);
+    if (Deno.env.get("CI")) {
+      const output = Deno.env.get("GITHUB_OUTPUT");
+      if (!output) throw new Error("$GITHUB_OUTPUT is not set");
+      const encoder = new TextEncoder();
+      if (branchList.includes(branch)) {
+        const data = encoder.encode(`branch=${branch}`);
+        yield* call(Deno.writeFile(output, data, { append: true }));
+      } else {
+        const data = encoder.encode("branch=main");
+        yield* call(Deno.writeFile(output, data, { append: true }));
+      }
     } else {
-      console.log(`branch=main`);
+      if (branchList.includes(branch)) {
+        console.log(`branch=${branch}`);
+      } else {
+        console.log(`branch=main`);
+      }
     }
   } else {
     console.error(
-      `Error trying to fetch https://api.github.com/repos/${ownerRepo}/branches and check for ${branch}`,
+      `Error trying to fetch https://api.github.com/repos/${ownerRepo}/branches and check for ${branch}`
     );
     const text = yield* call(response.text());
     throw new Error(text);
