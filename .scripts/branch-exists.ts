@@ -4,6 +4,7 @@ await main(function* (): Operation<void> {
   // based on env created from ${{ secrets.GITHUB_TOKEN }} in CI
   const token = Deno.env.get("GITHUB_TOKEN");
   const [branch, ownerRepo] = Deno.args;
+  console.dir({ branch, ownerRepo });
 
   const response = yield* call(
     fetch(`https://api.github.com/repos/${ownerRepo}/branches`, {
@@ -18,6 +19,7 @@ await main(function* (): Operation<void> {
   if (response.ok) {
     const branches = yield* call(response.json());
     const branchList = branches.map((branch: { name: string }) => branch.name);
+    console.dir({ branchList });
     if (Deno.env.get("CI")) {
       const output = Deno.env.get("GITHUB_OUTPUT");
       if (!output) throw new Error("$GITHUB_OUTPUT is not set");
