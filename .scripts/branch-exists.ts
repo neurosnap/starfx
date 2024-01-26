@@ -31,12 +31,11 @@ await main(function* (): Operation<void> {
         const data = encoder.encode("branch=main");
         yield* call(Deno.writeFile(output, data, { append: true }));
       }
+    }
+    if (branchList.includes(branch)) {
+      console.log(`branch=${branch}`);
     } else {
-      if (branchList.includes(branch)) {
-        console.log(`branch=${branch}`);
-      } else {
-        console.log(`branch=main`);
-      }
+      console.log(`branch=main`);
     }
   } else {
     console.error(
