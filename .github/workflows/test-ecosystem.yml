@@ -38,6 +38,7 @@ jobs:
         with:
           deno-version: v1.x
 
+      # determines branch and sets it as output available through the `id`
       - name: dynamically determine ${{ matrix.example.owner }}/${{ matrix.example.repo }} branch
         id: conditionalBranch
         run: deno run -A ./starfx/.scripts/branch-exists.ts $GITHUB_HEAD_REF neurosnap/starfx-examples
@@ -49,7 +50,7 @@ jobs:
           path: ${{ matrix.example.repo }}
           ref: ${{ steps.conditionalBranch.outputs.branch }}
 
-      - name: npm task
+      - name: bundle for npm
         run: deno task npm 0.0.0
         working-directory: starfx
 
@@ -67,7 +68,6 @@ jobs:
       - name: build ${{ matrix.example.owner }}/${{ matrix.example.repo }}
         working-directory: ${{ matrix.example.repo }}/${{ matrix.example.folder }}
         run: npm run build --if-present
-
       - name: test ${{ matrix.example.owner }}/${{ matrix.example.repo }}
         working-directory: ${{ matrix.example.repo }}/${{ matrix.example.folder }}
         run: npm run test --if-present

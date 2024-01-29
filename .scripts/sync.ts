@@ -16,6 +16,7 @@ await main(function* (): Operation<void> {
     });
     yield* call(command.output());
   } else if (syncMethod === "symlink") {
+    // this option is primarily for local usage
     try {
       yield* call(Deno.remove(dir, { recursive: true }));
     } catch (_error) {

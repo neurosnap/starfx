@@ -11,6 +11,7 @@ await main(function* (): Operation<void> {
       headers: {
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
+        // the token isn't required but helps with rate limiting
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     }),
@@ -19,7 +20,10 @@ await main(function* (): Operation<void> {
   if (response.ok) {
     const branches = yield* call(response.json());
     const branchList = branches.map((branch: { name: string }) => branch.name);
+    // for CI debug purposes
     console.dir({ branchList });
+    // GitHub Actions maintains the step output through a file which you append keys into
+    //   the path that file is available as an env var
     if (Deno.env.get("CI")) {
       const output = Deno.env.get("GITHUB_OUTPUT");
       if (!output) throw new Error("$GITHUB_OUTPUT is not set");
@@ -32,6 +36,7 @@ await main(function* (): Operation<void> {
         yield* call(Deno.writeFile(output, data, { append: true }));
       }
     }
+    // always log out the branch for both CI and local running
     if (branchList.includes(branch)) {
       console.log(`branch=${branch}`);
     } else {
