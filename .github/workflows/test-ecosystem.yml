@@ -41,7 +41,8 @@ jobs:
       # determines branch and sets it as output available through the `id`
       - name: dynamically determine ${{ matrix.example.owner }}/${{ matrix.example.repo }} branch
         id: conditionalBranch
-        run: deno run -A ./starfx/scripts/branch-exists.ts $GITHUB_HEAD_REF neurosnap/starfx-examples
+        shell: bash
+        run: deno run -A ./starfx/scripts/branch-exists.ts "$GITHUB_HEAD_REF" neurosnap/starfx-examples
 
       - name: checkout ${{ matrix.example.owner }}/${{ matrix.example.repo }} on ${{ steps.conditionalBranch.outputs.branch }}
         uses: actions/checkout@v4
@@ -51,16 +52,19 @@ jobs:
           ref: ${{ steps.conditionalBranch.outputs.branch }}
 
       - name: bundle for npm
+        shell: bash
         run: deno task npm 0.0.0
         working-directory: starfx
 
       # install in example repos
       - name: install ${{ matrix.example.owner }}/${{ matrix.example.repo }}
+        shell: bash
         working-directory: ${{ matrix.example.repo }}/${{ matrix.example.folder }}
         run: npm install
 
       # symlink example repos
       - name: symlink built assets
+        shell: bash
         run: deno task sync-build-to install ${{ matrix.example.repo }}/${{ matrix.example.folder }}
         working-directory: starfx
 
