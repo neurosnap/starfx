@@ -18,7 +18,6 @@ import {
   takeEvery,
 } from "../mod.ts";
 import { useCache } from "../react.ts";
-import { API_ACTION_PREFIX } from "../action.ts";
 
 interface User {
   id: string;
