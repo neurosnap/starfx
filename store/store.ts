@@ -94,7 +94,7 @@ export function createStore<S extends AnyState>({
 
   function* logMdw(ctx: UpdaterCtx<S>, next: Next) {
     dispatch({
-      type: `${API_ACTION_PREFIX}:store`,
+      type: `${API_ACTION_PREFIX}store`,
       payload: ctx,
     });
     yield* next();
@@ -135,7 +135,7 @@ export function createStore<S extends AnyState>({
 
     if (!ctx.result.ok) {
       dispatch({
-        type: `${API_ACTION_PREFIX}:store`,
+        type: `${API_ACTION_PREFIX}store`,
         payload: ctx.result.error,
       });
     }

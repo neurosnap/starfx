@@ -32,7 +32,7 @@ export function supervise<T>(
         attempt = 0;
       } else {
         yield* put({
-          type: `${API_ACTION_PREFIX}:supervise`,
+          type: `${API_ACTION_PREFIX}supervise`,
           payload: res.error,
           meta:
             `Exception caught, waiting ${waitFor}ms before restarting operation`,

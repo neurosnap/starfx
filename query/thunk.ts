@@ -134,7 +134,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     yield* next();
   }
 
-  const createType = (post: string) => `${API_ACTION_PREFIX}:${post}`;
+  const createType = (post: string) => `${API_ACTION_PREFIX}${post}`;
 
   function* onApi<P extends CreateActionPayload>(
     action: ActionWithPayload<P>,
@@ -218,7 +218,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
         dynamicMiddlewareMap[name] = fn;
       }
     };
-    actionFn.toString = () => name;
+    actionFn.toString = () => type;
     actionFn._success = {};
     actionFn._error = {};
     actionMap[name] = actionFn;

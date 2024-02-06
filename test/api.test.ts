@@ -18,6 +18,7 @@ import {
   takeEvery,
 } from "../mod.ts";
 import { useCache } from "../react.ts";
+import { API_ACTION_PREFIX } from "../action.ts";
 
 interface User {
   id: string;
@@ -237,7 +238,7 @@ it(tests, "run() from a normal saga", () => {
   store.dispatch(action2());
 });
 
-it(tests, "createApi with hash key on a large post", async () => {
+it(tests, "with hash key on a large post", async () => {
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.api());
@@ -289,12 +290,13 @@ it(tests, "createApi with hash key on a large post", async () => {
   const largetext = "abc-def-ghi-jkl-mno-pqr".repeat(100);
 
   store.run(query.bootup);
-  store.dispatch(createUserDefaultKey({ email, largetext }));
+  const action = createUserDefaultKey({ email, largetext });
+  store.dispatch(action);
 
   await sleep(150);
 
   const s = store.getState();
-  const expectedKey = createKey(`${createUserDefaultKey}`, {
+  const expectedKey = createKey(action.payload.name, {
     email,
     largetext,
   });
