@@ -103,7 +103,7 @@ export function* takeLeading<T>(
   }
 }
 
-export const API_ACTION_PREFIX = "@@starfx:";
+export const API_ACTION_PREFIX = "";
 export const createAction = (type: string) => {
   if (!type) throw new Error("createAction requires non-empty string");
   const action = () => ({ type });
