@@ -290,6 +290,8 @@ In review:
 
 # what is a supervisor task?
 
+[Supplemental reading from erlang](https://www.erlang.org/doc/design_principles/des_princ)
+
 A supervisor task is a way to monitor children tasks and probably most
 importantly, manage their health. By structuring your side-effects and business
 logic around supervisor tasks, we gain very interesting coding paradigms that
@@ -320,10 +322,9 @@ for events and if they fail, restart them.
 import { parallel, run, takeEvery } from "starfx";
 
 function* watchFetch() {
-  const task = yield* takeEvery("FETCH_USERS", function* (action) {
+  yield* takeEvery("FETCH_USERS", function* (action) {
     console.log(action);
   });
-  yield* task;
 }
 
 function* send() {
@@ -340,17 +341,16 @@ await run(
 Here we create a supervisor function using a helper `takeEvery` to call a
 function for every `FETCH_USERS` event emitted.
 
-However, this means that we are going to make the same request 3 times, we need
-a throttle or debounce to prevent this issue.
+However, this means that we are going to make the same request 3 times, we
+probably want a throttle or debounce to prevent this behavior.
 
 ```ts
 import { takeLeading } from "starfx";
 
 function* watchFetch() {
-  const task = yield* takeLeading("FETCH_USERS", function* (action) {
+  yield* takeLeading("FETCH_USERS", function* (action) {
     console.log(action);
   });
-  yield* task;
 }
 ```
 
@@ -364,8 +364,18 @@ Both thunks and endpoints support overriding the default `takeEvery` supervisor
 for either our officially supported supervisors `takeLatest` and `takeLeading`,
 or a user-defined supervisor.
 
-That's it. We are just leveraging the same tiny API that we are already using in
-`starfx`.
+Because every thunk and endpoint have their own supervisor tasks monitoring the
+health of their children, we allow the end-developer to change the default
+supervisor -- which is `takeEvery`:
+
+```ts
+const someAction = thunks.create("some-action", { supervisor: takeLatest });
+dispatch(someAction()); // this task gets cancelled
+dispatch(someAction()); // this task gets cancelled
+dispatch(someAction()); // this tasks lives
+```
+
+This is the power of supervisors and is fundamental to how `starfx` works.
 
 # example: test that doesn't need an http interceptor
 
