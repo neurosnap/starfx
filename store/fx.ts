@@ -34,12 +34,18 @@ export function* waitForLoader<M extends AnyState>(
   loaders: LoaderOutput<M, AnyState>,
   action: ThunkAction | ActionFnWithPayload,
 ) {
+  const id = getIdFromAction(action);
+  const selector = (s: AnyState) => loaders.selectById(s, { id });
+
+  // check for done state on init
+  let loader = yield* select(selector);
+  if (loader.isSuccess || loader.isError) {
+    return loader;
+  }
+
   while (true) {
     yield* take("*");
-    const id = getIdFromAction(action);
-    const loader = yield* select((s: AnyState) =>
-      loaders.selectById(s, { id })
-    );
+    loader = yield* select(selector);
     if (loader.isSuccess || loader.isError) {
       return loader;
     }
