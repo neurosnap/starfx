@@ -7,6 +7,8 @@ import {
 import type { AnyState, LoaderState } from "./types.ts";
 import type { ThunkAction } from "./query/mod.ts";
 import { type FxSchema, type FxStore, PERSIST_LOADER_ID } from "./store/mod.ts";
+import { ActionFn, ActionFnWithPayload } from "./types.ts";
+import { getIdFromAction } from "./query/mod.ts";
 
 export { useDispatch, useSelector } from "./deps.ts";
 export type { TypedUseSelectorHook } from "./deps.ts";
@@ -19,16 +21,13 @@ const {
   createElement: h,
 } = React;
 
-type ActionFn<P = any> = (p: P) => { toString: () => string };
-type ActionFnSimple = () => { toString: () => string };
-
 export interface UseApiProps<P = any> extends LoaderState {
   trigger: (p: P) => void;
-  action: ActionFn<P>;
+  action: ActionFnWithPayload<P>;
 }
 export interface UseApiSimpleProps extends LoaderState {
   trigger: () => void;
-  action: ActionFn;
+  action: ActionFnWithPayload;
 }
 export interface UseApiAction<A extends ThunkAction = ThunkAction>
   extends LoaderState {
@@ -93,10 +92,10 @@ export function useSchema<S extends AnyState>() {
  * ```
  */
 export function useLoader<S extends AnyState>(
-  action: ThunkAction | ActionFn,
+  action: ThunkAction | ActionFnWithPayload,
 ) {
   const schema = useSchema();
-  const id = typeof action === "function" ? `${action}` : action.payload.key;
+  const id = getIdFromAction(action);
   return useSelector((s: S) => schema.loaders.selectById(s, { id }));
 }
 
@@ -131,10 +130,10 @@ export function useApi<P = any, A extends ThunkAction = ThunkAction<P>>(
   action: A,
 ): UseApiAction<A>;
 export function useApi<P = any, A extends ThunkAction = ThunkAction<P>>(
-  action: ActionFn<P>,
+  action: ActionFnWithPayload<P>,
 ): UseApiProps<P>;
 export function useApi<A extends ThunkAction = ThunkAction>(
-  action: ActionFnSimple,
+  action: ActionFn,
 ): UseApiSimpleProps;
 export function useApi(action: any): any {
   const dispatch = useDispatch();

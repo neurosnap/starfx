@@ -1,8 +1,10 @@
 import { createThunks, type ThunksApi } from "./thunk.ts";
+import * as mdw from "./mdw.ts";
+
 export * from "./api.ts";
 export * from "./types.ts";
 export * from "./create-key.ts";
-import * as mdw from "./mdw.ts";
+export * from "./action.ts";
 
 export { createThunks, mdw, ThunksApi };
 
