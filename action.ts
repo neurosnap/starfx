@@ -12,6 +12,7 @@ import {
 import { ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";
+import { Callable } from "./mod.ts";
 
 export const ActionContext = createContext(
   "starfx:action",
@@ -100,6 +101,23 @@ export function* takeLeading<T>(
   while (true) {
     const action = yield* take(pattern);
     yield* call(() => op(action));
+  }
+}
+
+export function* waitFor(
+  predicate: Callable<boolean>,
+) {
+  const init = yield* call(predicate as any);
+  if (init) {
+    return;
+  }
+
+  while (true) {
+    yield* take("*");
+    const result = yield* call(() => predicate as any);
+    if (result) {
+      return;
+    }
   }
 }
 

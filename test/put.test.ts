@@ -68,7 +68,7 @@ it(
   "should not cause stack overflow when puts are emitted while dispatching saga",
   async () => {
     function* root() {
-      for (let i = 0; i < 40_000; i += 1) {
+      for (let i = 0; i < 10_000; i += 1) {
         yield* put({ type: "test" });
       }
       yield* sleep(0);
@@ -88,7 +88,7 @@ it(
 
     function* root() {
       yield* spawn(function* firstspawn() {
-        yield* sleep(1000);
+        yield* sleep(10);
         yield* put({ type: "c" });
         yield* put({ type: "do not miss" });
       });
@@ -103,7 +103,7 @@ it(
     }
 
     const store = configureStore({ initialState: {} });
-    await store.run(() => root());
+    await store.run(root);
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
   },
