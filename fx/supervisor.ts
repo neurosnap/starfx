@@ -11,7 +11,7 @@ export function superviseBackoff(attempt: number, max = 10): number {
 }
 
 /**
- * {@link supvervise} will watch whatever {@link Operation} is provided
+ * supvervise will watch whatever {@link Operation} is provided
  * and it will automatically try to restart it when it exists.  By
  * default it uses a backoff pressure mechanism so if there is an
  * error simply calling the {@link Operation} then it will exponentially

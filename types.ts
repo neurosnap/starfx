@@ -46,6 +46,9 @@ export interface Action {
   type: string;
 }
 
+export type ActionFn = () => { toString: () => string };
+export type ActionFnWithPayload<P = any> = (p: P) => { toString: () => string };
+
 // https://github.com/redux-utilities/flux-standard-action
 export interface AnyAction extends Action {
   payload?: any;

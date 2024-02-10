@@ -1,18 +1,21 @@
-import { assertLike, asserts, describe, expect, it, sleep } from "../test.ts";
+import { assertLike, asserts, describe, expect, it } from "../test.ts";
 import {
   configureStore,
   createSchema,
   slice,
   storeMdw,
   updateStore,
+  waitForLoader,
 } from "../store/mod.ts";
 import {
   createApi,
   createKey,
   mdw,
+  put,
   safe,
   takeEvery,
   takeLatest,
+  waitFor,
 } from "../mod.ts";
 import type { ApiCtx, Next, ThunkCtx } from "../mod.ts";
 
@@ -405,7 +408,9 @@ it(tests, "createApi with own key", async () => {
   store.run(query.bootup);
 
   store.dispatch(createUserCustomKey({ email: newUEmail }));
-  await sleep(150);
+
+  await store.run(waitForLoader(schema.loaders, createUserCustomKey));
+
   const expectedKey = theTestKey
     ? `/users [POST]|${theTestKey}`
     : createKey("/users [POST]", { email: newUEmail });
@@ -473,9 +478,10 @@ it(tests, "createApi with custom key but no payload", async () => {
   );
 
   store.run(query.bootup);
-
   store.dispatch(getUsers());
-  await sleep(150);
+
+  await store.run(waitForLoader(schema.loaders, getUsers));
+
   const expectedKey = theTestKey
     ? `/users [GET]|${theTestKey}`
     : createKey("/users [GET]", null);
@@ -547,7 +553,7 @@ it(tests, "errorHandler", () => {
 });
 
 it(tests, "stub predicate", async () => {
-  let actual = null;
+  let actual: { ok: boolean } = { ok: false };
   const api = createApi();
   api.use(function* (ctx, next) {
     ctx.stub = true;
@@ -563,6 +569,7 @@ it(tests, "stub predicate", async () => {
     function* (ctx, next) {
       yield* next();
       actual = ctx.json;
+      yield* put({ type: "DONE" });
     },
     stub(function* (ctx, next) {
       ctx.response = new Response(JSON.stringify({ frodo: "shire" }));
@@ -575,7 +582,9 @@ it(tests, "stub predicate", async () => {
   });
   store.run(api.bootup);
   store.dispatch(fetchUsers());
-  await sleep(150);
+
+  await store.run(waitFor(() => actual.ok));
+
   expect(actual).toEqual({
     ok: true,
     value: { frodo: "shire" },

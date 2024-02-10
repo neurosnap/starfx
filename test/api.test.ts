@@ -1,21 +1,25 @@
 import { describe, expect, it } from "../test.ts";
-import { sleep } from "../test.ts";
 import {
   configureStore,
   createSchema,
+  select,
   slice,
   storeMdw,
   updateStore,
+  waitForLoader,
 } from "../store/mod.ts";
 import {
+  AnyState,
   type ApiCtx,
   call,
   createApi,
   createKey,
   keepAlive,
   mdw,
+  Operation,
   safe,
   takeEvery,
+  waitFor,
 } from "../mod.ts";
 import { useCache } from "../react.ts";
 
@@ -44,9 +48,8 @@ const jsonBlob = (data: unknown) => {
 
 const tests = describe("createApi()");
 
-it(tests, "createApi - POST", async () => {
+it(tests, "POST", async () => {
   const query = createApi();
-
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
   query.use(query.routes());
@@ -102,7 +105,12 @@ it(tests, "createApi - POST", async () => {
   store.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
-  await sleep(150);
+
+  await store.run(waitFor(function* (): Operation<boolean> {
+    const res = yield* select((state: AnyState) => state.users["1"].id);
+    return res !== "";
+  }));
+
   expect(store.getState().users).toEqual({
     "1": { id: "1", name: "test", email: "test@test.com" },
   });
@@ -292,7 +300,7 @@ it(tests, "with hash key on a large post", async () => {
   const action = createUserDefaultKey({ email, largetext });
   store.dispatch(action);
 
-  await sleep(150);
+  await store.run(waitForLoader(schema.loaders, action));
 
   const s = store.getState();
   const expectedKey = createKey(action.payload.name, {
@@ -306,18 +314,16 @@ it(tests, "with hash key on a large post", async () => {
   });
 });
 
-it(tests, "createApi - two identical endpoints", async () => {
+it(tests, "two identical endpoints", () => {
   const actual: string[] = [];
   const { store, schema } = testStore();
   const api = createApi();
   api.use(mdw.api());
   api.use(storeMdw.store(schema));
-  api.use(mdw.nameParser);
   api.use(api.routes());
 
   const first = api.get(
     "/health",
-    { supervisor: takeEvery },
     function* (ctx, next) {
       actual.push(ctx.req().url);
       yield* next();
@@ -326,7 +332,6 @@ it(tests, "createApi - two identical endpoints", async () => {
 
   const second = api.get(
     ["/health", "poll"],
-    { supervisor: takeEvery },
     function* (ctx, next) {
       actual.push(ctx.req().url);
       yield* next();
@@ -336,8 +341,6 @@ it(tests, "createApi - two identical endpoints", async () => {
   store.run(api.bootup);
   store.dispatch(first());
   store.dispatch(second());
-
-  await sleep(150);
 
   expect(actual).toEqual(["/health", "/health"]);
 });

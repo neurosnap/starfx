@@ -1,6 +1,13 @@
-import { assertLike, asserts, describe, it, sleep } from "../test.ts";
+import { assertLike, asserts, describe, it } from "../test.ts";
 import { configureStore, updateStore } from "../store/mod.ts";
-import { call, createThunks, put, sleep as delay, takeEvery } from "../mod.ts";
+import {
+  call,
+  createThunks,
+  put,
+  sleep as delay,
+  takeEvery,
+  waitFor,
+} from "../mod.ts";
 import type { Next, ThunkCtx } from "../mod.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -397,6 +404,7 @@ it(tests, "middleware order of execution", async () => {
       acc += "a";
       yield* next();
       acc += "g";
+      yield* put({ type: "DONE" });
     },
   );
 
@@ -404,7 +412,7 @@ it(tests, "middleware order of execution", async () => {
   store.run(api.bootup);
   store.dispatch(action());
 
-  await sleep(150);
+  await store.run(waitFor(() => acc === "abcdefg"));
   asserts.assert(acc === "abcdefg");
 });
 
@@ -417,11 +425,13 @@ it(tests, "retry with actionFn", async () => {
 
   const action = api.create(
     "/api",
-    { supervisor: takeEvery },
     function* (ctx, next) {
       acc += "a";
       yield* next();
       acc += "g";
+      if (acc === "agag") {
+        yield* put({ type: "DONE" });
+      }
 
       if (!called) {
         called = true;
@@ -434,7 +444,7 @@ it(tests, "retry with actionFn", async () => {
   store.run(api.bootup);
   store.dispatch(action());
 
-  await sleep(150);
+  await store.run(waitFor(() => acc === "agag"));
   asserts.assertEquals(acc, "agag");
 });
 
@@ -464,7 +474,7 @@ it(tests, "retry with actionFn with payload", async () => {
   store.run(api.bootup);
   store.dispatch(action({ page: 1 }));
 
-  await sleep(150);
+  await store.run(waitFor(() => acc === "agag"));
   asserts.assertEquals(acc, "agag");
 });
 

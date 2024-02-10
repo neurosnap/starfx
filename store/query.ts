@@ -128,7 +128,7 @@ export function loaderApi<
     }
 
     if (!ctx.loader) {
-      ctx.loader || {};
+      ctx.loader = {};
     }
 
     if (!ctx.response.ok) {
