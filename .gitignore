@@ -5,3 +5,5 @@ npm/
 .DS_Store
 *.bak
 .vscode
+docs/public/*
+!docs/public/.gitkeep
