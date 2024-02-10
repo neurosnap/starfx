@@ -4,10 +4,10 @@ clean:
 .PHONY: clean
 
 ssg: clean
-	go run ./docs/main.go
+	cd docs && go run ./main.go
 	cp ./docs/static/* ./docs/public
 .PHONY: ssg
 
 local: ssg
-	rsync -vr ./docs/public/ erock@pgs.sh:/docs-local
+	rsync -vr ./docs/public/ erock@pgs.sh:/starfx-local
 .PHONY: dev
