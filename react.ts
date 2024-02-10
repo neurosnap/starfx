@@ -1,17 +1,18 @@
+import React from "https://esm.sh/react@18.2.0?pin=v122";
 import {
   Provider as ReduxProvider,
-  React,
   useDispatch,
   useSelector,
-} from "./deps.ts";
+} from "https://esm.sh/react-redux@8.0.5?pin=v122";
+export type {
+  TypedUseSelectorHook,
+} from "https://esm.sh/react-redux@8.0.5?pin=v122";
+
 import type { AnyState, LoaderState } from "./types.ts";
 import type { ThunkAction } from "./query/mod.ts";
 import { type FxSchema, type FxStore, PERSIST_LOADER_ID } from "./store/mod.ts";
 import { ActionFn, ActionFnWithPayload } from "./types.ts";
 import { getIdFromAction } from "./action.ts";
-
-export { useDispatch, useSelector } from "./deps.ts";
-export type { TypedUseSelectorHook } from "./deps.ts";
 
 const {
   useContext,
@@ -20,6 +21,8 @@ const {
   createContext,
   createElement: h,
 } = React;
+
+export { useDispatch, useSelector };
 
 export interface UseApiProps<P = any> extends LoaderState {
   trigger: (p: P) => void;

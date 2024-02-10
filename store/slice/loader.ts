@@ -1,4 +1,4 @@
-import { createSelector } from "../../deps.ts";
+import { createSelector } from "../deps.ts";
 import type {
   AnyState,
   LoaderItemState,

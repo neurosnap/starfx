@@ -1,7 +1,6 @@
-import { asserts, describe, it } from "../test.ts";
+import { asserts, describe, it, React } from "../test.ts";
 import { Provider } from "../react.ts";
 import { createSchema, createStore, slice } from "../store/mod.ts";
-import { React } from "../deps.ts";
 
 const tests = describe("react");
 

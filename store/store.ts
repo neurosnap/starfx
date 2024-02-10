@@ -2,9 +2,7 @@ import {
   Callable,
   createScope,
   createSignal,
-  enablePatches,
   Ok,
-  produceWithPatches,
   Result,
   Scope,
   Task,
@@ -16,6 +14,7 @@ import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { ActionContext, emit } from "../action.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
+import { enablePatches, produceWithPatches } from "./deps.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
 

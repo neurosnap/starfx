@@ -1,3 +1,5 @@
+import React from "https://esm.sh/react@18.2.0?pin=v122";
+export { React };
 export { assert } from "https://deno.land/std@0.187.0/testing/asserts.ts";
 export {
   beforeEach,

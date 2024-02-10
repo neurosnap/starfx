@@ -1,15 +1,9 @@
 import type { LoaderOutput } from "./slice/loader.ts";
 import type { TableOutput } from "./slice/table.ts";
-import type {
-  Callable,
-  Operation,
-  Patch,
-  Result,
-  Scope,
-  Task,
-} from "../deps.ts";
+import type { Callable, Operation, Result, Scope, Task } from "../deps.ts";
 import { BaseCtx } from "../mod.ts";
 import type { AnyAction, AnyState } from "../types.ts";
+import type { Patch } from "./deps.ts";
 
 export type StoreUpdater<S extends AnyState> = (s: S) => S | void;
 

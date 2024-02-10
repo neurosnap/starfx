@@ -1,4 +1,4 @@
-import { createSelector } from "../../deps.ts";
+import { createSelector } from "../deps.ts";
 import type { AnyState, IdProp } from "../../types.ts";
 import { BaseSchema } from "../types.ts";
 
