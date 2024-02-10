@@ -4,8 +4,8 @@ import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext } from "./context.ts";
 import { LoaderOutput } from "./slice/loader.ts";
 import { parallel, safe } from "../fx/mod.ts";
-import { getIdFromAction, ThunkAction } from "../query/mod.ts";
-import { take } from "../action.ts";
+import { ThunkAction } from "../query/mod.ts";
+import { getIdFromAction, take } from "../action.ts";
 
 export function* updateStore<S extends AnyState>(
   updater: StoreUpdater<S> | StoreUpdater<S>[],

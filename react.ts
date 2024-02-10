@@ -8,7 +8,7 @@ import type { AnyState, LoaderState } from "./types.ts";
 import type { ThunkAction } from "./query/mod.ts";
 import { type FxSchema, type FxStore, PERSIST_LOADER_ID } from "./store/mod.ts";
 import { ActionFn, ActionFnWithPayload } from "./types.ts";
-import { getIdFromAction } from "./query/mod.ts";
+import { getIdFromAction } from "./action.ts";
 
 export { useDispatch, useSelector } from "./deps.ts";
 export type { TypedUseSelectorHook } from "./deps.ts";

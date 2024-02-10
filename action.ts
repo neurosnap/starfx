@@ -1,5 +1,6 @@
 import {
   call,
+  Callable,
   createContext,
   createSignal,
   each,
@@ -12,7 +13,7 @@ import {
 import { ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";
-import { Callable } from "./mod.ts";
+import { ActionFnWithPayload } from "./types.ts";
 
 export const ActionContext = createContext(
   "starfx:action",
@@ -119,6 +120,12 @@ export function* waitFor(
       return;
     }
   }
+}
+
+export function getIdFromAction(
+  action: ActionWithPayload<{ key: string }> | ActionFnWithPayload,
+): string {
+  return typeof action === "function" ? action.toString() : action.payload.key;
 }
 
 export const API_ACTION_PREFIX = "";

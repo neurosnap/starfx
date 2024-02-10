@@ -4,7 +4,6 @@ import * as mdw from "./mdw.ts";
 export * from "./api.ts";
 export * from "./types.ts";
 export * from "./create-key.ts";
-export * from "./action.ts";
 
 export { createThunks, mdw, ThunksApi };
 
