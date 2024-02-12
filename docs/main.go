@@ -21,7 +21,67 @@ func main() {
 			Text: "Getting started",
 			Href: "/getting-started",
 			Page: pager("getting-started.md"),
-			Tag:  "Help",
+			Tag:  "Info",
+		},
+		{
+			Text: "Thunks",
+			Href: "/thunks",
+			Page: pager("thunks.md"),
+			Tag:  "Side Effects",
+		},
+		{
+			Text: "Endpoints",
+			Href: "/endpoints",
+			Page: pager("endpoints.md"),
+			Tag:  "Side Effects",
+		},
+		{
+			Text: "Store",
+			Href: "/store",
+			Page: pager("store.md"),
+			Tag:  "Store",
+		},
+		{
+			Text: "React",
+			Href: "/react",
+			Page: pager("react.md"),
+			Tag:  "View",
+		},
+		{
+			Text: "Schema",
+			Href: "/schema",
+			Page: pager("schema.md"),
+			Tag:  "Store",
+		},
+		{
+			Text: "Structured Concurrency",
+			Href: "/structured-concurrency",
+			Page: pager("structured-concurrency.md"),
+			Tag:  "Info",
+		},
+		{
+			Text: "Supervisors",
+			Href: "/supervisors",
+			Page: pager("supervisors.md"),
+			Tag:  "Advanced",
+		},
+		{
+			Text: "Testing",
+			Href: "/testing",
+			Page: pager("testing.md"),
+			Tag:  "Advanced",
+		},
+		{
+			Text: "API",
+			Href: "/api",
+			Page: pager("api.md"),
+			Tag:  "Info",
+		},
+		{
+			Text: "Resources",
+			Href: "/resources",
+			Page: pager("resources.md"),
+			Tag:  "Info",
 		},
 	}
 
