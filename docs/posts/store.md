@@ -47,17 +47,12 @@ interface User {
 }
 
 // app-wide database for ui, api data, or anything that needs reactivity
-const { db, initialState, update } = createSchema({
-  users: slice.table<User>(),
+const schema = createSchema({
   cache: slice.table(),
   loaders: slice.loader(),
-  // -- more slice examples --
-  // token: slice.str(),
-  // nav: slice.obj<{ collapsed: boolean }>(),
-  // counter: slice.num(0),
-  // userIds: slice.any<string[]>(),
+  users: slice.table<User>(),
 });
-type AppState = typeof initialState;
+type WebState = typeof schema.initialState;
 
 // just a normal endpoint
 const fetchUsers = api.get<never, User[]>(
@@ -79,17 +74,18 @@ const fetchUsers = api.get<never, User[]>(
     }, {});
 
     // update the store and trigger a re-render in react
-    yield* update(db.users.add(users));
+    yield* schema.update(schema.users.add(users));
 
     // User[]
-    const users = yield* select(db.users.selectTableAsList);
+    const users = yield* select(schema.users.selectTableAsList);
     // User
     const user = yield* select(
-      (state) => db.users.selectById(state, { id: "1" }),
+      (state) => schema.users.selectById(state, { id: "1" }),
     );
   },
 );
 
-const store = configureStore({ initialState });
+const store = configureStore(schema);
+store.run(api.bootup);
 store.dispatch(fetchUsers());
 ```

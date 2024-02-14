@@ -3,14 +3,6 @@ title: Getting Started
 description: Use starfx with deno, node, or the browser
 ---
 
-# features
-
-- task tree side-effect management system (like `redux-saga`)
-- task management and fault-tolerance via supervisors
-- simple immutable data store (like `redux`)
-- traceability throughout the entire system (event logs via dispatching actions)
-- data synchronization and caching for `react` (like `react-query`, `rtk-query`)
-
 # design philosophy
 
 - user interaction is a side-effect of using a web app
@@ -50,4 +42,56 @@ yarn add starfx
 
 ```ts
 import * as starfx from "https://deno.land/x/starfx@0.7.0/mod.ts";
+```
+
+# the simplest example
+
+Here we demonstrate a complete example so you can get a glimpse of how `starfx`
+works. The rest of our docs will go into more detail for how all the pieces
+work.
+
+```tsx
+import ReactDOM from "react-dom/client";
+import { createApi, mdw } from "starfx";
+import { configureStore, createSchema, slice } from "starfx/store";
+import { Provider, useCache } from "starfx/react";
+
+const api = createApi();
+api.use(mdw.api());
+api.use(api.routes());
+api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
+
+const fetchUsers = api.get("/users", api.cache());
+
+const schema = createSchema({
+  loaders: slice.loader(),
+  cache: slice.table(),
+});
+const store = configureStore(schema);
+type WebState = typeof store.initialState;
+
+store.run(api.bootup);
+
+function App() {
+  const { isLoading, data: users } = useCache(fetchUsers());
+
+  if (isLoading) {
+    return <div>Loading ...</div>;
+  }
+
+  return (
+    <div>
+      {users.map(
+        (user) => <div key={user.id}>{user.name}</div>,
+      )}
+    </div>
+  );
+}
+
+const root = document.getElementById("root") as HTMLElement;
+ReactDOM.createRoot(root).render(
+  <Provider schema={schema} store={store}>
+    <App />
+  </Provider>,
+);
 ```

@@ -9,22 +9,22 @@ also wield the full power of structured concurrency.
 
 As I've been developing these specialized thunks, I'm starting to think of them
 more like micro-controllers. Only thunks and endpoints have the ability to
-update state. However, thunks are not tied to any particular view and in that
-way are more composable. Thunks can call other thunks and you have the async
-flow control tools from effection to facilitate coordination.
+update state (think MVC). However, thunks are not tied to any particular view
+and in that way are more composable. Thunks can call other thunks and you have
+the async flow control tools from `effection` to facilitate coordination.
 
-Every thunk that is created requires a unique id -- user provided string. This
+Every thunk that's created requires a unique id -- user provided string. This
 provides us with a handful of benefits:
 
 - User hand-labels each thunk created
-- Better traceability (via labels)
-- Easier to debug async and side-effects in general (via labels)
+- Better traceability
+- Easier to debug async and side-effects
 - Build abstractions off naming conventions (e.g. creating routers
   `/users [GET]`)
 
-They also come with built-in support for a middleware stack (like `express`).
-This provides a familiar and powerful abstraction for async flow control for all
-thunks and endpoints.
+They also come with built-in support for a middleware stack (like `express` or
+`koa`). This provides a familiar and powerful abstraction for async flow control
+for all thunks and endpoints.
 
 Each run of a thunk gets its own `ctx` object which provides a substrate to
 communicate between middleware.
