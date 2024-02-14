@@ -11,3 +11,7 @@ ssg: clean
 local: ssg
 	rsync -vr ./docs/public/ erock@pgs.sh:/starfx-local
 .PHONY: dev
+
+prod: ssg
+	rsync -vr ./docs/public/ erock@pgs.sh:/starfx-prod
+.PHONY: prod
