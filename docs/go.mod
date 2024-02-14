@@ -1,6 +1,6 @@
 module github.com/neurosnap/starfx/docs
 
-go 1.22.0
+go 1.22
 
 require github.com/picosh/pdocs v0.0.0-20240205045212-d44525ffbbf5
 
