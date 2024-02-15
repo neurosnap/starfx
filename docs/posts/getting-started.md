@@ -110,4 +110,4 @@ need to understand how `effection` works.
 We highly recommend reading through their docs at least once to get some
 fundamental knowledge for how these libraries work.
 
-[https://frontside.com/effection](Read the `effection` docs)
+[Read the `effection` docs](https://frontside.com/effection)
