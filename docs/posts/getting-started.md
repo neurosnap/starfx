@@ -108,6 +108,6 @@ that for us. As a result, in order to be successful using `starfx` developers
 need to understand how `effection` works.
 
 We highly recommend reading through their docs at least once to get some
-fundamental knowledge for how these libraries work.
+fundamental knowledge for how these libraries work together.
 
 [Read the `effection` docs](https://frontside.com/effection)

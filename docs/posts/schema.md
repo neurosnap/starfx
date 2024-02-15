@@ -55,7 +55,7 @@ function*() {
 }
 ```
 
-# `slice.num`
+# `num`
 
 This slice has some custom actions to manage a number value.
 
@@ -73,7 +73,7 @@ function*() {
 }
 ```
 
-# `slice.str`
+# `str`
 
 This slice is probably not super useful since it is essentially the same as
 `slice.any<string>` but we could add more actions to it in the future.
@@ -90,7 +90,7 @@ function*() {
 }
 ```
 
-# `slice.obj`
+# `obj`
 
 This is a specialized slice with some custom actions to deal with javascript
 objects.
@@ -114,7 +114,7 @@ function*() {
 }
 ```
 
-# `slice.table`
+# `table`
 
 This is the more powerful and specialized slice we created. It attempts to
 mimick a database table where it holds an object:
