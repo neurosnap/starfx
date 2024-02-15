@@ -46,11 +46,14 @@ import * as starfx from "https://deno.land/x/starfx@0.7.0/mod.ts";
 
 # the simplest example
 
-Here we demonstrate a complete example so you glimpse at how `starfx` works.
+Here we demonstrate a complete example so you can glimpse at how `starfx` works.
+In this example, we will fetch users from an API endpoint, cache the `Response`
+json, and then ensure the endpoint only gets called at-most once every **5
+minutes**, mimicking the basic features of `react-query`.
 
 ```tsx
 import ReactDOM from "react-dom/client";
-import { createApi, mdw } from "starfx";
+import { createApi, mdw, timer } from "starfx";
 import { configureStore, createSchema, slice } from "starfx/store";
 import { Provider, useCache } from "starfx/react";
 
@@ -59,7 +62,11 @@ api.use(mdw.api());
 api.use(api.routes());
 api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
 
-const fetchUsers = api.get("/users", api.cache());
+const fetchUsers = api.get(
+  "/users",
+  { supervisor: timer() },
+  api.cache(),
+);
 
 const schema = createSchema({
   loaders: slice.loader(),
@@ -93,3 +100,14 @@ ReactDOM.createRoot(root).render(
   </Provider>,
 );
 ```
+
+# `effection`
+
+In order to support structured concurrency, we are using `effection` to manage
+that for us. As a result, in order to be successful using `starfx` developers
+need to understand how `effection` works.
+
+We highly recommend reading through their docs at least once to get some
+fundamental knowledge for how these libraries work.
+
+[https://frontside.com/effection](Read the `effection` docs)
