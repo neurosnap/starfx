@@ -3,12 +3,12 @@ title: Supervisors
 description: Learn how supervisor tasks work
 ---
 
-[Supplemental reading from erlang](https://www.erlang.org/doc/design_principles/des_princ)
-
 A supervisor task is a way to monitor children tasks and probably most
 importantly, manage their health. By structuring your side-effects and business
 logic around supervisor tasks, we gain very interesting coding paradigms that
 result is easier to read and manage code.
+
+[Supplemental reading from erlang](https://www.erlang.org/doc/design_principles/des_princ)
 
 The most basic version of a supervisor is simply an infinite loop that calls a
 child task:
@@ -89,3 +89,63 @@ dispatch(someAction()); // this tasks lives
 ```
 
 This is the power of supervisors and is fundamental to how `starfx` works.
+
+# poll
+
+When activated, call a thunk or endpoint once every N millisecond indefinitely
+until cancelled.
+
+```ts
+import { poll } from "starfx";
+
+const fetchUsers = api.get("/users", { supervisor: poll() });
+store.dispatch(fetchUsers());
+// fetch users
+// sleep 5000
+// fetch users
+// sleep 5000
+// fetch users
+store.dispatch(fetchUsers());
+// cancelled
+```
+
+The default value provided to `poll()` is **5 seconds**.
+
+You can optionally provide a cancel action instead of calling the thunk twice:
+
+```ts
+import { poll } from "starfx";
+
+const cancelPoll = createAction("cancel-poll");
+const fetchUsers = api.get("/users", {
+  supervisor: poll(5 * 1000, `${cancelPoll}`),
+});
+store.dispatch(fetchUsers());
+// fetch users
+// sleep 5000
+// fetch users
+// sleep 5000
+// fetch users
+store.dispatch(cancelPoll());
+// cancelled
+```
+
+# timer
+
+Only call a thunk or endpoint at-most once every N milliseconds.
+
+```ts
+import { timer } from "starfx";
+
+const fetchUsers = api.get("/users", { supervisor: timer(1000) });
+store.dispatch(fetchUsers());
+store.dispatch(fetchUsers());
+// sleep(100);
+store.dispatch(fetchUsers());
+// sleep(1000);
+store.dispatch(fetchUsers());
+// called: 2 times
+```
+
+The default value provided to `timer()` is **5 minutes**. This means you can
+only call `fetchUsers` at-most once every **5 minutes**.

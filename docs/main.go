@@ -54,6 +54,30 @@ func main() {
 			Tag:  "Store",
 		},
 		{
+			Text: "Caching",
+			Href: "/caching",
+			Page: pager("caching.md"),
+			Tag:  "Store",
+		},
+		{
+			Text: "Dependent Queries",
+			Href: "/dependent-queries",
+			Page: pager("dependent.md"),
+			Tag:  "Side Effects",
+		},
+		{
+			Text: "Middleware",
+			Href: "/middleware",
+			Page: pager("mdw.md"),
+			Tag:  "Side Effects",
+		},
+		{
+			Text: "Loaders",
+			Href: "/loaders",
+			Page: pager("loader.md"),
+			Tag:  "Side Effects",
+		},
+		{
 			Text: "Structured Concurrency",
 			Href: "/structured-concurrency",
 			Page: pager("structured-concurrency.md"),

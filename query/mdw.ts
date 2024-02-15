@@ -97,7 +97,7 @@ export function* queryCtx<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
  * This middleware is a composition of many middleware used to faciliate
  * the {@link createApi}.
  *
- * It is not required, however,
+ * It is not required, however, it is battle-tested and highly recommended.
  */
 export function api<Ctx extends ApiCtx = ApiCtx>() {
   return compose<Ctx>([

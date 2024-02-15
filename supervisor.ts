@@ -8,7 +8,7 @@ const MS = 1000;
 const SECONDS = 1 * MS;
 const MINUTES = 60 * SECONDS;
 
-export function poll(parentTimer: number = 5 * 1000, cancelType?: string) {
+export function poll(parentTimer: number = 5 * SECONDS, cancelType?: string) {
   return function* poller<T>(
     actionType: string,
     op: (action: AnyAction) => Operation<T>,

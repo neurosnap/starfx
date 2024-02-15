@@ -3,6 +3,24 @@ title: Schema
 description: Learn more about schamas and slices
 ---
 
+A schema has two primary features:
+
+- A fully typed state shape
+- Reusable pieces of state management logic
+
+A schema must be an object. It is composed of slices of state. Slices can
+represent any data type, however, we recommend keeping it as JSON serializable
+as possible. Slices not only hold a value, but associated with that value are
+ways to:
+
+- Update the value
+- Query for data within the value
+
+# Built-in slices
+
+As a result, the following slices should cover the most common data types and
+associated logic:
+
 - `any`
 - `loader`
 - `num`
@@ -10,8 +28,14 @@ description: Learn more about schamas and slices
 - `str`
 - `table`
 
+# Schema assumptions
+
 `createSchema` requires two slices by default in order for it and everything
 inside `starfx` to function properly: `cache` and `loader`.
+
+Why do we require those slices? Because if we can assume those exist, we can
+build a lot of useful middleware and supervisors on top of that assumption. It's
+a place for `starfx` and third-party functionality to hold their state.
 
 # Build your own slice
 

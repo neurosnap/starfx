@@ -3,7 +3,9 @@ title: Endpoints
 description: endpoints are tasks for managing HTTP requests
 ---
 
-Building off of `createThunks` we have a way to easily manage http requests.
+An endpoint is just a specialized thunk designed to manage http requests. It has
+a supervisor, it has a middleware stack, and it hijacks the unique id for our
+thunks and turns it into a router.
 
 ```ts
 import { createApi, mdw } from "starfx";
@@ -35,3 +37,24 @@ store.dispatch(fetchUsers());
 // lets update a user record
 store.dispatch(updateUser({ id: "1", name: "bobby" }));
 ```
+
+# The same API endpoints but different logic
+
+It is very common to have the same endpoint with different business logic
+associated with it.
+
+For example, sometimes I need a simple `fetchUsers` endpoint as well as a
+`fetchUsersPoll` endpoint, essentially the same endpoint, but different
+supervisor tasks.
+
+Since the router is defined by a thunk id that must be unique, we have to
+support a workaround:
+
+```ts
+const fetchUsers = api.get("/users");
+const fetchUsersPoll = api.get(["/users", "poll"], { supervisors: poll() });
+```
+
+The first part of the array is what is used for the router, everything else is
+unused. This lets you create as many different variations of calling that
+endpoint that you need.

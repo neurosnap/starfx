@@ -24,7 +24,7 @@ server that serves files and that's it.
 Is your app highly interactive, requiring it to persist data across pages? This
 is the sweet spot for `starfx`.
 
-You can use this library as general purpose structured concurrency, but
+You can use this library for general purpose structured concurrency, but
 [effection](https://github.com/thefrontside/effection) serves those needs well.
 
 You could use this library for SSR, but I don't heavily build SSR apps, so I
@@ -46,9 +46,7 @@ import * as starfx from "https://deno.land/x/starfx@0.7.0/mod.ts";
 
 # the simplest example
 
-Here we demonstrate a complete example so you can get a glimpse of how `starfx`
-works. The rest of our docs will go into more detail for how all the pieces
-work.
+Here we demonstrate a complete example so you glimpse at how `starfx` works.
 
 ```tsx
 import ReactDOM from "react-dom/client";
