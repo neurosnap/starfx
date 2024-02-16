@@ -97,6 +97,31 @@ const fetchUsers = api.get<never, Success>(
 );
 ```
 
+# Using variables inside the API endpoint
+
+Just like other popular server-side routing libraries, we have a way to provide
+slots in our URI to fill with actual values. This is critical for CRUD
+operations that have ids inside the URI.
+
+```ts
+const fetchUsersByAccount = api.get<{ id: string }>("/accounts/:id/users");
+const fetchServices = api.get<{ accountId: string; appId: string }>(
+  "/accounts/:accountId/apps/:appId/services",
+);
+```
+
+One ergonomic feature we baked into this functionality is: what happens when
+`id` is empty?
+
+```ts
+const fetchUsersByAccount = api.get<{ id: string }>("/accounts/:id/users");
+store.dispatch(fetchUsersByAccount({ id: "" }));
+```
+
+In this case we detect that there is no id and bail early. So you can hit this
+endpoint with empty data and it'll just exit early. Convenient when the view
+just throws around data without checking if it is filled.
+
 # The same API endpoints but different logic
 
 It is very common to have the same endpoint with different business logic
