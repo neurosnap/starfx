@@ -143,12 +143,19 @@ The first part of the array is what is used for the router, everything else is
 unused. This lets you create as many different variations of calling that
 endpoint that you need.
 
+# `ctx.request`
+
+This is a `Request` object that will feed directly into a `fetch` request.
+End-users are able to manipulate it however they want regardless of what was set
+on it previously. We have mdw that will automatically manipulate it but it all
+lives inside the mdw stack that the end-user can control.
+
 # Using `ctx.req`
 
 `ctx.req` is a helper function to merge what currently exists inside
 `ctx.request` with new properties. It is gaurenteed to return a valid `Request`
-object and performs a deep merge on `ctx.request` and what the user provides to
-it.
+object and performs a deep merge between `ctx.request` and what the user
+provides to it.
 
 ```ts
 const fetchUsers = api.get("/users", function*(ctx, next) {
@@ -161,6 +168,16 @@ const fetchUsers = api.get("/users", function*(ctx, next) {
   yield* next();
 }
 ```
+
+# `ctx.response`
+
+This is a fetch `Response` object that our `mdw.fetch` will fill automatically.
+
+# `ctx.json`
+
+Our `mdw.fetch` will automatically fill this value as a `Result` type derived
+from `Response.json`. Success or failure of this property is determined by
+`Response.ok` and if we can successully call `Response.json` without errors.
 
 # Middleware automation
 
