@@ -47,6 +47,9 @@ func main() {
 			Children: []*pdocs.Sitemap {
 				pdocs.AnchorTagSitemap("Enforcing fetch response type"),
 				pdocs.AnchorTagSitemap("The same API endpoints but different logic"),
+				pdocs.AnchorTagSitemap("Using variables inside the API endpoint"),
+				{ Text: "Using ctx.req", Href: "using-ctxreq" },
+				pdocs.AnchorTagSitemap("Middleware automation"),
 			},
 		},
 		{

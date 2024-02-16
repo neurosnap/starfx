@@ -162,7 +162,7 @@ const fetchUsers = api.get("/users", function*(ctx, next) {
 }
 ```
 
-# Middleware
+# Middleware automation
 
 Because endpoints use the same powerful middleware system employed by thunks, we
 can do quite a lot of automating for API requests -- to the point where an
