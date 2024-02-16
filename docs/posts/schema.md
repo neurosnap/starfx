@@ -183,7 +183,7 @@ in your system.
 
 [Read more about entity factories.](https://bower.sh/entity-factories)
 
-# `slice.loader`
+# `loader`
 
 This is a specialized database table specific to managing loaders in `starfx`.
 [Read more about loaders here](/loader).

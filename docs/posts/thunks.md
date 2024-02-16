@@ -61,3 +61,64 @@ store.dispatch(log("sending log message"));
 // last mdw in the stack
 // after all remaining middleware have run
 ```
+
+# Thunk action
+
+When creating a thunk, the return value is just an action creator:
+
+```ts
+console.log(log("sending log message"));
+{
+  type: "log",
+  payload: "sending log message"
+}
+```
+
+A thunk action adheres to the
+[flux standard action spec](https://github.com/redux-utilities/flux-standard-action).
+
+# Thunk payload
+
+When calling a thunk, the user can provide a payload that is strictly enforced
+and accessible via the `ctx.payload` property:
+
+```ts
+const makeItSo = api.get<{ id: string }>("make-it-so", function* (ctx, next) {
+  console.log(ctx.payload);
+  yield* next();
+});
+
+makeItSo(); // type error!
+makeItSo("123"); // type error!
+makeItSo({ id: "123" }); // nice!
+```
+
+# Custom `ctx`
+
+End-users are able to provide a custom `ctx` object to their thunks. It must
+extend `ThunkCtx` in order for it to pass, but otherwise you are free to add
+whatever properties you want:
+
+```ts
+import { createThunks, type ThunkCtx } from "starfx";
+
+interface MyCtx extends ThunkCtx {
+  wow: bool;
+}
+
+const thunks = createThunks<MyCtx>();
+
+// we recommend a mdw that ensures the property exists since we cannot
+// make that guarentee
+thunks.use(function* (ctx, next) {
+  if (!Object.hasOwn(ctx, "wow")) {
+    ctx.wow = false;
+  }
+  yield* next();
+});
+
+const log = thunks.create("log", function* (ctx, next) {
+  ctx.wow = true;
+  yield* next();
+});
+```

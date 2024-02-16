@@ -89,3 +89,54 @@ const store = configureStore(schema);
 store.run(api.bootup);
 store.dispatch(fetchUsers());
 ```
+
+# How to update state
+
+There are **three** ways to update state, each with varying degrees of type
+safety:
+
+```ts
+import { updateStore } from "starfx/store";
+
+function*() {
+  // good types
+  yield* schema.update([/* ... */]);
+  // no types
+  yield* updateStore([/* ... */]);
+}
+
+store.run(function*() {
+  // no types
+  yield* store.update([/* ... */]);
+});
+```
+
+`schema.update` has the highest type safety because it knows your state shape.
+The other methods are more generic and the user will have to provide types to
+them manually.
+
+# Updating state from view
+
+You cannot directly update state from the view, users can only manipulate state
+from a thunk, endpoint, or a delimited continuation.
+
+This is a design decision that forces everything to route through our mini
+controllers.
+
+However, it is very easy to create a controller to do simple tasks like updating
+state:
+
+```ts
+import type { StoreUpdater } from "starfx/store";
+
+const updater = thunks.create<StoreUpdater[]>("update", function* (ctx, next) {
+  yield* updateStore(ctx.payload);
+  yield* next();
+});
+
+store.dispatch(
+  updater([
+    schema.users.add({ [user1.id]: user }),
+  ]),
+);
+```

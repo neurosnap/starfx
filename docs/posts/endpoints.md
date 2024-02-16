@@ -38,6 +38,65 @@ store.dispatch(fetchUsers());
 store.dispatch(updateUser({ id: "1", name: "bobby" }));
 ```
 
+# Enforcing fetch response type
+
+When using `createApi` and `mdw.fetch` we can provide the type that we think
+will be returned by the fetch response:
+
+```ts
+interface Success {
+  users: User[];
+}
+
+interface Err {
+  error: string;
+}
+
+const fetchUsers = api.get<never, Success, Err>(
+  "/users",
+  function* (ctx, next) {
+    yield* next();
+
+    if (!ctx.json.ok) {
+      // we have an error type
+      console.log(ctx.json.value.error);
+      return;
+    }
+
+    // we have a success type
+    console.log(ctx.json.value.users);
+  },
+);
+```
+
+When calling `createApi` you can also pass it a generic error type that all
+endpoints inherit:
+
+```ts
+import type { ApiCtx } from "starfx";
+
+type MyApiCtx<P = any, S = any> = ApiCtx<P, S, { error: string }>;
+
+const api = createApi<MyApiCtx>();
+
+// this will inherit the types from `MyApiCtx`
+const fetchUsers = api.get<never, Success>(
+  "/users",
+  function* (ctx, next) {
+    yield* next();
+
+    if (!ctx.json.ok) {
+      // we have an error type
+      console.log(ctx.json.value.error);
+      return;
+    }
+
+    // we have a success type
+    console.log(ctx.json.value.users);
+  },
+);
+```
+
 # The same API endpoints but different logic
 
 It is very common to have the same endpoint with different business logic
