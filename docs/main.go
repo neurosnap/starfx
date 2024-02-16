@@ -49,7 +49,7 @@ func main() {
 				pdocs.AnchorTagSitemap("The same API endpoints but different logic"),
 				pdocs.AnchorTagSitemap("Using variables inside the API endpoint"),
 				pdocs.AnchorTagSitemap("ctx.request"),
-				{ Text: "Using ctx.req", Href: "using-ctxreq" },
+				pdocs.AnchorTagSitemap("Using ctx.req"),
 				pdocs.AnchorTagSitemap("ctx.response"),
 				pdocs.AnchorTagSitemap("ctx.json"),
 				pdocs.AnchorTagSitemap("Middleware automation"),
