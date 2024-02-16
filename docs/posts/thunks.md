@@ -93,6 +93,18 @@ makeItSo("123"); // type error!
 makeItSo({ id: "123" }); // nice!
 ```
 
+If you do not provide a type for an endpoint, then the action can be dispatched
+without a payload:
+
+```ts
+const makeItSo = api.get("make-it-so", function* (ctx, next) {
+  console.log(ctx.payload);
+  yield* next();
+});
+
+makeItSo(); // nice!
+```
+
 # Custom `ctx`
 
 End-users are able to provide a custom `ctx` object to their thunks. It must

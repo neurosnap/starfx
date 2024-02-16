@@ -117,3 +117,260 @@ const fetchUsersPoll = api.get(["/users", "poll"], { supervisors: poll() });
 The first part of the array is what is used for the router, everything else is
 unused. This lets you create as many different variations of calling that
 endpoint that you need.
+
+# Using `ctx.req`
+
+`ctx.req` is a helper function to merge what currently exists inside
+`ctx.request` with new properties. It is gaurenteed to return a valid `Request`
+object and performs a deep merge on `ctx.request` and what the user provides to
+it.
+
+```ts
+const fetchUsers = api.get("/users", function*(ctx, next) {
+  ctx.request = ctx.req({
+    url: "/psych",
+    headers: {
+      "Content-Type": "yoyo",
+    },
+  });
+  yield* next();
+}
+```
+
+# Middleware
+
+Because endpoints use the same powerful middleware system employed by thunks, we
+can do quite a lot of automating for API requests -- to the point where an
+endpoint doesn't have a custom middleware function at all.
+
+For example, if you API leverages an API specification like JSON API, then we
+can automate response processing.
+
+Given the following API response:
+
+```json
+{
+  "links": {
+    "self": "http://example.com/articles",
+    "next": "http://example.com/articles?page[offset]=2",
+    "last": "http://example.com/articles?page[offset]=10"
+  },
+  "data": [{
+    "type": "articles",
+    "id": "1",
+    "attributes": {
+      "title": "JSON:API paints my bikeshed!"
+    },
+    "relationships": {
+      "author": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/author",
+          "related": "http://example.com/articles/1/author"
+        },
+        "data": { "type": "people", "id": "9" }
+      },
+      "comments": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/comments",
+          "related": "http://example.com/articles/1/comments"
+        },
+        "data": [
+          { "type": "comments", "id": "5" },
+          { "type": "comments", "id": "12" }
+        ]
+      }
+    },
+    "links": {
+      "self": "http://example.com/articles/1"
+    }
+  }],
+  "included": [{
+    "type": "people",
+    "id": "9",
+    "attributes": {
+      "firstName": "Dan",
+      "lastName": "Gebhardt",
+      "twitter": "dgeb"
+    },
+    "links": {
+      "self": "http://example.com/people/9"
+    }
+  }, {
+    "type": "comments",
+    "id": "5",
+    "attributes": {
+      "body": "First!"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "2" }
+      }
+    },
+    "links": {
+      "self": "http://example.com/comments/5"
+    }
+  }, {
+    "type": "comments",
+    "id": "12",
+    "attributes": {
+      "body": "I like XML better"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "9" }
+      }
+    },
+    "links": {
+      "self": "http://example.com/comments/12"
+    }
+  }]
+}
+```
+
+We could create a middleware:
+
+```ts
+import { createApi, mdw } from "starfx";
+import {
+  createSchema,
+  select,
+  slice,
+  storeMdw,
+  StoreUpdater,
+} from "starfx/store";
+
+interface Article {
+  id: string;
+  title: string;
+  authorId: string;
+  comments: string[];
+}
+
+function deserializeArticle(art: any): Article {
+  return {
+    id: art.id,
+    title: art.attributes.title,
+    authorId: art.relationships.author.data.id,
+    comments: art.relationships.comments.data.map((c) => c.id),
+  };
+}
+
+interface Person {
+  id: string;
+  firstName: string;
+  lastName: string;
+  twitter: string;
+}
+
+function deserializePerson(per: any): Person {
+  return {
+    id: per.id,
+    firstName: per.attributes.firstName,
+    lastName: per.attributes.lastName,
+    twitter: per.attributes.twitter,
+  };
+}
+
+interface Comment {
+  id: string;
+  body: string;
+  authorId: string;
+}
+
+function deserializeComment(com: any): Comment {
+  return {
+    id: comm.id,
+    body: com.attributes.body,
+    authorId: com.relationships.author.data.id,
+  };
+}
+
+const schema = createSchema({
+  cache: slice.table(),
+  loaders: slice.loader(),
+  token: slice.str(),
+  articles: slice.table<Article>(),
+  people: slice.table<Person>(),
+  comments: slice.table<Comment>(),
+});
+type WebState = typeof schema.initialState;
+
+const api = createApi();
+api.use(mdw.api());
+api.use(storeMdw.store(schema));
+api.use(api.routes());
+
+// do some request setup before making fetch call
+api.use(function* (ctx, next) {
+  const token = yield* select(schema.token.select);
+  ctx.request = ctx.req({
+    headers: {
+      "Content-Type": "application/vnd.api+json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  yield* next();
+});
+
+api.use(mdw.fetch({ baseUrl: "https://json-api.com" }));
+
+function process(entity: any): StoreUpdater[] {
+  if (entity.type === "article") {
+    const article = deserializeArticle(entity);
+    return [schema.articles.add({ [article.id]: article })];
+  } else if (entity.type === "people") {
+    const person = deserializePerson(entity);
+    return [schema.people.add({ [person.id]: person })];
+  } else if (entity.type === "comment") {
+    const comment = deserializeComment(entity);
+    return [schema.comments.add({ [comment.id]: comment })];
+  }
+
+  return [];
+}
+
+// parse response
+api.use(function* (ctx, next) {
+  // wait for fetch response
+  yield* next();
+
+  if (!ctx.json.ok) {
+    // bail
+    return;
+  }
+
+  const updaters: StoreUpdater<WebState>[] = [];
+  const jso = ctx.json.value;
+
+  if (Array.isArray(jso.data)) {
+    jso.data.forEach(
+      (entity) => updaters.push(...process(entity)),
+    );
+  } else {
+    updaters.push(...process(jso.data));
+  }
+
+  jso.included.forEach(
+    (entity) => updaters.push(...process(entity)),
+  );
+
+  yield* schema.update(updaters);
+});
+```
+
+Now when we create the endpoints, we really don't need a mdw function for them
+because everything is automated higher in the mdw stack:
+
+```ts
+const fetchArticles = api.get("/articles");
+const fetchArticle = api.get<{ id: string }>("/articles/:id");
+const fetchCommentsByArticleId = api.get<{ id: string }>(
+  "/articles/:id/comments",
+);
+const fetchComment = api.get<{ id: string }>("/comments/:id");
+```
+
+This is simple it is silly not to nomalize the data because we get a ton of
+benefits from treating our front-end store like a database. CRUD operations
+become trivial and app-wide.
