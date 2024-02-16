@@ -50,8 +50,8 @@ function App() {
 
 ## `useLoader`
 
-This selector will accept an action creator or action and return the loader
-associated with it.
+Will accept an action creator or action and return the loader associated with
+it.
 
 ```tsx
 import { useLoader } from "starfx/react";
@@ -70,9 +70,8 @@ function App() {
 
 ## `useApi`
 
-useApi will take an action creator or action itself and fetch the associated
-loader and create a `trigger` function that you can call later in your react
-component.
+Will take an action creator or action itself and fetch the associated loader and
+create a `trigger` function that you can call later in your react component.
 
 This hook will _not_ fetch the data for you because it does not know how to
 fetch data from your redux state.
@@ -97,7 +96,7 @@ const View = () => {
 
 ## `useQuery`
 
-useQuery uses [useApi](#useapi) and automatically calls `useApi().trigger()`
+Uses [useApi](#useapi) and automatically calls `useApi().trigger()`
 
 ```ts
 import { useQuery } from 'starfx/react';
@@ -116,8 +115,8 @@ const View = () => {
 
 ## `useCache`
 
-useCache uses [useQuery](#usequery) and automatically selects the cached data
-associated with the action creator or action provided.
+Uses [useQuery](#usequery) and automatically selects the cached data associated
+with the action creator or action provided.
 
 ```ts
 import { useCache } from 'starfx/react';
@@ -134,8 +133,8 @@ const View = () => {
 
 ## `useLoaderSuccess`
 
-useLoaderSuccess will activate the callback provided when the loader transitions
-from some state to success.
+Will activate the callback provided when the loader transitions from some state
+to success.
 
 ```ts
 import { useApi, useLoaderSuccess } from "starfx/react";
