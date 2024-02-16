@@ -168,8 +168,8 @@ Because endpoints use the same powerful middleware system employed by thunks, we
 can do quite a lot of automating for API requests -- to the point where an
 endpoint doesn't have a custom middleware function at all.
 
-For example, if you API leverages an API specification like JSON API, then we
-can automate response processing.
+For example, if you API leverages an API specification like
+[JSON API](https://jsonapi.org), then we can automate response processing.
 
 Given the following API response:
 
