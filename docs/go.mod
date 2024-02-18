@@ -2,7 +2,7 @@ module github.com/neurosnap/starfx/docs
 
 go 1.22
 
-require github.com/picosh/pdocs v0.0.0-20240216195759-cf9ace42f2f8
+require github.com/picosh/pdocs v0.0.0-20240218162954-0dec737a7805
 
 require (
 	github.com/alecthomas/chroma v0.10.0 // indirect
