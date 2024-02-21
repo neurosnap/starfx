@@ -47,12 +47,12 @@ interface User {
 }
 
 // app-wide database for ui, api data, or anything that needs reactivity
-const schema = createSchema({
+const [schema, initialState] = createSchema({
   cache: slice.table(),
   loaders: slice.loader(),
   users: slice.table<User>(),
 });
-type WebState = typeof schema.initialState;
+type WebState = typeof initialState;
 
 // just a normal endpoint
 const fetchUsers = api.get<never, User[]>(

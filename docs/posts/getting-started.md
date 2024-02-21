@@ -51,14 +51,22 @@ In this example, we will fetch users from an API endpoint, cache the `Response`
 json, and then ensure the endpoint only gets called at-most once every **5
 minutes**, mimicking the basic features of `react-query`.
 
+[Codesanbox](https://codesandbox.io/p/sandbox/starfx-simplest-dgqc9v?file=%2Fsrc%2Findex.tsx)
+
 ```tsx
 import ReactDOM from "react-dom/client";
 import { createApi, mdw, timer } from "starfx";
-import { configureStore, createSchema, slice } from "starfx/store";
+import { configureStore, createSchema, slice, storeMdw } from "starfx/store";
 import { Provider, useCache } from "starfx/react";
+
+const [schema, initialState] = createSchema({
+  loaders: slice.loader(),
+  cache: slice.table(),
+});
 
 const api = createApi();
 api.use(mdw.api());
+api.use(storeMdw.store(schema));
 api.use(api.routes());
 api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
 
@@ -68,12 +76,8 @@ const fetchUsers = api.get(
   api.cache(),
 );
 
-const schema = createSchema({
-  loaders: slice.loader(),
-  cache: slice.table(),
-});
-const store = configureStore(schema);
-type WebState = typeof store.initialState;
+const store = configureStore(initialState);
+type WebState = typeof initialState;
 
 store.run(api.bootup);
 
@@ -86,7 +90,7 @@ function App() {
 
   return (
     <div>
-      {users.map(
+      {users?.map(
         (user) => <div key={user.id}>{user.name}</div>,
       )}
     </div>

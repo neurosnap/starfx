@@ -44,7 +44,7 @@ ought to be and it has a couple functions to manage and query the value stored
 inside of it.
 
 ```ts
-const schema = createSchema({
+const [schema] = createSchema({
   nav: slice.any<bool>(false),
 });
 
@@ -60,7 +60,7 @@ function*() {
 This slice has some custom actions to manage a number value.
 
 ```ts
-const schema = createSchema({
+const [schema] = createSchema({
   views: slice.num(0),
 });
 
@@ -79,7 +79,7 @@ This slice is probably not super useful since it is essentially the same as
 `slice.any<string>` but we could add more actions to it in the future.
 
 ```ts
-const schema = createSchema({
+const [schema] = createSchema({
   token: slice.str(""),
 });
 
@@ -96,7 +96,7 @@ This is a specialized slice with some custom actions to deal with javascript
 objects.
 
 ```ts
-const schema = createSchema({
+const [schema] = createSchema({
   settings: slice.obj({
     notifications: false,
     theme: "light",
@@ -126,7 +126,7 @@ type Table<Entity = any> = Record<string | number, Entity>;
 The key is the entity's primary id and the value is the entity itself.
 
 ```ts
-const schema = createSchema({
+const [schema] = createSchema({
   users: slice.table({ empty: { id: "", name: "" } }),
 });
 
@@ -189,7 +189,7 @@ This is a specialized database table specific to managing loaders in `starfx`.
 [Read more about loaders here](/loader).
 
 ```ts
-const schema = createSchema({
+const [schema] = createSchema({
   loaders: slice.loader(),
 });
 
@@ -244,10 +244,10 @@ export function counter(initialState?: number) {
   return (name: string) => createCounter<AnyState>({ name, initialState });
 }
 
-const schema = createSchema({
+const [schema, initialState] = createSchema({
   counter: counter(100),
 });
-const store = configureStore(schema);
+const store = configureStore(initialState);
 
 store.run(function* () {
   yield* schema.update([

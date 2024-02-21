@@ -327,7 +327,7 @@ function deserializeComment(com: any): Comment {
   };
 }
 
-const schema = createSchema({
+const [schema, initialState] = createSchema({
   cache: slice.table(),
   loaders: slice.loader(),
   token: slice.str(),
@@ -335,7 +335,7 @@ const schema = createSchema({
   people: slice.table<Person>(),
   comments: slice.table<Comment>(),
 });
-type WebState = typeof schema.initialState;
+type WebState = typeof initialState;
 
 const api = createApi();
 api.use(mdw.api());

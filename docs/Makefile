@@ -1,3 +1,8 @@
+fmt:
+	go fmt ./...
+	deno fmt
+.PHONY: fmt
+
 clean:
 	rm -rf ./public/*
 	echo "" > ./public/.gitkeep
