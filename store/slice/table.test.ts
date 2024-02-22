@@ -82,9 +82,11 @@ it(tests, "gets a row", async () => {
     initialState,
   });
   await store.run(function* () {
-    yield* updateStore(
-      slice.add({ [first.id]: first, [second.id]: second, [third.id]: third }),
-    );
+    yield* slice.add({
+      [first.id]: first,
+      [second.id]: second,
+      [third.id]: third,
+    }) as any;
   });
 
   const row = slice.selectById(store.getState(), { id: "2" });
