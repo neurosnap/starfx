@@ -93,6 +93,14 @@ export function loader<
           message: err.message,
         }),
       ]);
+    } finally {
+      const loaders = yield* select((s: any) =>
+        loaderSchema.selectByIds(s, { ids: [ctx.name, ctx.key] })
+      );
+      const ids = loaders
+        .filter((loader) => loader.status === "loading")
+        .map((loader) => loader.id);
+      yield* updateStore(loaderSchema.resetByIds(ids));
     }
   };
 }
@@ -112,44 +120,54 @@ export function loaderApi<
   },
 ) {
   return function* trackLoading(ctx: Ctx, next: Next) {
-    yield* updateStore([
-      loaderSchema.start({ id: ctx.name }),
-      loaderSchema.start({ id: ctx.key }),
-    ]);
-    if (!ctx.loader) ctx.loader = {} as any;
-
-    yield* next();
-
-    if (!ctx.response) {
-      yield* updateStore(
-        loaderSchema.resetByIds([ctx.name, ctx.key]),
-      );
-      return;
-    }
-
-    if (!ctx.loader) {
-      ctx.loader = {};
-    }
-
-    if (!ctx.response.ok) {
+    try {
       yield* updateStore([
-        loaderSchema.error({
-          id: ctx.name,
-          message: errorFn(ctx),
-          ...ctx.loader,
-        }),
-        loaderSchema.error({
-          id: ctx.key,
-          message: errorFn(ctx),
-          ...ctx.loader,
-        }),
+        loaderSchema.start({ id: ctx.name }),
+        loaderSchema.start({ id: ctx.key }),
       ]);
-      return;
-    }
+      if (!ctx.loader) ctx.loader = {} as any;
 
-    yield* updateStore([
-      loaderSchema.success({ id: ctx.name, ...ctx.loader }),
-      loaderSchema.success({ id: ctx.key, ...ctx.loader }),
-    ]);
+      yield* next();
+
+      if (!ctx.response) {
+        yield* updateStore(
+          loaderSchema.resetByIds([ctx.name, ctx.key]),
+        );
+        return;
+      }
+
+      if (!ctx.loader) {
+        ctx.loader = {};
+      }
+
+      if (!ctx.response.ok) {
+        yield* updateStore([
+          loaderSchema.error({
+            id: ctx.name,
+            message: errorFn(ctx),
+            ...ctx.loader,
+          }),
+          loaderSchema.error({
+            id: ctx.key,
+            message: errorFn(ctx),
+            ...ctx.loader,
+          }),
+        ]);
+        return;
+      }
+
+      yield* updateStore([
+        loaderSchema.success({ id: ctx.name, ...ctx.loader }),
+        loaderSchema.success({ id: ctx.key, ...ctx.loader }),
+      ]);
+    } finally {
+      const loaders = yield* select((s: any) =>
+        loaderSchema.selectByIds(s, { ids: [ctx.name, ctx.key] })
+      );
+      const ids = loaders
+        .filter((loader) => loader.status === "loading")
+        .map((loader) => loader.id);
+      yield* updateStore(loaderSchema.resetByIds(ids));
+    }
   };
 }
