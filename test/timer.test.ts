@@ -1,20 +1,12 @@
 import { describe, expect, it } from "../test.ts";
-import {
-  clearTimers,
-  Operation,
-  put,
-  run,
-  sleep,
-  spawn,
-  timer,
-} from "../mod.ts";
+import { clearTimers, put, run, sleep, spawn, timer } from "../mod.ts";
 
 const tests = describe("timer()");
 
 it(tests, "should call thunk at most once every timer", async () => {
   let called = 0;
   await run(function* () {
-    yield* spawn(function* (): Operation<void> {
+    yield* spawn(function* () {
       yield* timer(10)("ACTION", function* () {
         called += 1;
       });
@@ -32,7 +24,7 @@ it(tests, "should call thunk at most once every timer", async () => {
 it(tests, "should let user cancel timer", async () => {
   let called = 0;
   await run(function* () {
-    yield* spawn(function* (): Operation<void> {
+    yield* spawn(function* () {
       yield* timer(10_000)("ACTION", function* () {
         called += 1;
       });
@@ -48,12 +40,12 @@ it(tests, "should let user cancel timer", async () => {
 it(tests, "should let user cancel timer with wildcard", async () => {
   let called = 0;
   await run(function* () {
-    yield* spawn(function* (): Operation<void> {
+    yield* spawn(function* () {
       yield* timer(10_000)("ACTION", function* () {
         called += 1;
       });
     });
-    yield* spawn(function* (): Operation<void> {
+    yield* spawn(function* () {
       yield* timer(10_000)("WOW", function* () {
         called += 1;
       });
