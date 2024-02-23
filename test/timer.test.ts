@@ -37,6 +37,23 @@ it(tests, "should let user cancel timer", async () => {
   expect(called).toBe(2);
 });
 
+it(tests, "should let user cancel timer with action obj", async () => {
+  let called = 0;
+  await run(function* () {
+    yield* spawn(function* () {
+      yield* timer(10_000)("ACTION", function* () {
+        called += 1;
+      });
+    });
+    const action = { type: "ACTION", payload: { key: "my-key" } };
+    yield* put(action);
+    yield* sleep(1);
+    yield* put(clearTimers(action));
+    yield* put(action);
+  });
+  expect(called).toBe(2);
+});
+
 it(tests, "should let user cancel timer with wildcard", async () => {
   let called = 0;
   await run(function* () {
