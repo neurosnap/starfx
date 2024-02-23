@@ -1,7 +1,6 @@
 import type { ApiCtx, ThunkCtx } from "../query/mod.ts";
 import { compose } from "../compose.ts";
-import type { AnyAction, AnyState, Next } from "../types.ts";
-import { put } from "../action.ts";
+import type { AnyState, Next } from "../types.ts";
 import { select, updateStore } from "./fx.ts";
 import { LoaderOutput } from "./slice/loaders.ts";
 import { TableOutput } from "./slice/table.ts";
@@ -15,7 +14,6 @@ export function store<
   errorFn?: (ctx: Ctx) => string;
 }) {
   return compose<Ctx>([
-    actions,
     loaderApi(props.loaders, props.errorFn),
     cache(props.cache),
   ]);
@@ -44,21 +42,6 @@ export function cache<Ctx extends ApiCtx = ApiCtx>(
     yield* updateStore(dataSchema.add({ [ctx.key]: data }));
     ctx.cacheData = data;
   };
-}
-
-/**
- * This middleware will take the result of `ctx.actions` and dispatch them
- * as a single batch.
- *
- * @remarks This is useful because sometimes there are a lot of actions that need dispatched
- * within the pipeline of the middleware and instead of dispatching them serially this
- * improves performance by only hitting the reducers once.
- */
-export function* actions(ctx: { actions: AnyAction[] }, next: Next) {
-  if (!ctx.actions) ctx.actions = [];
-  yield* next();
-  if (ctx.actions.length === 0) return;
-  yield* put(ctx.actions);
 }
 
 /**

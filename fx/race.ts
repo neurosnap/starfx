@@ -5,7 +5,7 @@ interface OpMap<T = unknown> {
   [key: string]: Callable<T>;
 }
 
-export function race<T>(
+export function raceMap<T>(
   opMap: OpMap,
 ): Operation<
   {
