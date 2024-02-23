@@ -60,7 +60,7 @@ import { configureStore, createSchema, slice, storeMdw } from "starfx/store";
 import { Provider, useCache } from "starfx/react";
 
 const [schema, initialState] = createSchema({
-  loaders: slice.loader(),
+  loaders: slice.loaders(),
   cache: slice.table(),
 });
 

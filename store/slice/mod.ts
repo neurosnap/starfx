@@ -6,16 +6,21 @@ import { obj, ObjOutput } from "./obj.ts";
 import {
   defaultLoader,
   defaultLoaderItem,
-  loader,
   LoaderOutput,
-} from "./loader.ts";
+  loaders,
+} from "./loaders.ts";
+
 export const slice = {
   str,
   num,
   table,
   any,
   obj,
-  loader,
+  loaders,
+  /**
+   * @deprecated Use `slice.loaders` instead
+   */
+  loader: loaders,
 };
 export { defaultLoader, defaultLoaderItem };
 export type {

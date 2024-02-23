@@ -23,7 +23,7 @@ it(tests, "general types and functionality", async () => {
     dev: slice.any<boolean>(false),
     currentUser: slice.obj<User>(emptyUser),
     cache: slice.table({ empty: {} }),
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
   });
   const store = configureStore({ initialState });
 
@@ -73,7 +73,7 @@ it(tests, "can work with a nested object", async () => {
   const [db, initialState] = createSchema({
     currentUser: slice.obj<UserWithRoles>({ id: "", name: "", roles: [] }),
     cache: slice.table({ empty: {} }),
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
   });
   const store = configureStore({ initialState });
   await store.run(function* () {

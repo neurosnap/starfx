@@ -37,7 +37,7 @@ const jsonBlob = (data: any) => {
 const testStore = () => {
   const [schema, initialState] = createSchema({
     users: slice.table<User>({ empty: emptyUser }),
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
     cache: slice.table({ empty: {} }),
   });
   const store = configureStore({ initialState });

@@ -25,13 +25,13 @@ associated logic:
 - [num](#num)
 - [str](#str)
 - [obj](#obj)
-- [loader](#loader)
+- [loaders](#loaders)
 - [table](#table)
 
 # Schema assumptions
 
 `createSchema` requires two slices by default in order for it and everything
-inside `starfx` to function properly: `cache` and `loader`.
+inside `starfx` to function properly: `cache` and `loaders`.
 
 Why do we require those slices? Because if we can assume those exist, we can
 build a lot of useful middleware and supervisors on top of that assumption. It's
@@ -183,14 +183,14 @@ in your system.
 
 [Read more about entity factories.](https://bower.sh/entity-factories)
 
-# `loader`
+# `loaders`
 
 This is a specialized database table specific to managing loaders in `starfx`.
 [Read more about loaders here](/loader).
 
 ```ts
 const [schema] = createSchema({
-  loaders: slice.loader(),
+  loaders: slice.loaders(),
 });
 
 function*() {

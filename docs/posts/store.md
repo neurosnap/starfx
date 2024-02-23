@@ -49,7 +49,7 @@ interface User {
 // app-wide database for ui, api data, or anything that needs reactivity
 const [schema, initialState] = createSchema({
   cache: slice.table(),
-  loaders: slice.loader(),
+  loaders: slice.loaders(),
   users: slice.table<User>(),
 });
 type WebState = typeof initialState;

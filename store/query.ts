@@ -3,7 +3,7 @@ import { compose } from "../compose.ts";
 import type { AnyAction, AnyState, Next } from "../types.ts";
 import { put } from "../action.ts";
 import { select, updateStore } from "./fx.ts";
-import { LoaderOutput } from "./slice/loader.ts";
+import { LoaderOutput } from "./slice/loaders.ts";
 import { TableOutput } from "./slice/table.ts";
 
 export function store<

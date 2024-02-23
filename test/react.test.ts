@@ -9,7 +9,7 @@ const tests = describe("react");
 it(tests, () => {
   const [schema, initialState] = createSchema({
     cache: slice.table(),
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
   });
   const store = createStore({ initialState });
   React.createElement(

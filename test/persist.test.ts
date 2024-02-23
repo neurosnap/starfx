@@ -15,7 +15,7 @@ const tests = describe("store");
 it(tests, "can persist to storage adapters", async () => {
   const [schema, initialState] = createSchema({
     token: slice.str(),
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
     cache: slice.table({ empty: {} }),
   });
   type State = typeof initialState;
@@ -63,7 +63,7 @@ it(tests, "can persist to storage adapters", async () => {
 it(tests, "rehydrates state", async () => {
   const [schema, initialState] = createSchema({
     token: slice.str(),
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
     cache: slice.table({ empty: {} }),
   });
   type State = typeof initialState;

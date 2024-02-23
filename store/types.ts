@@ -1,4 +1,4 @@
-import type { LoaderOutput } from "./slice/loader.ts";
+import type { LoaderOutput } from "./slice/loaders.ts";
 import type { TableOutput } from "./slice/table.ts";
 import type {
   Callable,

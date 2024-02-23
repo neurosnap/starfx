@@ -16,7 +16,7 @@ const mockUser = { id: "1", email: "test@starfx.com" };
 
 const testStore = () => {
   const [schema, initialState] = createSchema({
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
     cache: slice.table({ empty: {} }),
   });
   const store = configureStore({ initialState });

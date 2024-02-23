@@ -12,7 +12,7 @@ const batch = describe("batch mdw");
 it(batch, "should batch notify subscribers based on mdw", async () => {
   const [schema, initialState] = createSchema({
     cache: slice.table({ empty: {} }),
-    loaders: slice.loader(),
+    loaders: slice.loaders(),
   });
   const store = configureStore({
     initialState,

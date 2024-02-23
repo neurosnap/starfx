@@ -329,7 +329,7 @@ function deserializeComment(com: any): Comment {
 
 const [schema, initialState] = createSchema({
   cache: slice.table(),
-  loaders: slice.loader(),
+  loaders: slice.loaders(),
   token: slice.str(),
   articles: slice.table<Article>(),
   people: slice.table<Person>(),

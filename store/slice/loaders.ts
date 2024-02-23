@@ -125,7 +125,7 @@ export interface LoaderOutput<
 
 const ts = () => new Date().getTime();
 
-export const createLoader = <
+export const createLoaders = <
   M extends AnyState = AnyState,
   S extends AnyState = AnyState,
 >({
@@ -184,8 +184,8 @@ export const createLoader = <
   };
 };
 
-export function loader<
+export function loaders<
   M extends AnyState = AnyState,
 >(initialState?: Record<string, LoaderItemState<M>>) {
-  return (name: string) => createLoader<M>({ name, initialState });
+  return (name: string) => createLoaders<M>({ name, initialState });
 }
