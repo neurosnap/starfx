@@ -10,5 +10,5 @@ it(tests, "should return action type when stringified", () => {
 
 it(tests, "return object with type", () => {
   const undo = createAction("UNDO");
-  expect(undo()).toEqual({ type: `UNDO` });
+  expect(undo()).toEqual({ type: `UNDO`, payload: undefined });
 });

@@ -26,6 +26,7 @@ export {
   ensure,
   Err,
   Ok,
+  race,
   resource,
   run,
   SignalQueueFactory,

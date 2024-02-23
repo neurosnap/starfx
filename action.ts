@@ -129,9 +129,20 @@ export function getIdFromAction(
 }
 
 export const API_ACTION_PREFIX = "";
-export const createAction = (type: string) => {
-  if (!type) throw new Error("createAction requires non-empty string");
-  const action = () => ({ type });
-  action.toString = () => type;
-  return action;
-};
+
+export function createAction(actionType: string): () => Action;
+export function createAction<P>(
+  actionType: string,
+): (p: P) => ActionWithPayload<P>;
+export function createAction(actionType: string) {
+  if (!actionType) {
+    throw new Error("createAction requires non-empty string");
+  }
+  const fn = (payload?: unknown) => ({
+    type: actionType,
+    payload,
+  });
+  fn.toString = () => actionType;
+
+  return fn;
+}
