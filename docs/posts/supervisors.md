@@ -149,3 +149,18 @@ store.dispatch(fetchUsers());
 
 The default value provided to `timer()` is **5 minutes**. This means you can
 only call `fetchUsers` at-most once every **5 minutes**.
+
+## clearTimers
+
+Want to clear a timer and refetch?
+
+```ts
+import { clearTimers, timer } from "starfx";
+
+const fetchUsers = api.get("/users", { supervisor: timer(1000) });
+store.dispatch(fetchUsers());
+store.dispatch(clearTimers(fetchUsers()));
+store.dispatch(fetchUsers());
+// called: 2 times
+store.dispatch(clearTimers("*")); // clear all timers
+```
