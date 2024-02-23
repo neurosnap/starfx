@@ -32,7 +32,11 @@ export function poll(parentTimer: number = 5 * SECONDS, cancelType?: string) {
   };
 }
 
-export const clearTimers = createAction<string[]>("clear-timers");
+type ClearTimerPayload = string | { type: string; payload: { key: string } };
+
+export const clearTimers = createAction<
+  ClearTimerPayload | ClearTimerPayload[]
+>("clear-timers");
 
 /**
  * timer() will create a cache timer for each `key` inside
@@ -54,15 +58,26 @@ export function timer(timer: number = 5 * MINUTES) {
       yield* call(() => op(action));
       const idA = getIdFromAction(action);
 
-      const matchFn = (act: AnyAction) => {
+      const matchFn = (
+        act: ActionWithPayload<ClearTimerPayload | ClearTimerPayload[]>,
+      ) => {
         if (act.type !== `${clearTimers}`) return false;
         if (!act.payload) return false;
-        const ids: string[] = act.payload || [];
-        return ids.some((id) => idA === id || id === "*");
+        const ids = Array.isArray(act.payload) ? act.payload : [act.payload];
+        return ids.some((id) => {
+          if (id === "*") {
+            return true;
+          }
+          if (typeof id === "string") {
+            return idA === id;
+          } else {
+            return idA === getIdFromAction(id);
+          }
+        });
       };
       yield* race([
         sleep(timer),
-        take(matchFn) as Operation<void>,
+        take(matchFn as any) as Operation<void>,
       ]);
 
       delete map[action.payload.key];
