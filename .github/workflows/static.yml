@@ -38,3 +38,4 @@ jobs:
           project: "git-starfx-${{ steps.vars.outputs.sha_short }}"
           promote: "git-starfx"
           retain: "git-starfx-"
+          retain_num: 1

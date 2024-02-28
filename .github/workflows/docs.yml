@@ -33,3 +33,4 @@ jobs:
           project: "starfx-docs-${{ steps.vars.outputs.sha_short }}"
           promote: "starfx-prod"
           retain: "starfx-docs"
+          retain_num: 1
