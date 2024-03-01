@@ -3,17 +3,20 @@ title: Getting Started
 description: Use starfx with deno, node, or the browser
 ---
 
-# design philosophy
+# motivation
 
-- user interaction is a side-effect of using a web app
-- side-effect management is the central processing unit to manage user
-  interaction, app features, and state
-- leverage structured concurrency to manage side-effects
-- leverage supervisor tasks to provide powerful design patterns
-- side-effect and state management decoupled from the view
-- user has full control over state management (opt-in to automatic data
-  synchronization)
-- state is just a side-effect (of user interaction and app features)
+Are you frustrated by the following issues in your react app?
+
+- Prop drilling
+- Waterfall fetching data
+- Loading spinners everywhere
+- Extraneous network calls
+- Business logic tightly coupled to react component lifecycle hooks
+- State management boilerplate
+- Lack of data normalization
+- Lack of async flow control tooling
+
+`starfx` will help with all of these common problems with modern react web apps.
 
 # when to use this library?
 
@@ -24,27 +27,7 @@ server that serves files and that's it.
 Is your app highly interactive, requiring it to persist data across pages? This
 is the sweet spot for `starfx`.
 
-You can use this library for general purpose structured concurrency, but
-[effection](https://github.com/thefrontside/effection) serves those needs well.
-
-You could use this library for SSR, but I don't heavily build SSR apps, so I
-cannot claim it'll work well.
-
-# install
-
-```bash
-npm install starfx
-```
-
-```bash
-yarn add starfx
-```
-
-```ts
-import * as starfx from "https://deno.land/x/starfx@0.7.0/mod.ts";
-```
-
-# the simplest example
+# code
 
 Here we demonstrate a complete example so you can glimpse at how `starfx` works.
 In this example, we will fetch users from an API endpoint, cache the `Response`
@@ -105,13 +88,16 @@ ReactDOM.createRoot(root).render(
 );
 ```
 
-# `effection`
+# install
 
-In order to support structured concurrency, we are using `effection` to manage
-that for us. As a result, in order to be successful using `starfx` developers
-need to understand how `effection` works.
+```bash
+npm install starfx
+```
 
-We highly recommend reading through their docs at least once to get some
-fundamental knowledge for how these libraries work together.
+```bash
+yarn add starfx
+```
 
-[Read the `effection` docs](https://frontside.com/effection)
+```ts
+import * as starfx from "https://deno.land/x/starfx@0.7.0/mod.ts";
+```

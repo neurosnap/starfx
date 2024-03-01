@@ -24,9 +24,10 @@ func main() {
 				Page: pager("getting-started.md"),
 				Tag:  "Info",
 				Children: []*pdocs.Sitemap{
-					pdocs.AnchorTagSitemap("Design Philosophy"),
-					pdocs.AnchorTagSitemap("The Simplest Example"),
-					pdocs.AnchorTagSitemap("Effection"),
+					pdocs.AnchorTagSitemap("Motivation"),
+					pdocs.AnchorTagSitemap("When to use this library"),
+					pdocs.AnchorTagSitemap("Code Example"),
+					pdocs.AnchorTagSitemap("Install"),
 				},
 			},
 			{
@@ -156,6 +157,12 @@ func main() {
 				Href: "/testing",
 				Page: pager("testing.md"),
 				Tag:  "Advanced",
+			},
+			{
+				Text: "Design Philosophy",
+				Href: "/design-philosophy",
+				Page: pager("design-philosophy.md"),
+				Tag:  "Info",
 			},
 			{
 				Text: "API",
