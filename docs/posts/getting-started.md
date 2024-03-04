@@ -103,9 +103,9 @@ function App() {
 }
 
 function Example() {
-  const { isLoading, isError, message, data } = useCache(fetchRepo());
+  const { isInitialLoading, isError, message, data } = useCache(fetchRepo());
 
-  if (isLoading || !data) return "Loading ...";
+  if (isInitialLoading) return "Loading ...";
 
   if (isError) return `An error has occurred: ${message}`;
 
