@@ -1,11 +1,16 @@
 import { updateStore } from "./fx.ts";
+import { slice } from "./slice/mod.ts";
 import { FxMap, FxSchema, StoreUpdater } from "./types.ts";
+
+const defaultSchema = function <O>(): O {
+  return { cache: slice.table(), loaders: slice.loaders() } as O;
+};
 
 export function createSchema<
   O extends FxMap,
   S extends { [key in keyof O]: ReturnType<O[key]>["initialState"] },
 >(
-  slices: O,
+  slices: O = defaultSchema<O>(),
 ): [FxSchema<S, O>, S] {
   const db = Object.keys(slices).reduce<FxSchema<S, O>>((acc, key) => {
     // deno-lint-ignore no-explicit-any

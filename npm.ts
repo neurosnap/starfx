@@ -21,10 +21,6 @@ async function init() {
         name: "./react",
         path: "react.ts",
       },
-      {
-        name: "./store",
-        path: "./store/mod.ts",
-      },
     ],
     mappings: {
       "https://deno.land/x/effection@3.0.0-beta.3/mod.ts": {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "../test.ts";
 import {
-  configureStore,
   createBatchMdw,
   createSchema,
+  createStore,
   slice,
 } from "../store/mod.ts";
 import { parallel } from "../mod.ts";
@@ -14,7 +14,7 @@ it(batch, "should batch notify subscribers based on mdw", async () => {
     cache: slice.table({ empty: {} }),
     loaders: slice.loaders(),
   });
-  const store = configureStore({
+  const store = createStore({
     initialState,
     middleware: [createBatchMdw(queueMicrotask)],
   });

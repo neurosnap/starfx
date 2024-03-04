@@ -1,6 +1,5 @@
 import { asserts, describe, it } from "../test.ts";
 import {
-  configureStore,
   createStore,
   StoreContext,
   StoreUpdateContext,
@@ -94,7 +93,7 @@ it(tests, "update store and receives update from `subscribe()`", async () => {
     theme: "",
     token: "",
   };
-  const store = configureStore({ initialState });
+  const store = createStore({ initialState });
 
   store.subscribe(() => {
     asserts.assertEquals(store.getState(), {
@@ -117,7 +116,7 @@ it(tests, "emit Action and update store", async () => {
     theme: "",
     token: "",
   };
-  const store = configureStore({ initialState });
+  const store = createStore({ initialState });
 
   await store.run(function* (): Operation<void> {
     const result = yield* parallel([
@@ -147,7 +146,7 @@ it(tests, "resets store", async () => {
     theme: "",
     token: "",
   };
-  const store = configureStore({ initialState });
+  const store = createStore({ initialState });
 
   await store.run(function* () {
     yield* store.update((s) => {

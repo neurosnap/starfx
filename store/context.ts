@@ -6,5 +6,4 @@ export const StoreUpdateContext = createContext<Channel<void, void>>(
   "starfx:store:update",
   createChannel<void, void>(),
 );
-
 export const StoreContext = createContext<FxStore<AnyState>>("starfx:store");
