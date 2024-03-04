@@ -8,11 +8,12 @@ a supervisor, it has a middleware stack, and it hijacks the unique id for our
 thunks and turns it into a router.
 
 ```ts
-import { createApi, mdw } from "starfx";
+import { createApi, createStore, mdw } from "starfx";
+import { initialState, schema } from "./schema";
 
 const api = createApi();
 // composition of handy middleware for createApi to function
-api.use(mdw.api());
+api.use(mdw.api({ schema }));
 api.use(api.routes());
 // calls `window.fetch` with `ctx.request` and sets to `ctx.response`
 api.use(mdw.fetch({ baseUrl: "https://jsonplaceholder.typicode.com" }));
@@ -30,6 +31,9 @@ export const updateUser = api.post<{ id: string; name: string }>(
     yield* next();
   },
 );
+
+const store = createStore(initialState);
+store.run(api.bootup);
 
 store.dispatch(fetchUsers());
 // now accessible with useCache(fetchUsers)
@@ -338,8 +342,7 @@ const [schema, initialState] = createSchema({
 type WebState = typeof initialState;
 
 const api = createApi();
-api.use(mdw.api());
-api.use(storeMdw.store(schema));
+api.use(mdw.api({ schema }));
 api.use(api.routes());
 
 // do some request setup before making fetch call

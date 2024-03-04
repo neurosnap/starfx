@@ -1,5 +1,5 @@
 import { assertLike, asserts, describe, it } from "../test.ts";
-import { configureStore, updateStore } from "../store/mod.ts";
+import { createStore, updateStore } from "../store/mod.ts";
 import {
   call,
   createThunks,
@@ -135,7 +135,7 @@ it(
     api.use(processTickets);
     const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
 
-    const store = configureStore<TestState>({
+    const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
     });
     store.run(api.bootup);
@@ -172,7 +172,7 @@ it(
       yield* put(fetchUsers());
     });
 
-    const store = configureStore<TestState>({
+    const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
     });
     store.run(api.bootup);
@@ -202,7 +202,7 @@ it(tests, "error handling", () => {
 
   const action = api.create(`/error`, { supervisor: takeEvery });
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
   asserts.assertStrictEquals(called, true);
@@ -227,7 +227,7 @@ it(tests, "error handling inside create", () => {
       }
     },
   );
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
   asserts.assertStrictEquals(called, true);
@@ -254,7 +254,7 @@ it(tests, "error inside endpoint mdw", () => {
     },
   );
 
-  const store = configureStore({
+  const store = createStore({
     initialState: {
       users: {},
     },
@@ -289,7 +289,7 @@ it(tests, "create fn is an array", () => {
     },
   ]);
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
 });
@@ -328,7 +328,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     },
   );
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action2());
 });
@@ -370,7 +370,7 @@ it(
       },
     );
 
-    const store = configureStore({ initialState: {} });
+    const store = createStore({ initialState: {} });
     store.run(api.bootup);
     store.dispatch(action2());
   },
@@ -408,7 +408,7 @@ it(tests, "middleware order of execution", async () => {
     },
   );
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
 
@@ -440,7 +440,7 @@ it(tests, "retry with actionFn", async () => {
     },
   );
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
 
@@ -470,7 +470,7 @@ it(tests, "retry with actionFn with payload", async () => {
     },
   );
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action({ page: 1 }));
 
@@ -500,7 +500,7 @@ it(tests, "should only call thunk once", () => {
     },
   );
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action2());
   asserts.assertEquals(acc, "a");

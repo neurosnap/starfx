@@ -39,7 +39,7 @@ This gets us closer to treating our store like a traditional database while
 still being flexible for our needs on the FE.
 
 ```ts
-import { configureStore, createSchema, select, slice } from "starfx/store";
+import { createSchema, createStore, select, slice } from "starfx";
 
 interface User {
   id: string;
@@ -96,7 +96,7 @@ There are **three** ways to update state, each with varying degrees of type
 safety:
 
 ```ts
-import { updateStore } from "starfx/store";
+import { updateStore } from "starfx";
 
 function*() {
   // good types
@@ -127,7 +127,7 @@ However, it is very easy to create a controller to do simple tasks like updating
 state:
 
 ```ts
-import type { StoreUpdater } from "starfx/store";
+import type { StoreUpdater } from "starfx";
 
 const updater = thunks.create<StoreUpdater[]>("update", function* (ctx, next) {
   yield* updateStore(ctx.payload);

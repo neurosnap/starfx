@@ -1,10 +1,9 @@
 import { describe, expect, it } from "../test.ts";
 import {
-  configureStore,
   createSchema,
+  createStore,
   select,
   slice,
-  storeMdw,
   updateStore,
   waitForLoader,
 } from "../store/mod.ts";
@@ -38,7 +37,7 @@ const testStore = () => {
     loaders: slice.loaders(),
     cache: slice.table({ empty: {} }),
   });
-  const store = configureStore({ initialState });
+  const store = createStore({ initialState });
   return { schema, store };
 };
 
@@ -101,7 +100,7 @@ it(tests, "POST", async () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const store = createStore({ initialState: { users: {} } });
   store.run(query.bootup);
 
   store.dispatch(createUser({ email: mockUser.email }));
@@ -158,7 +157,7 @@ it(tests, "POST with uri", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const store = createStore({ initialState: { users: {} } });
   store.run(query.bootup);
   store.dispatch(createUser({ email: mockUser.email }));
 });
@@ -178,7 +177,7 @@ it(tests, "middleware - with request fn", () => {
     { supervisor: takeEvery },
     query.request({ method: "POST" }),
   );
-  const store = configureStore({ initialState: { users: {} } });
+  const store = createStore({ initialState: { users: {} } });
   store.run(query.bootup);
   store.dispatch(createUser());
 });
@@ -206,7 +205,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const store = createStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(action2());
 });
@@ -240,7 +239,7 @@ it(tests, "run() from a normal saga", () => {
     yield* takeEvery(`${action2}`, onAction);
   }
 
-  const store = configureStore({ initialState: { users: {} } });
+  const store = createStore({ initialState: { users: {} } });
   store.run(() => keepAlive([api.bootup, watchAction]));
   store.dispatch(action2());
 });
@@ -248,8 +247,7 @@ it(tests, "run() from a normal saga", () => {
 it(tests, "with hash key on a large post", async () => {
   const { store, schema } = testStore();
   const query = createApi();
-  query.use(mdw.api());
-  query.use(storeMdw.store(schema));
+  query.use(mdw.api({ schema }));
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const data = {
@@ -318,8 +316,7 @@ it(tests, "two identical endpoints", () => {
   const actual: string[] = [];
   const { store, schema } = testStore();
   const api = createApi();
-  api.use(mdw.api());
-  api.use(storeMdw.store(schema));
+  api.use(mdw.api({ schema }));
   api.use(api.routes());
 
   const first = api.get(
@@ -375,7 +372,7 @@ it(tests, "ensure types for get() endpoint", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const store = createStore({ initialState: { users: {} } });
   store.run(api.bootup);
 
   store.dispatch(action1({ id: "1" }));
@@ -413,7 +410,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
     },
   );
 
-  const store = configureStore({ initialState: { users: {} } });
+  const store = createStore({ initialState: { users: {} } });
   store.run(api.bootup);
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
@@ -449,7 +446,7 @@ it(
       },
     );
 
-    const store = configureStore({ initialState: { users: {} } });
+    const store = createStore({ initialState: { users: {} } });
     store.run(api.bootup);
     store.dispatch(action1());
     expect(acc).toEqual(["wow"]);
@@ -458,7 +455,7 @@ it(
 
 it(tests, "should bubble up error", () => {
   let error: any = null;
-  const { store, schema } = testStore();
+  const { store } = testStore();
   const api = createApi();
   api.use(function* (_, next) {
     try {
@@ -468,7 +465,6 @@ it(tests, "should bubble up error", () => {
     }
   });
   api.use(mdw.queryCtx);
-  api.use(storeMdw.store(schema));
   api.use(api.routes());
 
   const fetchUser = api.get(
@@ -518,7 +514,7 @@ it(
       },
     );
 
-    const store = configureStore({ initialState: { users: {} } });
+    const store = createStore({ initialState: { users: {} } });
     store.run(api.bootup);
 
     function _App() {

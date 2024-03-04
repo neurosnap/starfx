@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { configureStore } from "../store/mod.ts";
+import { createStore } from "../store/mod.ts";
 import type { AnyAction } from "../mod.ts";
 import { sleep, take, takeEvery, takeLatest, takeLeading } from "../mod.ts";
 import { spawn } from "../deps.ts";
@@ -22,7 +22,7 @@ it(testLatest, "should cancel previous tasks and only use latest", async () => {
     yield* take("CANCEL_WATCHER");
     yield* task.halt();
   }
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   const task = store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
@@ -49,7 +49,7 @@ it(testLeading, "should keep first action and discard the rest", async () => {
     yield* sleep(150);
     yield* task.halt();
   }
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   const task = store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
@@ -82,7 +82,7 @@ it(testEvery, "should receive all actions", async () => {
     actual.push([arg1, arg2, action.payload]);
   }
 
-  const store = configureStore({ initialState: {} });
+  const store = createStore({ initialState: {} });
   const task = store.run(root);
 
   for (let i = 1; i <= loop / 2; i += 1) {

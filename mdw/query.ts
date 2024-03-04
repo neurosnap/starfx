@@ -8,9 +8,9 @@ import type {
   PerfCtx,
   RequiredApiRequest,
   ThunkCtx,
-} from "./types.ts";
+} from "../query/types.ts";
 import type { AnyAction, Next } from "../types.ts";
-import { mergeRequest } from "./util.ts";
+import { mergeRequest } from "../query/util.ts";
 import * as fetchMdw from "./fetch.ts";
 import { call, Callable } from "../deps.ts";
 import { put } from "../action.ts";
@@ -33,11 +33,13 @@ export function* err<Ctx extends ThunkCtx = ThunkCtx>(
 ) {
   ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
+    const message =
+      `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;
+    console.error(message, ctx);
     yield* put({
       type: "error:query",
       payload: {
-        message:
-          `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`,
+        message,
         ctx,
       },
     });
@@ -106,22 +108,6 @@ export function* actions(ctx: { actions: AnyAction[] }, next: Next) {
   yield* next();
   if (ctx.actions.length === 0) return;
   yield* put(ctx.actions);
-}
-
-/**
- * This middleware is a composition of many middleware used to faciliate
- * the {@link createApi}.
- *
- * It is not required, however, it is battle-tested and highly recommended.
- */
-export function api<Ctx extends ApiCtx = ApiCtx>() {
-  return compose<Ctx>([
-    err,
-    actions,
-    queryCtx,
-    customKey,
-    fetchMdw.nameParser,
-  ]);
 }
 
 /**

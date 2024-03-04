@@ -18,12 +18,11 @@ For example, the recommended mdw stack for `createApi()` looks like this:
 
 ```ts
 import { createApi, mdw } from "starfx";
-import { storeMdw } from "starfx/store";
+import { schema } from "./schema";
 
 // this api:
 const api = createApi();
-api.use(mdw.api());
-api.use(storeMdw.store());
+api.use(mdw.api({ schema }));
 api.use(api.routes());
 api.use(mdw.fetch({ baseUrl: "https://api.com" }));
 
@@ -33,9 +32,9 @@ api.use(mdw.fetch({ baseUrl: "https://api.com" }));
   mdw.queryCtx,
   mdw.customKey,
   mdw.nameParser,
-  storeMdw.actions,
-  storeMdw.loaderApi(),
-  storeMdw.cache(props.cache),
+  mdw.actions,
+  mdw.loaderApi({ schema }),
+  mdw.cache({ schema }),
   api.routes(),
   mdw.composeUrl("https://api.com"),
   mdw.payload,

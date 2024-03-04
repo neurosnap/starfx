@@ -1,5 +1,5 @@
 import { asserts, describe, it } from "../test.ts";
-import { configureStore, createSchema, select, slice } from "../store/mod.ts";
+import { createSchema, createStore, select, slice } from "../store/mod.ts";
 
 const tests = describe("createSchema()");
 
@@ -12,6 +12,29 @@ interface UserWithRoles extends User {
 }
 
 const emptyUser = { id: "", name: "" };
+
+it(tests, "default schema", async () => {
+  const [schema, initialState] = createSchema();
+  const store = createStore({ initialState });
+  asserts.assertEquals(store.getState(), {
+    cache: {},
+    loaders: {},
+  });
+
+  await store.run(function* () {
+    yield* schema.update(schema.loaders.start({ id: "1" }));
+    yield* schema.update(schema.cache.add({ "1": true }));
+  });
+
+  asserts.assertEquals(schema.cache.selectTable(store.getState()), {
+    "1": true,
+  });
+  asserts.assertEquals(
+    schema.loaders.selectById(store.getState(), { id: "1" }).status,
+    "loading",
+  );
+});
+
 it(tests, "general types and functionality", async () => {
   const [db, initialState] = createSchema({
     users: slice.table<User>({
@@ -25,7 +48,7 @@ it(tests, "general types and functionality", async () => {
     cache: slice.table({ empty: {} }),
     loaders: slice.loaders(),
   });
-  const store = configureStore({ initialState });
+  const store = createStore({ initialState });
 
   asserts.assertEquals(store.getState(), {
     users: { "1": { id: "1", name: "wow" } },
@@ -75,7 +98,7 @@ it(tests, "can work with a nested object", async () => {
     cache: slice.table({ empty: {} }),
     loaders: slice.loaders(),
   });
-  const store = configureStore({ initialState });
+  const store = createStore({ initialState });
   await store.run(function* () {
     yield* db.update(db.currentUser.update({ key: "name", value: "vvv" }));
     const curUser = yield* select(db.currentUser.select);

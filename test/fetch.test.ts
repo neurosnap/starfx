@@ -1,9 +1,8 @@
 import { describe, expect, install, it, mock } from "../test.ts";
 import {
-  configureStore,
   createSchema,
+  createStore,
   slice,
-  storeMdw,
   waitForLoader,
   waitForLoaders,
 } from "../store/mod.ts";
@@ -19,7 +18,7 @@ const testStore = () => {
     loaders: slice.loaders(),
     cache: slice.table({ empty: {} }),
   });
-  const store = configureStore({ initialState });
+  const store = createStore({ initialState });
   return { schema, store };
 };
 
@@ -39,8 +38,7 @@ it(
 
     const { store, schema } = testStore();
     const api = createApi();
-    api.use(mdw.api());
-    api.use(storeMdw.store(schema));
+    api.use(mdw.api({ schema }));
     api.use(api.routes());
     api.use(mdw.headers);
     api.use(mdw.fetch({ baseUrl }));
@@ -87,8 +85,7 @@ it(
 
     const { store, schema } = testStore();
     const api = createApi();
-    api.use(mdw.api());
-    api.use(storeMdw.store(schema));
+    api.use(mdw.api({ schema }));
     api.use(api.routes());
     api.use(mdw.fetch({ baseUrl }));
 
@@ -124,8 +121,7 @@ it(tests, "error handling", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(mdw.api());
-  api.use(storeMdw.store(schema));
+  api.use(mdw.api({ schema }));
   api.use(api.routes());
   api.use(mdw.fetch({ baseUrl }));
 
@@ -160,8 +156,7 @@ it(tests, "status 204", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(mdw.api());
-  api.use(storeMdw.store(schema));
+  api.use(mdw.api({ schema }));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -200,8 +195,7 @@ it(tests, "malformed json", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(mdw.api());
-  api.use(storeMdw.store(schema));
+  api.use(mdw.api({ schema }));
   api.use(api.routes());
   api.use(function* (ctx, next) {
     const url = ctx.req().url;
@@ -245,8 +239,7 @@ it(tests, "POST", async () => {
 
   const { schema, store } = testStore();
   const api = createApi();
-  api.use(mdw.api());
-  api.use(storeMdw.store(schema));
+  api.use(mdw.api({ schema }));
   api.use(api.routes());
   api.use(mdw.headers);
   api.use(mdw.fetch({ baseUrl }));
@@ -297,8 +290,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
 
   const { store, schema } = testStore();
   const api = createApi();
-  api.use(mdw.api());
-  api.use(storeMdw.store(schema));
+  api.use(mdw.api({ schema }));
   api.use(api.routes());
   api.use(mdw.headers);
   api.use(mdw.fetch({ baseUrl }));
@@ -385,8 +377,7 @@ it(
   () => {
     const { store, schema } = testStore();
     const api = createApi();
-    api.use(mdw.api());
-    api.use(storeMdw.store(schema));
+    api.use(mdw.api({ schema }));
     api.use(api.routes());
     api.use(mdw.fetch({ baseUrl }));
     let actual = "";
@@ -432,8 +423,7 @@ it(
 
     const { schema, store } = testStore();
     const api = createApi();
-    api.use(mdw.api());
-    api.use(storeMdw.store(schema));
+    api.use(mdw.api({ schema }));
     api.use(api.routes());
     api.use(mdw.fetch({ baseUrl }));
 
@@ -481,8 +471,7 @@ it(
     const { schema, store } = testStore();
     let actual = null;
     const api = createApi();
-    api.use(mdw.api());
-    api.use(storeMdw.store(schema));
+    api.use(mdw.api({ schema }));
     api.use(api.routes());
     api.use(mdw.fetch({ baseUrl }));
 
@@ -515,8 +504,7 @@ it(
     const { schema, store } = testStore();
     let actual = null;
     const api = createApi();
-    api.use(mdw.api());
-    api.use(storeMdw.store(schema));
+    api.use(mdw.api({ schema }));
     api.use(api.routes());
     api.use(mdw.fetch({ baseUrl }));
 
@@ -543,8 +531,7 @@ it(tests, "should use dynamic mdw to mock response", async () => {
   const { schema, store } = testStore();
   let actual = null;
   const api = createApi();
-  api.use(mdw.api());
-  api.use(storeMdw.store(schema));
+  api.use(mdw.api({ schema }));
   api.use(api.routes());
   api.use(mdw.fetch({ baseUrl }));
 
