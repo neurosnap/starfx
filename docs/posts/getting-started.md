@@ -78,7 +78,7 @@ import { createApi, createSchema, createStore, mdw, timer } from "starfx";
 import { Provider, useCache } from "starfx/react";
 
 const [schema, initialState] = createSchema();
-const store = createStore(initialState);
+const store = createStore({ initialState });
 
 const api = createApi();
 // mdw = middleware
@@ -97,15 +97,15 @@ store.run(api.bootup);
 function App() {
   return (
     <Provider schema={schema} store={store}>
-      <App />
+      <Example />
     </Provider>
   );
 }
 
 function Example() {
-  const { isLoading, isError, message, data = [] } = useCache(fetchRepo());
+  const { isLoading, isError, message, data } = useCache(fetchRepo());
 
-  if (isLoading) return "Loading ...";
+  if (isLoading || !data) return "Loading ...";
 
   if (isError) return `An error has occurred: ${message}`;
 
