@@ -10,7 +10,7 @@ import {
 import { actions, customKey, err, queryCtx } from "./query.ts";
 import { nameParser } from "./fetch.ts";
 
-interface ApiMdwProps<
+export interface ApiMdwProps<
   Ctx extends ApiCtx = ApiCtx,
   M extends AnyState = AnyState,
 > {
