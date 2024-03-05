@@ -89,7 +89,7 @@ export function* queryCtx<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx, next: Next) {
   }
   if (!ctx.request) ctx.request = ctx.req();
   if (!ctx.response) ctx.response = null;
-  if (!ctx.json) ctx.json = { ok: false, data: {}, error: {} };
+  if (!ctx.json) ctx.json = { ok: false, error: {} };
   if (!ctx.actions) ctx.actions = [];
   if (!ctx.bodyType) ctx.bodyType = "json";
   yield* next();

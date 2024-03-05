@@ -285,7 +285,6 @@ it(tests, "with hash key on a large post", async () => {
       ctx.response = new Response();
       ctx.json = {
         ok: true,
-        data: curUsers,
         value: curUsers,
       };
     },
@@ -353,7 +352,7 @@ it(tests, "ensure types for get() endpoint", () => {
   api.use(function* (ctx, next) {
     yield* next();
     const data = { result: "wow" };
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
   });
 
   const acc: string[] = [];
@@ -391,7 +390,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
   api.use(function* (ctx, next) {
     yield* next();
     const data = { result: "wow" };
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
   });
 
   const acc: string[] = [];
@@ -428,7 +427,7 @@ it(
     api.use(function* (ctx, next) {
       yield* next();
       const data = { result: "wow" };
-      ctx.json = { ok: true, data, value: data };
+      ctx.json = { ok: true, value: data };
     });
 
     const acc: string[] = [];
@@ -493,7 +492,7 @@ it(
     api.use(function* (ctx, next) {
       yield* next();
       const data = { result: "wow" };
-      ctx.json = { ok: true, data, value: data };
+      ctx.json = { ok: true, value: data };
     });
 
     const acc: string[] = [];

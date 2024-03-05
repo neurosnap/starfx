@@ -71,7 +71,7 @@ it(
       headers: {
         "Content-Type": "application/json",
       },
-    }, { ok: true, data: mockUser, value: mockUser }]);
+    }, { ok: true, value: mockUser }]);
   },
 );
 
@@ -109,7 +109,7 @@ it(
     await store.run(waitForLoader(schema.loaders, action));
 
     const data = "this is some text";
-    expect(actual).toEqual({ ok: true, data, value: data });
+    expect(actual).toEqual({ ok: true, value: data });
   },
 );
 
@@ -146,7 +146,7 @@ it(tests, "error handling", async () => {
 
   const state = store.getState();
   expect(state.cache[action.payload.key]).toEqual(errMsg);
-  expect(actual).toEqual({ ok: false, data: errMsg, error: errMsg });
+  expect(actual).toEqual({ ok: false, error: errMsg });
 });
 
 it(tests, "status 204", async () => {
@@ -185,7 +185,7 @@ it(tests, "status 204", async () => {
 
   const state = store.getState();
   expect(state.cache[action.payload.key]).toEqual({});
-  expect(actual).toEqual({ ok: true, data: {}, value: {} });
+  expect(actual).toEqual({ ok: true, value: {} });
 });
 
 it(tests, "malformed json", async () => {
@@ -227,7 +227,6 @@ it(tests, "malformed json", async () => {
   };
   expect(actual).toEqual({
     ok: false,
-    data,
     error: data,
   });
 });
@@ -278,7 +277,6 @@ it(tests, "POST", async () => {
 
   expect(loader.value.meta.json).toEqual({
     ok: true,
-    data: mockUser,
     value: mockUser,
   });
 });
@@ -351,7 +349,6 @@ it(tests, "POST multiple endpoints with same uri", async () => {
 
   expect(result1.value.meta.json).toEqual({
     ok: true,
-    data: mockUser,
     value: mockUser,
   });
 
@@ -366,7 +363,6 @@ it(tests, "POST multiple endpoints with same uri", async () => {
 
   expect(result2.value.meta.json).toEqual({
     ok: true,
-    data: mockUser,
     value: mockUser,
   });
 });
@@ -454,7 +450,7 @@ it(
 
     const state = store.getState();
     expect(state.cache[action.payload.key]).toEqual(mockUser);
-    expect(actual).toEqual({ ok: true, data: mockUser, value: mockUser });
+    expect(actual).toEqual({ ok: true, value: mockUser });
   },
 );
 
@@ -493,7 +489,7 @@ it(
       throw loader.error;
     }
     const data = { message: "error" };
-    expect(actual).toEqual({ ok: false, data, error: data });
+    expect(actual).toEqual({ ok: false, error: data });
   },
 );
 
@@ -523,7 +519,7 @@ it(
     if (!loader.ok) {
       throw loader.error;
     }
-    expect(actual).toEqual({ ok: true, data: mockUser, value: mockUser });
+    expect(actual).toEqual({ ok: true, value: mockUser });
   },
 );
 
@@ -553,7 +549,7 @@ it(tests, "should use dynamic mdw to mock response", async () => {
   if (!loader.ok) {
     throw loader.error;
   }
-  expect(actual).toEqual({ ok: true, data: dynamicUser, value: dynamicUser });
+  expect(actual).toEqual({ ok: true, value: dynamicUser });
 
   // reset dynamic mdw and try again
   api.reset();
@@ -562,5 +558,5 @@ it(tests, "should use dynamic mdw to mock response", async () => {
   if (!loader.ok) {
     throw loader.error;
   }
-  expect(actual).toEqual({ ok: true, data: mockUser, value: mockUser });
+  expect(actual).toEqual({ ok: true, value: mockUser });
 });

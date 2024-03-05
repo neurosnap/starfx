@@ -52,14 +52,14 @@ it(tests, "basic", () => {
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     if (`${ctx.req().url}`.startsWith("/users/")) {
-      ctx.json = { ok: true, data: mockUser2, value: mockUser2 };
+      ctx.json = { ok: true, value: mockUser2 };
       yield* next();
       return;
     }
     const data = {
       users: [mockUser],
     };
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
     yield* next();
   });
 
@@ -116,7 +116,7 @@ it(tests, "with loader", () => {
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
     const data = { users: [mockUser] };
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
     yield* next();
   });
 
@@ -158,7 +158,7 @@ it(tests, "with item loader", () => {
   api.use(function* fetchApi(ctx, next) {
     ctx.response = new Response(jsonBlob(mockUser), { status: 200 });
     const data = { users: [mockUser] };
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
     yield* next();
   });
 
@@ -254,7 +254,7 @@ it(tests, "simpleCache", () => {
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
     ctx.response = new Response(jsonBlob(data));
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
     yield* next();
   });
 
@@ -283,7 +283,7 @@ it(tests, "overriding default loader behavior", () => {
   api.use(function* fetchApi(ctx, next) {
     const data = { users: [mockUser] };
     ctx.response = new Response(jsonBlob(data));
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
     yield* next();
   });
 
@@ -390,7 +390,6 @@ it(tests, "createApi with own key", async () => {
       ctx.response = new Response();
       ctx.json = {
         ok: true,
-        data: curUsers,
         value: curUsers,
       };
     },
@@ -462,7 +461,6 @@ it(tests, "createApi with custom key but no payload", async () => {
       ctx.response = new Response();
       ctx.json = {
         ok: true,
-        data: curUsers,
         value: curUsers,
       };
     },
@@ -510,14 +508,14 @@ it(tests, "errorHandler", () => {
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     if (`${ctx.req().url}`.startsWith("/users/")) {
-      ctx.json = { ok: true, data: mockUser2, value: mockUser2 };
+      ctx.json = { ok: true, value: mockUser2 };
       yield* next();
       return;
     }
     const data = {
       users: [mockUser],
     };
-    ctx.json = { ok: true, data, value: data };
+    ctx.json = { ok: true, value: data };
     yield* next();
   });
 
@@ -578,6 +576,5 @@ it(tests, "stub predicate", async () => {
   expect(actual).toEqual({
     ok: true,
     value: { frodo: "shire" },
-    data: { frodo: "shire" },
   });
 });

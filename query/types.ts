@@ -30,18 +30,10 @@ export type ApiFetchResult<ApiSuccess = any, ApiError = any> =
   | {
     ok: true;
     value: ApiSuccess;
-    /**
-     * @deprecated Use {@link ApiFetchResult.value} instead.
-     */
-    data: ApiSuccess;
   }
   | {
     ok: false;
     error: ApiError;
-    /**
-     * @deprecated Use {@link ApiFetchResult.error} instead.
-     */
-    data: ApiError;
   };
 
 export type ApiRequest = Partial<{ url: string } & RequestInit>;

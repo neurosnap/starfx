@@ -103,7 +103,6 @@ export function* json<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   if (ctx.response.status === 204) {
     ctx.json = {
       ok: true,
-      data: {},
       value: {},
     };
     yield* next();
@@ -120,13 +119,11 @@ export function* json<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     if (ctx.response.ok) {
       ctx.json = {
         ok: true,
-        data: data.value,
         value: data.value,
       };
     } else {
       ctx.json = {
         ok: false,
-        data: data.value,
         error: data.value,
       };
     }
@@ -134,7 +131,6 @@ export function* json<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     const dta = { message: data.error.message };
     ctx.json = {
       ok: false,
-      data: dta,
       error: dta,
     };
   }
@@ -190,7 +186,6 @@ export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
         `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`;
       ctx.json = {
         ok: false,
-        data,
         error: data,
       };
       return;
