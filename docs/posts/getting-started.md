@@ -5,19 +5,18 @@ description: Use starfx with deno, node, or the browser
 
 # motivation
 
-We think you need a react framework or server-side rendering because that's
-where money is being made. If we are building a highly dynamic and interactive
-web application then we probably don't need SSR. These frameworks sell us that
-they are an easier way to build web apps, but that's not true. Just think of it
-this way: if we can build a web app using only static assets, isn't that simpler
-than having static assets and a react framework server?
+We think we need a react framework and server-side rendering (SSR) because
+that's where money is being made. If we are building a highly dynamic and
+interactive web application then we probably don't need SSR. These frameworks
+sell us that they are an easier way to build web apps, but that's not true. Just
+think of it this way: if we can build a web app using only static assets, isn't
+that simpler than having static assets **and** a react framework server?
 
 React hook-based fetching and caching libraries dramatically simplify data
 synchronization but are so tightly coupled to a component's life cycle that it
 creates waterfall fetches and loading spinners everywhere. We also have the
 downside of not being able to normalize our cache which means we have to spend
-time thinking about how and when to invalidate our various caches that hold the
-identical API entities.
+time thinking about how and when to invalidate our various caches.
 
 Further, all of these data caching libraries don't handle data normalization. In
 every library we are going to see a line similar to this: "Data normalization is
@@ -57,19 +56,26 @@ The benefits of using this library:
 
 # when to use this library?
 
-The primary target for this library are single-page apps. This is for an app
-that might be hosted inside an object store (like s3) or with a simple web
-server that serves files and that's it.
+The primary target for this library are SPAs. This is for an app that might be
+hosted inside an object store (like s3) or with a simple web server (like nginx)
+that serves files and that's it.
 
 Is your app highly interactive, requiring it to persist data across pages? This
 is the sweet spot for `starfx`.
 
+This library is **not** a great fit for ecommerce, tiny projects, or blogs. This
+is for web apps that are generally behind a login screen that require a
+desktop-class user experience. This library is designed to scale, so it might
+feel a little overwhelming. Just know if you use this library, your code will be
+easier to read, easier to write, all while handling a massive amount of business
+complexity.
+
 # code
 
 Here we demonstrate a complete example so you can glimpse at how `starfx` works.
-In this example, we will fetch users from an API endpoint, cache the `Response`
-json, and then ensure the endpoint only gets called at-most once every **5
-minutes**, mimicking the basic features of `react-query`.
+In this example, we will fetch a github repo from an API endpoint, cache the
+`Response` json, and then ensure the endpoint only gets called at-most once
+every **5 minutes**, mimicking the basic features of `react-query`.
 
 [Codesanbox](https://codesandbox.io/p/sandbox/starfx-simplest-dgqc9v?file=%2Fsrc%2Findex.tsx)
 
