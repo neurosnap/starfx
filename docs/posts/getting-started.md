@@ -5,32 +5,31 @@ description: Use starfx with deno, node, or the browser
 
 # motivation
 
-We've been sold a lie. You think you need a react framework or server-side
-rendering because that's where money is being made. If you are building a highly
-dynamic and interactive web application then you probably don't need SSR. These
-frameworks sell you that they are an easier way to build web apps, but that's
-not true. Just think of it this way: if you can build your web app using only
-static assets, isn't that simpler than having static assets and a react
-framework server?
+We think you need a react framework or server-side rendering because that's
+where money is being made. If we are building a highly dynamic and interactive
+web application then we probably don't need SSR. These frameworks sell us that
+they are an easier way to build web apps, but that's not true. Just think of it
+this way: if we can build a web app using only static assets, isn't that simpler
+than having static assets and a react framework server?
 
 React hook-based fetching and caching libraries dramatically simplify data
 synchronization but are so tightly coupled to a component's life cycle that it
-creates waterfall fetches and loading spinners everywhere. You also have the
-downside of not being able to normalize your cache which means you have to spend
-time thinking about how and when to invalidate your various caches that hold the
+creates waterfall fetches and loading spinners everywhere. We also have the
+downside of not being able to normalize our cache which means we have to spend
+time thinking about how and when to invalidate our various caches that hold the
 identical API entities.
 
-Further, all of these data caching libraries have sold you another lie. In every
-library you are going to see a line similar to this: "Data normalization is hard
-and it isn't worth it." Wrong. Their libraries are not built with data
+Further, all of these data caching libraries don't handle data normalization. In
+every library we are going to see a line similar to this: "Data normalization is
+hard and it isn't worth it." Their libraries are not built with data
 normalization in mind so they claim it's an anti-feature. Why do we want to
 normalize data in the backend but not the frontend? Data normalization is
-critically important because it makes CRUD operations automatically update your
-web app without having to invalidate your cache so the app will refetch the data
-you already have.
+critically important because it makes CRUD operations automatically update our
+web app without having to invalidate our cache just so the app will refetch the
+data we already have.
 
-So what if you are building a highly interactive web app that doesn't need SEO
-and you also need more control over data synchronization and caching?
+So what if we are building a highly interactive web app that doesn't need SEO
+and we also need more control over data synchronization and caching?
 
 Are you frustrated by the following issues in your react app?
 
@@ -40,19 +39,20 @@ Are you frustrated by the following issues in your react app?
 - Extraneous network calls
 - Business logic tightly coupled to react component lifecycle hooks
 - State management boilerplate
+- Lack of state management
 - Lack of async flow control tooling
 
 We built `starfx` because we looked at the web app landscape and felt like there
 was something missing.
 
-Do you want a library that:
+The benefits of using this library:
 
-- Design for single-page applications (SPAs)
+- Designed for single-page applications (SPAs)
+- Makes data normalization easy and straightforward
 - Has a powerful middleware system similar to express to handle requests and
   responses
-- Makes data normalization easy and straightforward
 - Reduces state management boilerplate to its absolute essentials
-- Has a powerful side-effect management system using structured concurrency
+- Has a robust side-effect management system using structured concurrency
 - Has data synchronization and caching separated from react
 
 # when to use this library?
