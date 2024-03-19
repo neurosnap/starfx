@@ -23,7 +23,7 @@ jobs:
             --out ./public \
             --label starfx \
             --desc "supercharged async flow control library." \
-            --clone-url "https://github.com/neovimcraft/starfx.git" \
+            --clone-url "https://github.com/neurosnap/starfx.git" \
             --home-url "https://git.erock.io" \
             --revs main
       - name: Set outputs
