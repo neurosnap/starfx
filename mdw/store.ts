@@ -1,4 +1,4 @@
-import type { ApiCtx, ThunkCtx } from "../query/mod.ts";
+import type { ApiCtx, ThunkCtxWLoader } from "../query/mod.ts";
 import { compose } from "../compose.ts";
 import type { AnyState, Next } from "../types.ts";
 import {
@@ -75,28 +75,41 @@ export function loader<M extends AnyState = AnyState>(schema: {
   loaders: LoaderOutput<M, AnyState>;
 }) {
   return function* <
-    Ctx extends ThunkCtx = ThunkCtx,
+    Ctx extends ThunkCtxWLoader = ThunkCtxWLoader,
   >(ctx: Ctx, next: Next) {
     yield* updateStore([
       schema.loaders.start({ id: ctx.name }),
       schema.loaders.start({ id: ctx.key }),
     ]);
 
+    if (!ctx.loader) ctx.loader = {} as any;
+
     try {
       yield* next();
+
+      if (!ctx.loader) {
+        ctx.loader = {};
+      }
+
       yield* updateStore([
-        schema.loaders.success({ id: ctx.name }),
-        schema.loaders.success({ id: ctx.key }),
+        schema.loaders.success({ id: ctx.name, ...ctx.loader }),
+        schema.loaders.success({ id: ctx.key, ...ctx.loader }),
       ]);
     } catch (err) {
+      if (!ctx.loader) {
+        ctx.loader = {};
+      }
+
       yield* updateStore([
         schema.loaders.error({
           id: ctx.name,
           message: err.message,
+          ...ctx.loader,
         }),
         schema.loaders.error({
           id: ctx.key,
           message: err.message,
+          ...ctx.loader,
         }),
       ]);
     } finally {
@@ -106,7 +119,10 @@ export function loader<M extends AnyState = AnyState>(schema: {
       const ids = loaders
         .filter((loader) => loader.status === "loading")
         .map((loader) => loader.id);
-      yield* updateStore(schema.loaders.resetByIds(ids));
+
+      if (ids.length > 0) {
+        yield* updateStore(schema.loaders.resetByIds(ids));
+      }
     }
   };
 }

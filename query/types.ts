@@ -22,6 +22,10 @@ export interface ThunkCtx<P = any> extends Payload<P> {
   result: Result<void>;
 }
 
+export interface ThunkCtxWLoader extends ThunkCtx {
+  loader: Omit<LoaderPayload<any>, "id"> | null;
+}
+
 export interface LoaderCtx<P = unknown> extends ThunkCtx<P> {
   loader: Partial<LoaderItemState> | null;
 }
