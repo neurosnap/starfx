@@ -183,6 +183,20 @@ export function loaderApi<
         schema.loaders.success({ id: ctx.name, ...ctx.loader }),
         schema.loaders.success({ id: ctx.key, ...ctx.loader }),
       ]);
+    } catch (err) {
+      const message = err?.message || "unknown exception";
+      yield* updateStore([
+        schema.loaders.error({
+          id: ctx.name,
+          message,
+          ...ctx.loader,
+        }),
+        schema.loaders.error({
+          id: ctx.key,
+          message,
+          ...ctx.loader,
+        }),
+      ]);
     } finally {
       const loaders = yield* select((s: any) =>
         schema.loaders.selectByIds(s, { ids: [ctx.name, ctx.key] })
