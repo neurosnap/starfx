@@ -22,7 +22,6 @@ func main() {
 				Text: "Getting started",
 				Href: "/getting-started",
 				Page: pager("getting-started.md"),
-				Tag:  "Info",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Motivation"),
 					pdocs.AnchorTagSitemap("When to use this library"),
@@ -34,7 +33,6 @@ func main() {
 				Text: "Thunks",
 				Href: "/thunks",
 				Page: pager("thunks.md"),
-				Tag:  "Side Effects",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Thunk Action"),
 					pdocs.AnchorTagSitemap("Thunk Payload"),
@@ -45,7 +43,6 @@ func main() {
 				Text: "Endpoints",
 				Href: "/endpoints",
 				Page: pager("endpoints.md"),
-				Tag:  "Side Effects",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Enforcing fetch response type"),
 					pdocs.AnchorTagSitemap("The same API endpoints but different logic"),
@@ -61,7 +58,6 @@ func main() {
 				Text: "Store",
 				Href: "/store",
 				Page: pager("store.md"),
-				Tag:  "Store",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("How to update state"),
 					pdocs.AnchorTagSitemap("Updating state from view"),
@@ -71,7 +67,6 @@ func main() {
 				Text: "React",
 				Href: "/react",
 				Page: pager("react.md"),
-				Tag:  "View",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("useSelector"),
 					pdocs.AnchorTagSitemap("useLoader"),
@@ -85,7 +80,6 @@ func main() {
 				Text: "Schema",
 				Href: "/schema",
 				Page: pager("schema.md"),
-				Tag:  "Store",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Schema Assumptions"),
 					pdocs.AnchorTagSitemap("any"),
@@ -101,7 +95,6 @@ func main() {
 				Text: "Caching",
 				Href: "/caching",
 				Page: pager("caching.md"),
-				Tag:  "Store",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Manual"),
 					pdocs.AnchorTagSitemap("Automatic"),
@@ -111,7 +104,6 @@ func main() {
 				Text: "Dependent Queries",
 				Href: "/dependent-queries",
 				Page: pager("dependent.md"),
-				Tag:  "Side Effects",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Dispatch the thunk as an action"),
 					pdocs.AnchorTagSitemap("Call the middleware stack directly"),
@@ -121,7 +113,6 @@ func main() {
 				Text: "Middleware",
 				Href: "/middleware",
 				Page: pager("mdw.md"),
-				Tag:  "Side Effects",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Context"),
 				},
@@ -130,7 +121,6 @@ func main() {
 				Text: "Loaders",
 				Href: "/loaders",
 				Page: pager("loader.md"),
-				Tag:  "Side Effects",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Usage"),
 					pdocs.AnchorTagSitemap("Shape"),
@@ -140,13 +130,11 @@ func main() {
 				Text: "Structured Concurrency",
 				Href: "/structured-concurrency",
 				Page: pager("structured-concurrency.md"),
-				Tag:  "Info",
 			},
 			{
 				Text: "Supervisors",
 				Href: "/supervisors",
 				Page: pager("supervisors.md"),
-				Tag:  "Advanced",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("poll"),
 					pdocs.AnchorTagSitemap("timer"),
@@ -156,25 +144,21 @@ func main() {
 				Text: "Testing",
 				Href: "/testing",
 				Page: pager("testing.md"),
-				Tag:  "Advanced",
 			},
 			{
 				Text: "Design Philosophy",
 				Href: "/design-philosophy",
 				Page: pager("design-philosophy.md"),
-				Tag:  "Info",
 			},
 			{
 				Text: "API",
 				Href: "/api",
 				Page: pager("api.md"),
-				Tag:  "Info",
 			},
 			{
 				Text: "Resources",
 				Href: "/resources",
 				Page: pager("resources.md"),
-				Tag:  "Info",
 				Children: []*pdocs.Sitemap{
 					pdocs.AnchorTagSitemap("Quick Links"),
 					pdocs.AnchorTagSitemap("Talk"),

@@ -16,16 +16,15 @@ React hook-based fetching and caching libraries dramatically simplify data
 synchronization but are so tightly coupled to a component's life cycle that it
 creates waterfall fetches and loading spinners everywhere. We also have the
 downside of not being able to normalize our cache which means we have to spend
-time thinking about how and when to invalidate our various caches.
+time thinking about how and when to invalidate our cache.
 
 Further, all of these data caching libraries don't handle data normalization. In
-every library we are going to see a line similar to this: "Data normalization is
-hard and it isn't worth it." Their libraries are not built with data
-normalization in mind so they claim it's an anti-feature. Why do we want to
-normalize data in the backend but not the frontend? Data normalization is
-critically important because it makes CRUD operations automatically update our
-web app without having to invalidate our cache just so the app will refetch the
-data we already have.
+every library we are going to see a line like: "Data normalization is hard and
+it isn't worth it." Their libraries are not built with data normalization in
+mind so they claim it's an anti-feature. Why do we want to normalize data in the
+backend but not the frontend? Data normalization is critically important because
+it makes CRUD operations automatically update our web app without having to
+invalidate our cache.
 
 So what if we are building a highly interactive web app that doesn't need SEO
 and we also need more control over data synchronization and caching?
@@ -46,6 +45,7 @@ was something missing.
 
 The benefits of using this library:
 
+- The missing model and controller (MC) in react (V)
 - Designed for single-page applications (SPAs)
 - Makes data normalization easy and straightforward
 - Has a powerful middleware system similar to express to handle requests and
