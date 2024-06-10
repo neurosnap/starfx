@@ -30,37 +30,78 @@ func main() {
 				},
 			},
 			{
-				Text: "Thunks",
-				Href: "/thunks",
-				Page: pager("thunks.md"),
+				Text: "Controllers",
 				Children: []*pdocs.Sitemap{
-					pdocs.AnchorTagSitemap("Thunk Action"),
-					pdocs.AnchorTagSitemap("Thunk Payload"),
-					pdocs.AnchorTagSitemap("Custom ctx"),
+					{
+						Text: "Overview",
+						Href: "/controllers",
+						Page: pager("controllers.md"),
+					},
+					{
+						Text: "Thunks",
+						Href: "/thunks",
+						Page: pager("thunks.md"),
+						Children: []*pdocs.Sitemap{
+							pdocs.AnchorTagSitemap("Thunk Action"),
+							pdocs.AnchorTagSitemap("Thunk Payload"),
+							pdocs.AnchorTagSitemap("Custom ctx"),
+						},
+					},
+					{
+						Text: "Endpoints",
+						Href: "/endpoints",
+						Page: pager("endpoints.md"),
+						Children: []*pdocs.Sitemap{
+							pdocs.AnchorTagSitemap("Enforcing fetch response type"),
+							pdocs.AnchorTagSitemap("The same API endpoints but different logic"),
+							pdocs.AnchorTagSitemap("Using variables inside the API endpoint"),
+							pdocs.AnchorTagSitemap("ctx.request"),
+							pdocs.AnchorTagSitemap("Using ctx.req"),
+							pdocs.AnchorTagSitemap("ctx.response"),
+							pdocs.AnchorTagSitemap("ctx.json"),
+							pdocs.AnchorTagSitemap("Middleware automation"),
+						},
+					},
 				},
 			},
 			{
-				Text: "Endpoints",
-				Href: "/endpoints",
-				Page: pager("endpoints.md"),
+				Text: "Models",
 				Children: []*pdocs.Sitemap{
-					pdocs.AnchorTagSitemap("Enforcing fetch response type"),
-					pdocs.AnchorTagSitemap("The same API endpoints but different logic"),
-					pdocs.AnchorTagSitemap("Using variables inside the API endpoint"),
-					pdocs.AnchorTagSitemap("ctx.request"),
-					pdocs.AnchorTagSitemap("Using ctx.req"),
-					pdocs.AnchorTagSitemap("ctx.response"),
-					pdocs.AnchorTagSitemap("ctx.json"),
-					pdocs.AnchorTagSitemap("Middleware automation"),
-				},
-			},
-			{
-				Text: "Store",
-				Href: "/store",
-				Page: pager("store.md"),
-				Children: []*pdocs.Sitemap{
-					pdocs.AnchorTagSitemap("How to update state"),
-					pdocs.AnchorTagSitemap("Updating state from view"),
+					{
+
+						Text: "Overview",
+						Href: "/models",
+						Page: pager("models.md"),
+						Children: []*pdocs.Sitemap{
+							pdocs.AnchorTagSitemap("How to update state"),
+							pdocs.AnchorTagSitemap("Updating state from view"),
+						},
+					},
+					{
+
+						Text: "Store",
+						Href: "/store",
+						Page: pager("store.md"),
+						Children: []*pdocs.Sitemap{
+							pdocs.AnchorTagSitemap("How to update state"),
+							pdocs.AnchorTagSitemap("Updating state from view"),
+						},
+					},
+					{
+						Text: "Schema",
+						Href: "/schema",
+						Page: pager("schema.md"),
+						Children: []*pdocs.Sitemap{
+							pdocs.AnchorTagSitemap("Schema Assumptions"),
+							pdocs.AnchorTagSitemap("any"),
+							pdocs.AnchorTagSitemap("str"),
+							pdocs.AnchorTagSitemap("num"),
+							pdocs.AnchorTagSitemap("obj"),
+							pdocs.AnchorTagSitemap("table"),
+							pdocs.AnchorTagSitemap("loader"),
+							pdocs.AnchorTagSitemap("Build your own slice"),
+						},
+					},
 				},
 			},
 			{
@@ -74,21 +115,6 @@ func main() {
 					pdocs.AnchorTagSitemap("useQuery"),
 					pdocs.AnchorTagSitemap("useCache"),
 					pdocs.AnchorTagSitemap("useLoaderSuccess"),
-				},
-			},
-			{
-				Text: "Schema",
-				Href: "/schema",
-				Page: pager("schema.md"),
-				Children: []*pdocs.Sitemap{
-					pdocs.AnchorTagSitemap("Schema Assumptions"),
-					pdocs.AnchorTagSitemap("any"),
-					pdocs.AnchorTagSitemap("str"),
-					pdocs.AnchorTagSitemap("num"),
-					pdocs.AnchorTagSitemap("obj"),
-					pdocs.AnchorTagSitemap("table"),
-					pdocs.AnchorTagSitemap("loader"),
-					pdocs.AnchorTagSitemap("Build your own slice"),
 				},
 			},
 			{
