@@ -112,6 +112,14 @@
   min-width: 150px;
 }
 
+.sidebar-list {
+  padding: 0 0 0 1rem;
+}
+
+.sidebar-list li {
+  margin: 0 0 0.5rem 0;
+}
+
 @media only screen and (max-width: 800px) {
   body {
     padding: 0 1rem;
@@ -126,9 +134,13 @@
   }
 
   .sitemap {
-    text-align: center;
     -moz-column-count: 2;
     column-count: 2;
     width: 100%;
+  }
+
+  .sidebar-list {
+    padding: 0 0 0 0.6rem;
+    margin: 0;
   }
 }

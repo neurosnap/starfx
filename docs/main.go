@@ -27,12 +27,9 @@ func main() {
 			},
 			{
 				Text: "Controllers",
+				Href: "/controllers",
+				Page: pager("controllers.md"),
 				Children: []*pdocs.Sitemap{
-					{
-						Text: "Overview",
-						Href: "/controllers",
-						Page: pager("controllers.md"),
-					},
 					{
 						Text: "Thunks",
 						Href: "/thunks",
@@ -47,13 +44,9 @@ func main() {
 			},
 			{
 				Text: "Models",
+				Href: "/models",
+				Page: pager("models.md"),
 				Children: []*pdocs.Sitemap{
-					{
-
-						Text: "Overview",
-						Href: "/models",
-						Page: pager("models.md"),
-					},
 					{
 
 						Text: "Store",
