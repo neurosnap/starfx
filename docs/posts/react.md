@@ -1,6 +1,7 @@
 ---
 title: React
 description: How to integrate with React
+toc: 2
 ---
 
 Even though we are **not** using `redux`, if you are familiar with
@@ -38,13 +39,17 @@ function App() {
 }
 ```
 
-# hooks
+# Hooks
 
 ## `useSelector`
+
+Query your store with this hook.
 
 [See `react-redux` docs](https://react-redux.js.org/api/hooks#useselector)
 
 ## `useDispatch`
+
+Call thunks and endpoints with this hook.
 
 [See `react-redux` docs](https://react-redux.js.org/api/hooks#usedispatch)
 

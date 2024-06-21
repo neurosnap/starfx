@@ -4,7 +4,7 @@ description: Use starfx with deno, node, or the browser
 toc: 1
 ---
 
-# motivation
+# Motivation
 
 We think we need a react framework and server-side rendering (SSR) because
 that's where money is being made. If we are building a highly dynamic and
@@ -55,7 +55,7 @@ The benefits of using this library:
 - Has a robust side-effect management system using structured concurrency
 - Has data synchronization and caching separated from react
 
-# when to use this library?
+# When to use this library?
 
 The primary target for this library are SPAs. This is for an app that might be
 hosted inside an object store (like s3) or with a simple web server (like nginx)
@@ -71,7 +71,7 @@ feel a little overwhelming. Just know if you use this library, your code will be
 easier to read, easier to write, all while handling a massive amount of business
 complexity.
 
-# code
+# Code
 
 Here we demonstrate a complete example so you can glimpse at how `starfx` works.
 In this example, we will fetch a github repo from an API endpoint, cache the
@@ -128,7 +128,7 @@ function Example() {
 }
 ```
 
-# install
+# Install
 
 ```bash
 npm install starfx

@@ -1,6 +1,7 @@
 ---
 title: Schema
 description: Learn more about schamas and slices
+toc: 2
 ---
 
 A schema has two primary features:
@@ -16,18 +17,6 @@ functions to:
 - Update the value
 - Query for data within the value
 
-# Built-in slices
-
-As a result, the following slices should cover the most common data types and
-associated logic:
-
-- [any](#any)
-- [num](#num)
-- [str](#str)
-- [obj](#obj)
-- [loaders](#loaders)
-- [table](#table)
-
 # Schema assumptions
 
 `createSchema` requires two slices by default in order for it and everything
@@ -37,7 +26,12 @@ Why do we require those slices? Because if we can assume those exist, we can
 build a lot of useful middleware and supervisors on top of that assumption. It's
 a place for `starfx` and third-party functionality to hold their state.
 
-# `slice.any`
+# Built-in slices
+
+As a result, the following slices should cover the most common data types and
+associated logic.
+
+## `slice.any`
 
 This is essentially a basic getter and setter slice. You can provide the type it
 ought to be and it has a couple functions to manage and query the value stored
@@ -55,7 +49,7 @@ function*() {
 }
 ```
 
-# `num`
+## `num`
 
 This slice has some custom actions to manage a number value.
 
@@ -73,7 +67,7 @@ function*() {
 }
 ```
 
-# `str`
+## `str`
 
 This slice is probably not super useful since it is essentially the same as
 `slice.any<string>` but we could add more actions to it in the future.
@@ -90,7 +84,7 @@ function*() {
 }
 ```
 
-# `obj`
+## `obj`
 
 This is a specialized slice with some custom actions to deal with javascript
 objects.
@@ -114,7 +108,7 @@ function*() {
 }
 ```
 
-# `table`
+## `table`
 
 This is the more powerful and specialized slice we created. It attempts to
 mimick a database table where it holds an object:
@@ -158,7 +152,7 @@ function*() {
 }
 ```
 
-## empty
+### empty
 
 When `empty` is provided to `slice.table` and we use a selector like
 `selectById` to find an entity that does **not** exist, we will return the
@@ -183,7 +177,7 @@ in your system.
 
 [Read more about entity factories.](https://bower.sh/entity-factories)
 
-# `loaders`
+## `loaders`
 
 This is a specialized database table specific to managing loaders in `starfx`.
 [Read more about loaders here](/loader).

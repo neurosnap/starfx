@@ -2,7 +2,9 @@ module github.com/neurosnap/starfx/docs
 
 go 1.22
 
-require github.com/picosh/pdocs v0.0.0-20240621040056-5cbf57557db3
+// replace github.com/picosh/pdocs => /home/erock/dev/pico/pdocs
+
+require github.com/picosh/pdocs v0.0.0-20240621181009-3827cd3af2d3
 
 require (
 	github.com/alecthomas/chroma v0.10.0 // indirect
