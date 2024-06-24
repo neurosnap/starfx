@@ -141,3 +141,10 @@ yarn add starfx
 ```ts
 import * as starfx from "https://deno.land/x/starfx@0.7.0/mod.ts";
 ```
+
+# Effection
+
+This library leverages structured concurrency using
+[`effection`](https://frontside.com/effection). It is highly recommended that
+you have a brief understanding of how its API because it is used heavily within
+`starfx`.
