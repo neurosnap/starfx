@@ -3,10 +3,10 @@
 {{define "title"}}{{.Data.Title}}{{end}}
 
 {{define "meta"}}
-<meta name="description" content="{{.Data.Description}}">
+<meta name="description" content="{{.Data.Description}}" />
 {{end}}
 
-{{define "attrs"}}class="container-sm"{{end}}
+{{define "attrs"}}class="container"{{end}}
 
 {{define "body"}}
 {{template "nav" .}}
@@ -18,6 +18,8 @@
   <hr />
 
   {{template "toc" .}}
+
+  <hr />
 </main>
 
 {{template "footer" .}}

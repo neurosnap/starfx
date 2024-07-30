@@ -1,3 +1,25 @@
+ul {
+  list-style-position: inside;
+}
+
+.logo-hdr {
+  line-height: 1;
+  display: inline-block;
+  background-color: #FF79C6;
+  background-image: linear-gradient(to right, #FF5555, #FF79C6, #F8F859);
+  color: transparent;
+  background-clip: text;
+  background-size: 100%;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+}
+
+.visited {
+  color: var(--visited);
+}
+
 .sitemap {
   width: 250px;
 }
@@ -6,53 +28,23 @@
   max-width: 700px;
 }
 
+.container-xs {
+  max-width: 20em;
+  width: 100%;
+}
+
 .post-container {
   display: flex;
   gap: 1rem;
   flex-direction: row-reverse;
 }
 
-.link-alt-adj,
-.link-alt-adj:visited,
-.link-alt-adj:visited:hover,
-.link-alt-adj:hover {
-  color: var(--link-color);
-  text-decoration: none;
-}
-
-.link-alt-adj:visited:hover,
-.link-alt-adj:hover {
-  text-decoration: underline;
-}
-
-.link-alt-hover,
-.link-alt-hover:visited,
-.link-alt-hover:visited:hover,
-.link-alt-hover:hover {
-  color: var(--hover);
-  text-decoration: none;
-}
-
-.link-alt-hover:visited:hover,
-.link-alt-hover:hover {
-  text-decoration: underline;
-}
-
-.link-alt,
-.link-alt:visited,
-.link-alt:visited:hover,
-.link-alt:hover {
-  color: var(--white);
-  text-decoration: none;
-}
-
-.link-alt:visited:hover,
-.link-alt:hover {
-  text-decoration: underline;
-}
-
 .hero {
-  padding: 5rem 0;
+  padding: 5rem 0 0 0;
+}
+
+.home-features pre {
+  margin: 0;
 }
 
 .features {
@@ -67,32 +59,6 @@
 
 .mk-nav {
   padding: 1rem;
-}
-
-.text-hdr {
-  color: var(--hover);
-}
-
-.text-underline-hdr {
-  border-bottom: 3px solid var(--hover);
-  padding-bottom: 3px;
-}
-
-.toc ul, ol {
-  list-style: none;
-  padding: 0 0 0 0.5rem;
-}
-
-.toc li {
-  margin: 0 0 0.15rem 0;
-}
-
-.toc li:first-child {
-  margin-top: 0;
-}
-
-.toc a {
-  color: var(--grey-light);
 }
 
 .current {
@@ -112,6 +78,12 @@
   min-width: 150px;
 }
 
+.sitemap-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
 .sidebar-list {
   padding: 0 0 0 1rem;
 }
@@ -122,7 +94,7 @@
 
 @media only screen and (max-width: 800px) {
   body {
-    padding: 0 1rem;
+    padding: 0 0.75rem;
   }
 
   header {
@@ -134,9 +106,18 @@
   }
 
   .sitemap {
+    text-align: center;
     -moz-column-count: 2;
     column-count: 2;
     width: 100%;
+  }
+
+  .sitemap-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .mk-nav {
+    padding: 1rem 0;
   }
 
   .sidebar-list {

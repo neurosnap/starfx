@@ -3,11 +3,21 @@
 {{range .Sitemap.Children -}}
   {{if .Children}}
   <div class="box my">
-    <h2 class="text-xl text-underline inline-block">{{.Text}}</h2>
+      {{if .GenHref}}
+        <h2 class="text-xl inline-block">
+          <a href="{{.GenHref}}">{{.Text}}</a>
+        </h2>
+      {{else}}
+        <h2 class="text-xl text-underline inline-block">
+          {{.Text}}
+        </h2>
+      {{end}}
+    </h2>
     <ul class="list-none" style="padding-left: 0;">
     {{range .Children -}}
       <li>
         <a href="{{.GenHref}}">{{.Text}}</a>
+
         <ul class="list-disc" style="padding-left: 2rem;">
         {{range .Children}}
           <li>
