@@ -26,6 +26,11 @@ func main() {
 				Page: pager("getting-started.md"),
 			},
 			{
+				Text: "Learn",
+				Href: "/learn",
+				Page: pager("learn.md"),
+			},
+			{
 				Text: "Controllers",
 				Href: "/controllers",
 				Page: pager("controllers.md"),
