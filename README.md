@@ -2,7 +2,6 @@
 
 # starfx
 
-Structured concurrency for your FE apps with a modern approach to side-effect
-and state management.
+A micro-mvc framework for react apps.
 
-[Read the docs](https://starfx.bower.sh)
+[Get started](https://starfx.bower.sh)
