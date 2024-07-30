@@ -1,4 +1,4 @@
-![starfx](https://erock.imgs.sh/starfx)
+![starfx](./docs/static/logo.svg)
 
 # starfx
 
