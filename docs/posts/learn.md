@@ -26,7 +26,7 @@ The high-level picture of `starfx` is _essentially_ a glorified pubsub system:
 
 It all happens as a single unidirectional loop.
 
-## How is `starfx` different?
+# How is `starfx` different?
 
 `starfx` is different in a number of ways.
 
@@ -41,7 +41,7 @@ of hooks. Then entire system is designed, from the ground up, to not need
 subscribing to and publishing events. Those events could come from `react`, but
 they could also come from anywhere.
 
-## Why does `starfx` use js generators?
+# Why does `starfx` use js generators?
 
 Generators give us -- the library authors -- more control over how side-effects
 are handled within a javascript runtime environment. There are things that we
