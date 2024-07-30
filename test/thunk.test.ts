@@ -505,3 +505,33 @@ it(tests, "should only call thunk once", () => {
   store.dispatch(action2());
   asserts.assertEquals(acc, "a");
 });
+
+it(tests, "should be able to create thunk after `register()`", () => {
+  const api = createThunks<RoboCtx>();
+  api.use(api.routes());
+  const store = createStore({ initialState: {} });
+  store.run(api.register);
+
+  let acc = "";
+  const action = api.create("/users", function* () {
+    acc += "a";
+  });
+  store.dispatch(action());
+  asserts.assertEquals(acc, "a");
+});
+
+it(tests, "should warn when calling thunk before registered", () => {
+  const err = console.error;
+  let called = false;
+  console.error = () => {
+    called = true;
+  };
+  const api = createThunks<RoboCtx>();
+  api.use(api.routes());
+  const store = createStore({ initialState: {} });
+
+  const action = api.create("/users");
+  store.dispatch(action());
+  asserts.assertEquals(called, true);
+  console.error = err;
+});
