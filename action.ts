@@ -70,7 +70,7 @@ export function* take(pattern: ActionPattern): Operation<Action> {
 
 export function* takeEvery<T>(
   pattern: ActionPattern,
-  op: (action: Action) => Operation<T>,
+  op: (action: AnyAction) => Operation<T>,
 ) {
   const fd = useActions(pattern);
   for (const action of yield* each(fd)) {
@@ -81,7 +81,7 @@ export function* takeEvery<T>(
 
 export function* takeLatest<T>(
   pattern: ActionPattern,
-  op: (action: Action) => Operation<T>,
+  op: (action: AnyAction) => Operation<T>,
 ) {
   const fd = useActions(pattern);
   let lastTask;
@@ -97,7 +97,7 @@ export function* takeLatest<T>(
 
 export function* takeLeading<T>(
   pattern: ActionPattern,
-  op: (action: Action) => Operation<T>,
+  op: (action: AnyAction) => Operation<T>,
 ) {
   while (true) {
     const action = yield* take(pattern);

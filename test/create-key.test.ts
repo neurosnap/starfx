@@ -1,8 +1,17 @@
-import { describe, expect, it } from "../test.ts";
+import { afterAll, beforeAll, describe, expect, it } from "../test.ts";
 import { type ActionWithPayload, createApi } from "../mod.ts";
 
 const getKeyOf = (action: ActionWithPayload<{ key: string }>): string =>
   action.payload.key;
+
+const err = console.error;
+beforeAll(() => {
+  console.error = () => {};
+});
+
+afterAll(() => {
+  console.error = err;
+});
 
 const tests = describe("create-key");
 
@@ -10,6 +19,7 @@ it(
   tests,
   "options object keys order for action key identity - 0: empty options",
   () => {
+    console.warn = () => {};
     const api = createApi();
     api.use(api.routes());
     // no param
