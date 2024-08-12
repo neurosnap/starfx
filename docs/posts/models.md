@@ -3,8 +3,19 @@ title: Models
 description: State management in starfx
 ---
 
-Since data normalization is a first-class citizen inside `starfx` we custom
-built a react database for your front-end web apps. Our store is most similar to
-`redux` but with a couple of important differences.
+Once core component of an MVC framework is the Model.
 
-Creating a front-end database starts first with creating a schema.
+Since data normalization is a first-class citizen inside `starfx`, we built a
+custom react database for front-end web apps. Like a backend MVC framework, we
+want to think of managing the FE store like managing a database. So while
+thinking about models as separate entities, you create all your models by
+creating a single schema.
+
+Managing models in `starfx` leverages two primary concepts: schema and store.
+
+The store is a single, global, and reactive object that was built to make
+updating views easy. It is essentially an event emitter with a javascript object
+attached to it.
+
+Because the goal of this library is to create scalable web apps, we want users
+to create all their models at the same time inside of a single schema.

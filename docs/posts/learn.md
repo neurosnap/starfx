@@ -55,7 +55,7 @@ Furthermore, `async`/`await` is implemented using generator functions. In
 `starfx`, not everything we want to `await` is a `Promise`!
 
 There is so much more to why generators are awesome but at the end of the day,
-to the end developer, it doesn't really matter that much.
+to the end developer, you can treat generators the same as `async`/`await`.
 
 If you are struggling to understand or are getting confused using generator
 functions, just use the
