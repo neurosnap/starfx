@@ -223,9 +223,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
       return action({ name, key, options });
     };
     actionFn.run = (action?: unknown): Operation<Ctx> => {
-      if (!signal) {
-        console.error(errMsg);
-      }
       if (action && Object.hasOwn(action, "type")) {
         return onApi(action as ActionWithPayload<CreateActionPayload>);
       }
