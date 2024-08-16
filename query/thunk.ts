@@ -161,6 +161,12 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function create(name: string, ...args: any[]) {
+    if (Object.hasOwn(visors, name)) {
+      const msg =
+        `[${name}] already exists, do you have two thunks with the same name?`;
+      console.warn(msg);
+    }
+
     const type = createType(name);
     const action = (payload?: any) => {
       return { type, payload };
@@ -192,12 +198,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
       throw new Error("Middleware must be a function");
     }
 
-    if (middlewareMap[name]) {
-      console.warn(
-        `[${name}] already exists which means you have two functions with the same name`,
-      );
-    }
-
     middlewareMap[name] = fn || defaultMiddleware;
 
     const tt = req ? (req as any).supervisor : supervisor;
@@ -217,7 +217,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     const actionFn = (options?: Ctx["payload"]) => {
       if (!signal) {
-        console.error(errMsg);
+        console.warn(errMsg);
       }
       const key = createKey(name, options);
       return action({ name, key, options });

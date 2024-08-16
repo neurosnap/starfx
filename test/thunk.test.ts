@@ -521,9 +521,9 @@ it(tests, "should be able to create thunk after `register()`", () => {
 });
 
 it(tests, "should warn when calling thunk before registered", () => {
-  const err = console.error;
+  const err = console.warn;
   let called = false;
-  console.error = () => {
+  console.warn = () => {
     called = true;
   };
   const api = createThunks<RoboCtx>();
@@ -533,5 +533,5 @@ it(tests, "should warn when calling thunk before registered", () => {
   const action = api.create("/users");
   store.dispatch(action());
   asserts.assertEquals(called, true);
-  console.error = err;
+  console.warn = err;
 });
