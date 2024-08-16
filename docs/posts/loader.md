@@ -13,11 +13,8 @@ want.
 
 # Usage
 
-For endpoints, when you use `storeMdw.store()`, loaders automatically track
-fetch requests.
-
-For thunks you can use `storeMdw.loader()` which will track the status of a
-thunk.
+For endpoints, loaders are installed automatically and track fetch requests.
+Loader success is determined by `Response.ok` or if `fetch` throws an error.
 
 You can also use loaders manually:
 
@@ -31,6 +28,26 @@ function* fn() {
   yield* put(schema.loaders.success({ id: "my-id" }));
   yield* put(schema.loaders.error({ id: "my-id", message: "boom!" }));
 }
+```
+
+For thunks you can use `mdw.loader()` which will track the status of a thunk.
+
+```ts
+import { createThunks, mdw } from "starfx";
+// imaginary schema
+import { initialState, schema } from "./schema";
+
+const thunks = createThunks();
+thunks.use(mdw.loader(schema));
+thunks.use(thunks.routes());
+
+const go = thunks.create("go", function* (ctx, next) {
+  throw new Error("boom!");
+});
+
+const store = createStore({ initialState });
+store.dispatch(go());
+schema.loaders.selectById(store.getState(), { id: `${go}` }); // status = "error"; message = "boom!"
 ```
 
 # Shape

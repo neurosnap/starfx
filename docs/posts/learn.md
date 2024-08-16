@@ -41,6 +41,10 @@ of hooks. Then entire system is designed, from the ground up, to not need
 subscribing to and publishing events. Those events could come from `react`, but
 they could also come from anywhere.
 
+Thirdly, we have taken the best part about `express` and `koa` and applied it to
+fetching API data on the front-end. What this means is that we have a powerful
+middleware system that we can leverage on the front-end.
+
 # Why does `starfx` use js generators?
 
 Generators give us -- the library authors -- more control over how side-effects

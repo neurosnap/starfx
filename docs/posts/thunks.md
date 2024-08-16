@@ -7,16 +7,18 @@ Thunks are the foundational central processing units. They have access to all
 the actions being dispatched from the view as well as your global state. They
 also wield the full power of structured concurrency.
 
-As I've been developing these specialized thunks, I'm starting to think of them
-more like micro-controllers. Only thunks and endpoints have the ability to
-update state (think MVC). However, thunks are not tied to any particular view
-and in that way are more composable. Thunks can call other thunks and you have
-the async flow control tools from `effection` to facilitate coordination.
+> Endpoints are specialized thunks as you will see later in the docs
+
+Think of thunks as micro-controllers. Only thunks and endpoints have the ability
+to update state (or a model in MVC terms). However, thunks are not tied to any
+particular view and in that way are more composable. Thunks can call other
+thunks and you have the async flow control tools from `effection` to facilitate
+coordination and cleanup.
 
 Every thunk that's created requires a unique id -- user provided string. This
-provides us with a handful of benefits:
+provides us with some benefits:
 
-- User hand-labels each thunk created
+- User hand-labels each thunk
 - Better traceability
 - Easier to debug async and side-effects
 - Build abstractions off naming conventions (e.g. creating routers
@@ -62,6 +64,34 @@ store.dispatch(log("sending log message"));
 // after all remaining middleware have run
 ```
 
+# Anatomy of thunk middleware
+
+Thunks are a composition of middleware functions in a stack. Therefore, every
+single middleware function shares the exact same type signature:
+
+```ts
+// for demonstration purposes we are copy/pasting these types which can
+// normally be imported from:
+//   import type { ThunkCtx, Next } from "starfx";
+type Next = () => Operation<void>;
+
+interface ThunkCtx<P = any> extends Payload<P> {
+  name: string;
+  key: string;
+  action: ActionWithPayload<CreateActionPayload<P>>;
+  actionFn: IfAny<
+    P,
+    CreateAction<ThunkCtx>,
+    CreateActionWithPayload<ThunkCtx<P>, P>
+  >;
+  result: Result<void>;
+}
+
+function* myMiddleware(ctx: ThunkCtx, next: Next) {
+  yield* next();
+}
+```
+
 # Thunk action
 
 When creating a thunk, the return value is just an action creator:
@@ -74,8 +104,14 @@ console.log(log("sending log message"));
 }
 ```
 
+An action is the "event" being emitted from `startfx` and subscribes to a very
+particular type signature.
+
 A thunk action adheres to the
 [flux standard action spec](https://github.com/redux-utilities/flux-standard-action).
+
+> While not strictly necessary, it is highly recommended to keep actions JSON
+> serializable
 
 # Thunk payload
 

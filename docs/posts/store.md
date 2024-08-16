@@ -3,10 +3,17 @@ title: Store
 Description: An immutable store that acts like a reactive, in-memory database
 ---
 
-I love `redux`. I know it gets sniped for having too much boilerplate when
+Features:
+
+- A single, global javascript object
+- Reactive
+- Normalized
+- Acts like a database
+
+We love `redux`. We know it gets sniped for having too much boilerplate when
 alternatives like `zustand` and `react-query` exist that cut through the
 ceremony of managing state. However, `redux` was never designed to be easy to
-use, it was designed to be scalable, debuggable, and maintainable. Yes, setting
+use; it was designed to be scalable, debuggable, and maintainable. Yes, setting
 up a `redux` store is work, but that is in an effort to serve its
 maintainability.
 
@@ -19,13 +26,13 @@ Fast forward to `redux-toolkit` and we have `createSlice` which leverages
 `immer` under-the-hood to ensure immutability. So we no longer need reducers for
 immutability.
 
-Further, I argue, placing the business logic for updating state inside reducers
+Further, we argue, placing the business logic for updating state inside reducers
 (via switch-cases) makes understanding business logic harder. Instead of having
 a single function that updates X state slices, we have X functions (reducers)
 that we need to piece together in our heads to understand what is being updated
 when an action is dispatched.
 
-With all of this in mind, `starfx/store` takes all the good parts of `redux` and
+With all of this in mind, `starfx` takes all the good parts of `redux` and
 removes the need for reducers entirely. We still have a single state object that
 contains everything from API data, UX, and a way to create memoized functions
 (e.g. selectors). We maintain immutability (using `immer`) and also have a

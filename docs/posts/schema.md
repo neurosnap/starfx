@@ -17,6 +17,8 @@ functions to:
 - Update the value
 - Query for data within the value
 
+Our schema implementation was heavily inspired by [zod](https://zod.dev/).
+
 # Schema assumptions
 
 `createSchema` requires two slices by default in order for it and everything
