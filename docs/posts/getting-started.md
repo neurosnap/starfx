@@ -9,9 +9,10 @@ toc: 1
 We think we need a react framework and server-side rendering (SSR) because
 that's where money is being made. If we are building a highly dynamic and
 interactive web application then we probably don't need SSR. These frameworks
-sell us that they are an easier way to build web apps, but that's not true. Just
-think of it this way: if we can build a web app using only static assets, isn't
-that simpler than having static assets **and** a react framework server?
+sell us that they are an easier way to build web apps, but that's not strictly
+true. Just think of it this way: if we can build a web app using **only** static
+assets, isn't that simpler than having static assets **and** a react framework
+server?
 
 React hook-based fetching and caching libraries dramatically simplify data
 synchronization but are so tightly coupled to a component's life cycle that it
@@ -20,12 +21,12 @@ downside of not being able to normalize our cache which means we have to spend
 time thinking about how and when to invalidate our cache.
 
 Further, all of these data caching libraries don't handle data normalization. In
-every library we are going to see a line like: "Data normalization is hard and
-it isn't worth it." Their libraries are not built with data normalization in
-mind so they claim it's an anti-feature. Why do we want to normalize data in the
-backend but not the frontend? Data normalization is critically important because
-it makes CRUD operations automatically update our web app without having to
-invalidate our cache.
+many similar libraries we are going to see a line like: "Data normalization is
+hard and it isn't worth it." Their libraries are not built with data
+normalization in mind so they claim it's an anti-feature. Why do we want to
+normalize data in the backend but not the frontend? Data normalization is
+critically important because it makes CRUD operations automatically update our
+web app without having to invalidate our cache.
 
 So what if we are building a highly interactive web app that doesn't need SEO
 and we also need more control over data synchronization and caching?
@@ -49,11 +50,11 @@ The benefits of using this library:
 - The missing model and controller (MC) in react (V)
 - Designed for single-page applications (SPAs)
 - Makes data normalization easy and straightforward
-- Has a powerful middleware system similar to express to handle requests and
+- Has a powerful middleware system similar to `express` to handle requests and
   responses
 - Reduces state management boilerplate to its absolute essentials
 - Has a robust side-effect management system using structured concurrency
-- Has data synchronization and caching separated from react
+- Has data synchronization and caching separated from `react`
 
 # When to use this library?
 
@@ -68,8 +69,8 @@ This library is **not** a great fit for ecommerce, tiny projects, or blogs. This
 is for web apps that are generally behind a login screen that require a
 desktop-class user experience. This library is designed to scale, so it might
 feel a little overwhelming. Just know if you use this library, your code will be
-easier to read, easier to write, all while handling a massive amount of business
-complexity.
+easier to read, easier to write, easier to refactor, all while handling a
+massive amount of business complexity.
 
 # Code
 
@@ -112,9 +113,7 @@ function App() {
 
 function Example() {
   const { isInitialLoading, isError, message, data } = useCache(fetchRepo());
-
   if (isInitialLoading) return "Loading ...";
-
   if (isError) return `An error has occurred: ${message}`;
 
   return (
@@ -140,7 +139,7 @@ yarn add starfx
 ```
 
 ```ts
-import * as starfx from "https://deno.land/x/starfx@0.7.0/mod.ts";
+import * as starfx from "https://deno.land/x/starfx@0.13.2/mod.ts";
 ```
 
 # Effection

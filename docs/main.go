@@ -111,11 +111,6 @@ func main() {
 				Page: pager("design-philosophy.md"),
 			},
 			{
-				Text: "API",
-				Href: "/api",
-				Page: pager("api.md"),
-			},
-			{
 				Text: "Resources",
 				Href: "/resources",
 				Page: pager("resources.md"),

@@ -10,8 +10,8 @@ user events (e.g. clicks, form inputs, etc.), activate side-effects (e.g. fetch
 api data, submit form data, update state), and then intelligently update the
 view. If you are familiar with **MVC**:
 
-- `react` is the **View**
-- `starfx` is the **Model** and **Controller**
+- `react` is the **View** layer
+- `starfx` are the **Model** and **Controller** layers
 
 The high-level picture of `starfx` is _essentially_ a glorified pubsub system:
 
@@ -20,7 +20,7 @@ The high-level picture of `starfx` is _essentially_ a glorified pubsub system:
 - When a user interacts with your web app, events gets dispatched
 - `starfx` listens for events and triggers side-effects (e.g. fetches API data,
   updates state, etc.)
-- An entirely new version of the `starfx` state gets created
+- An entirely new version of the state gets created
 - `react` surgically updates the view based on changes to the `starfx` state
 - Rinse and repeat
 

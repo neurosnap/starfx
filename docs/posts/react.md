@@ -6,8 +6,7 @@ toc: 2
 
 Even though we are **not** using `redux`, if you are familiar with
 [react-redux](https://react-redux.js.org) then this will be an identical
-experience because that's what we are using under-the-hood to integrate with
-`react`.
+experience because `starfx/react` has an identical API signature.
 
 `useDispatch`, `useSelector`, and `createSelector` are the bread and butter of
 `redux`'s integration with `react` all of which we use inside `starfx`.
@@ -45,11 +44,34 @@ function App() {
 
 Query your store with this hook.
 
+```tsx
+import { useSelector } from "starfx";
+
+function App() {
+  const data = useSelector((state) => state.data);
+  return <div>{data}</div>;
+}
+```
+
 [See `react-redux` docs](https://react-redux.js.org/api/hooks#useselector)
 
 ## `useDispatch`
 
 Call thunks and endpoints with this hook.
+
+```tsx
+import { useDispatch } from "starfx";
+
+function App() {
+  const dispatch = useDispatch();
+
+  return (
+    <button onClick={() => dipatch({ type: "action!" })}>
+      Click me!
+    </button>
+  );
+}
+```
 
 [See `react-redux` docs](https://react-redux.js.org/api/hooks#usedispatch)
 
