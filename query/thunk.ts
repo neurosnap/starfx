@@ -1,6 +1,6 @@
 import { compose } from "../compose.ts";
 import type { ActionWithPayload, AnyAction, Next, Payload } from "../types.ts";
-import { ActionContext, createAction, put, takeEvery } from "../action.ts";
+import { ActionContext, createAction, takeEvery } from "../action.ts";
 import { isFn, isObject } from "./util.ts";
 import { createKey } from "./create-key.ts";
 import type {
@@ -14,7 +14,7 @@ import type {
 } from "./types.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
 import { Callable, Ok, Operation, Signal, spawn } from "../deps.ts";
-import { supervise } from "../fx/mod.ts";
+import { keepAlive, supervise } from "../fx/mod.ts";
 
 const registerThunk = createAction<Callable<unknown>>(
   `${API_ACTION_PREFIX}REGISTER_THUNK`,
@@ -258,7 +258,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     });
 
     // register any thunks already created
-    yield* put(Object.values(visors).map(registerThunk));
+    yield* keepAlive(Object.values(visors));
 
     yield* task;
   }
