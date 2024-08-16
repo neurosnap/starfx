@@ -1,6 +1,6 @@
 ---
 title: starfx
-description: Structured concurrency for your FE apps with a modern approach to side-effect and state management.
+description: A micro-mvc framework for react apps
 slug: index
 template: home.page.tmpl
 ---
