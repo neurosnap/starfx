@@ -90,6 +90,7 @@ const store = createStore({ initialState });
 const api = createApi();
 // mdw = middleware
 api.use(mdw.api({ schema }));
+// where `fetchRepo` will be placed inside the middleware stack
 api.use(api.routes());
 api.use(mdw.fetch({ baseUrl: "https://api.github.com" }));
 
@@ -99,7 +100,7 @@ const fetchRepo = api.get(
   api.cache(),
 );
 
-store.run(api.bootup);
+store.run(api.register);
 
 function App() {
   return (
