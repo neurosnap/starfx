@@ -6,7 +6,7 @@ description: Learn how supervisor tasks work
 A supervisor task is a way to monitor children tasks and probably most
 importantly, manage their health. By structuring your side-effects and business
 logic around supervisor tasks, we gain very interesting coding paradigms that
-result is easier to read and manage code.
+result in easier to read and manage code.
 
 [Supplemental reading from erlang](https://www.erlang.org/doc/design_principles/des_princ)
 
@@ -14,6 +14,8 @@ The most basic version of a supervisor is simply an infinite loop that calls a
 child task:
 
 ```ts
+import { call } from "starfx";
+
 function* supervisor() {
   while (true) {
     try {

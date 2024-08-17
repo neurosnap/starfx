@@ -30,22 +30,28 @@ It all happens as a single unidirectional loop.
 
 `starfx` is different in a number of ways.
 
-First, we combine both state and side-effect management into a single cohesive
-unit. This streamlines the implementation of your web app.
+We combine both state and side-effect management into a single cohesive unit.
+This streamlines the implementation of your web app.
 
-Second, business logic does not live inside of `react`, rather, it lives inside
-of the side-effect system. We are not shackled by `react` lifecycle hooks, in
-fact, `starfx` has virtually no concept of `react` at all -- except for a couple
-of hooks. Then entire system is designed, from the ground up, to not need
-`react` at all in order to function. At the end of the day, `starfx` works by
-subscribing to and publishing events. Those events could come from `react`, but
-they could also come from anywhere.
+Our business logic does not live inside of `react`, rather, it lives inside of
+the side-effect system. We are not shackled by `react` lifecycle hooks, in fact,
+`starfx` has virtually no concept of `react` at all -- except for a couple of
+hooks. The entire system is designed, from the ground up, to not need `react` at
+all in order to function. At the end of the day, `starfx` works by subscribing
+to and publishing events. Those events could come from `react`, but they could
+also come from anywhere.
 
-Thirdly, we have taken the best part about `express` and `koa` and applied it to
-fetching API data on the front-end. What this means is that we have a powerful
-middleware system that we can leverage on the front-end.
+We have taken the best part about `express` and `koa` and applied it to fetching
+API data on the front-end. What this means is that we have a powerful middleware
+system that we can leverage on the front-end.
 
-# Why does `starfx` use js generators?
+We built a state management system leveraging the concept of a database schema.
+We took inspiration from [zod](https://zod.dev) to build an ergonomic and
+powerful state system leveraging reusable slice helpers. With our schema and
+custom built store, we can replace all of boilerplate with a single function
+call `createSchema()`.
+
+# Why does `starfx` use [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)?
 
 Generators give us -- the library authors -- more control over how side-effects
 are handled within a javascript runtime environment. There are things that we

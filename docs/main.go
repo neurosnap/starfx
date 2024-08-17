@@ -45,6 +45,11 @@ func main() {
 						Href: "/endpoints",
 						Page: pager("endpoints.md"),
 					},
+					{
+						Text: "Dispatch",
+						Href: "/dispatch",
+						Page: pager("dispatch.md"),
+					},
 				},
 			},
 			{
@@ -62,6 +67,11 @@ func main() {
 						Text: "Schema",
 						Href: "/schema",
 						Page: pager("schema.md"),
+					},
+					{
+						Text: "Selectors",
+						Href: "/selectors",
+						Page: pager("selectors.md"),
 					},
 				},
 			},
