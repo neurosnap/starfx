@@ -98,5 +98,5 @@ state, respectively.
 You can put whatever you want in there. This is a useful field when you want to
 pass structured data from a thunk into the view on success or failure. Maybe
 this is the new `id` for the entity you just created and the view needs to know
-it. The `meta` prop is where you would be contextual information beyond a
+it. The `meta` prop is where you would put contextual information beyond the
 `message` string.
