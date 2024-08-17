@@ -3,7 +3,7 @@ title: Models
 description: State management in starfx
 ---
 
-Once core component of an MVC framework is the Model.
+One core component of an MVC framework is the Model.
 
 Since data normalization is a first-class citizen inside `starfx`, we built a
 custom, reactive database for front-end web apps. Like a backend MVC framework,
