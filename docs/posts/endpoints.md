@@ -33,7 +33,7 @@ export const updateUser = api.post<{ id: string; name: string }>(
 );
 
 const store = createStore(initialState);
-store.run(api.bootup);
+store.run(api.register);
 
 store.dispatch(fetchUsers());
 // now accessible with useCache(fetchUsers)

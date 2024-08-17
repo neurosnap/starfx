@@ -35,12 +35,13 @@ when an action is dispatched.
 With all of this in mind, `starfx` takes all the good parts of `redux` and
 removes the need for reducers entirely. We still have a single state object that
 contains everything from API data, UX, and a way to create memoized functions
-(e.g. selectors). We maintain immutability (using `immer`) and also have a
-middleware system to extend it.
+(e.g. [selectors](/selectors)). We maintain immutability (using
+[immer](https://github.com/immerjs/immer)) and also have a middleware system to
+extend it.
 
-Finally, we bring the utility of creating a schema (like `zod` or a traditional
-database) to make it plainly obvious what the state shape looks like as well as
-reusable utilities to make it easy to update and query state.
+Finally, we bring the utility of creating a schema (like [zod](https://zod.dev)
+or a traditional database) to make it plainly obvious what the state shape looks
+like as well as reusable utilities to make it easy to update and query state.
 
 This gets us closer to treating our store like a traditional database while
 still being flexible for our needs on the FE.
@@ -92,8 +93,8 @@ const fetchUsers = api.get<never, User[]>(
   },
 );
 
-const store = configureStore(schema);
-store.run(api.bootup);
+const store = createStore(schema);
+store.run(api.register);
 store.dispatch(fetchUsers());
 ```
 

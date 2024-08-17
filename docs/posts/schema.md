@@ -243,7 +243,7 @@ export function counter(initialState?: number) {
 const [schema, initialState] = createSchema({
   counter: counter(100),
 });
-const store = configureStore(initialState);
+const store = createStore(initialState);
 
 store.run(function* () {
   yield* schema.update([
