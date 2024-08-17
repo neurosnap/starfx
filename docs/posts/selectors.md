@@ -1,6 +1,6 @@
 ---
 title: Selectors
-Description: Deriving data with selectors 
+description: Deriving data with selectors 
 ---
 
 In a typical web app, the logic for deriving data is usually written as

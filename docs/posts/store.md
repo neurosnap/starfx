@@ -1,6 +1,6 @@
 ---
 title: Store
-Description: An immutable store that acts like a reactive, in-memory database
+description: An immutable store that acts like a reactive, in-memory database
 ---
 
 Features:
