@@ -123,13 +123,63 @@ store.run(function*() {
 The other methods are more generic and the user will have to provide types to
 them manually.
 
+# Updater function
+
+`schema.update` expects one or many state updater functions. An updater function
+receives the state as a function parameter. Any mutations to the `state`
+parameter will be applied to the app's state using
+[immer](https://github.com/immerjs/immer).
+
+```ts
+type StoreUpdater<S extends AnyState> = (s: S) => S | void;
+```
+
+> It is highly recommended you read immer's doc on
+> [update patterns](https://immerjs.github.io/immer/update-patterns) because
+> there are limitations to understand.
+
+Here's a simple updater function that increments a counter:
+
+```ts
+function* inc() {
+  yield* schema.update((state) => {
+    state.counter += 1;
+  });
+}
+```
+
+Since the `update` function accepts an array, it's important to know that we
+just run those functions by iterating through that array.
+
+In fact, our store's core state management can _essentially_ be reduced to this:
+
+```ts
+import { produce } from "immer";
+
+function createStore(initialState = {}) {
+  let state = initialState;
+
+  function update(updaters) {
+    const nextState = produce(state, (draft) => {
+      updaters.forEach((updater) => updater(draft));
+    });
+    state = nextState;
+  }
+
+  return {
+    getState: () => state,
+    update,
+  };
+}
+```
+
 # Updating state from view
 
 You cannot directly update state from the view, users can only manipulate state
 from a thunk, endpoint, or a delimited continuation.
 
-This is a design decision that forces everything to route through our mini
-controllers.
+This is a design decision that forces everything to route through our
+[controllers](/controllers).
 
 However, it is very easy to create a controller to do simple tasks like updating
 state:
