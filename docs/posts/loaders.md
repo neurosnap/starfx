@@ -47,7 +47,8 @@ const go = thunks.create("go", function* (ctx, next) {
 
 const store = createStore({ initialState });
 store.dispatch(go());
-schema.loaders.selectById(store.getState(), { id: `${go}` }); // status = "error"; message = "boom!"
+schema.loaders.selectById(store.getState(), { id: `${go}` });
+// status = "error"; message = "boom!"
 ```
 
 # Shape
@@ -76,3 +77,26 @@ export interface LoaderState<
   isInitialLoading: boolean;
 }
 ```
+
+# `isLoading` vs `isInitialLoading`
+
+Why does this distinction exist? Well, when building a web app with `starfx`,
+it's very common to have called the same endpoint multiple times. If that loader
+has already successfully been called previously, `isInitialLoading` will **not**
+flip states.
+
+The primary use case is: why show a loader if we can already show the user data?
+
+Conversely, `isLoading` will always be true when a loader is in "loading" state.
+
+This information is derived from `lastRun` and `lastSuccess`. Those are unix
+timestamps of the last "loading" loader and the last time it was in "success"
+state, respectively.
+
+# The `meta` property
+
+You can put whatever you want in there. This is a useful field when you want to
+pass structured data from a thunk into the view on success or failure. Maybe
+this is the new `id` for the entity you just created and the view needs to know
+it. The `meta` prop is where you would be contextual information beyond a
+`message` string.

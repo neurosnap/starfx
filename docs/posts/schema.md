@@ -28,6 +28,15 @@ Why do we require those slices? Because if we can assume those exist, we can
 build a lot of useful middleware and supervisors on top of that assumption. It's
 a place for `starfx` and third-party functionality to hold their state.
 
+```ts
+import { createSchema, slice } from "starfx";
+
+const [schema, initialState] = createSchema({
+  cache: slice.table(),
+  loaders: slice.loaders(),
+});
+```
+
 # Built-in slices
 
 As a result, the following slices should cover the most common data types and
