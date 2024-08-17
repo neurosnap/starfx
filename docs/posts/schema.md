@@ -182,7 +182,7 @@ in your system.
 ## `loaders`
 
 This is a specialized database table specific to managing loaders in `starfx`.
-[Read more about loaders here](/loader).
+[Read more about loaders here](/loaders).
 
 ```ts
 const [schema] = createSchema({

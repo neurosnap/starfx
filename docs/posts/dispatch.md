@@ -26,6 +26,19 @@ const store = createStore({ initialState });
 store.dispatch({ type: "action", payload: {} });
 ```
 
+# Dispatch in thunk
+
+```ts
+import { put } from "starfx";
+
+function* thunk(ctx, next) {
+  yield* put({ type: "click" });
+  yield* next();
+}
+```
+
+# Dispatch in react
+
 You can also use dispatch with a `react` hook:
 
 ```tsx

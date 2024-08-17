@@ -98,7 +98,7 @@ func main() {
 			{
 				Text: "Loaders",
 				Href: "/loaders",
-				Page: pager("loader.md"),
+				Page: pager("loaders.md"),
 			},
 			{
 				Text: "Structured Concurrency",
