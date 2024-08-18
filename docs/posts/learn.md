@@ -74,3 +74,31 @@ functions, just use the
 We highly recommend reading the
 [Thinking in Effection](https://frontside.com/effection/docs/thinking-in-effection)
 page because it should help here.
+
+# Data strategy: preload then refresh
+
+Preloading is a first-class citizen in `starfx`. It is the primary use case for
+using it.
+
+The idea is simple:
+
+> Preload most of your API data in the background and refresh it as the user
+> interacts with your web app.
+
+This is the biggest performance boost to using a single-page app. Since routing
+happens all client-side, it's beneficial to download data in the background
+while the user navigates through your web app. While you might be fetching slow
+API endpoints, it feels instantaneous because the data was preloaded.
+
+When the user lands on your web app, initialize a preload thunk that will
+essentially sync the user's database locally, then when they navigate to a page
+that requires data, refresh that data as needed.
+
+For example, let's say the root page `/` requires a list of users while the
+`/mailboxes` page requires a list of mailboxes.
+
+One the root page you would not only fetch the list of users, but you would also
+fetch the lists of mailboxes. When the user finally decides to click on the
+"Mailboxes" page, the page will act as if the data was loaded instantly because
+it was preloaded. So the user sees the data immediately, while at the same time
+you would also re-fetch the mailboxes.
