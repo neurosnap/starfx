@@ -100,3 +100,23 @@ pass structured data from a thunk into the view on success or failure. Maybe
 this is the new `id` for the entity you just created and the view needs to know
 it. The `meta` prop is where you would put contextual information beyond the
 `message` string.
+
+Here's an example for how you can update the `meta` property inside an endpoint:
+
+```tsx
+const fetchUsers = api.get("/users", function* (ctx, next) {
+  yield* next();
+  if (!ctx.json.ok) return;
+  // this will merge with the default success loader state
+  // so you don't have to set the `status` here as it is done automatically
+  // with the api middleware
+  ctx.loader = { meta: { total: ctx.json.value.length } };
+});
+
+function App() {
+  const loader = useQuery(fetchUsers());
+  if (loader.isInitialLoading) return <div>loading ...</div>;
+  if (loader.isError) return <div>error: {loader.message}</div>;
+  return <div>Total number of users: {loader.meta.total}</div>;
+}
+```
