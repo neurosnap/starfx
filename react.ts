@@ -3,6 +3,7 @@ import {
   React,
   useDispatch,
   useSelector,
+  useStore as useReduxStore,
 } from "./deps.ts";
 import type { AnyState, LoaderState } from "./types.ts";
 import type { ThunkAction } from "./query/mod.ts";
@@ -66,6 +67,10 @@ export function Provider(
 
 export function useSchema<S extends AnyState>() {
   return useContext(SchemaContext) as FxSchema<S>;
+}
+
+export function useStore<S extends AnyState>() {
+  return useReduxStore() as FxStore<S>;
 }
 
 /**
