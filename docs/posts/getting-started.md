@@ -50,6 +50,7 @@ The benefits of using this library:
 - The missing model and controller (MC) in react (V)
 - Designed for single-page applications (SPAs)
 - Makes data normalization easy and straightforward
+- Tools to preload and refresh data
 - Has a powerful middleware system similar to `express` to handle requests and
   responses
 - Reduces state management boilerplate to its absolute essentials
