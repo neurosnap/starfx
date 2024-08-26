@@ -1,6 +1,6 @@
 ---
 title: fx
-description: Our powerful async flow control
+description: Utilities to handle complex async flow control
 ---
 
 `fx` (Effects) are helper functions to make async flow control easier.
