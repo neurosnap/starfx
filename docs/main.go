@@ -101,6 +101,11 @@ func main() {
 				Page: pager("loaders.md"),
 			},
 			{
+				Text: "fx",
+				Href: "/fx",
+				Page: pager("fx.md"),
+			},
+			{
 				Text: "Error Handling",
 				Href: "/error-handling",
 				Page: pager("error-handling.md"),
