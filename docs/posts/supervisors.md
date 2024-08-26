@@ -3,10 +3,9 @@ title: Supervisors
 description: Learn how supervisor tasks work
 ---
 
-A supervisor task is a way to monitor children tasks and probably most
-importantly, manage their health. By structuring your side-effects and business
-logic around supervisor tasks, we gain very interesting coding paradigms that
-result in easier to read and manage code.
+A supervisor task is a way to monitor children tasks and manage their health. By
+structuring your side-effects and business logic around supervisor tasks, we
+gain interesting coding paradigms that result in easier to read and manage code.
 
 [Supplemental reading from erlang](https://www.erlang.org/doc/design_principles/des_princ)
 
@@ -27,19 +26,20 @@ function* supervisor() {
 }
 ```
 
-Here we call some task that should always be in a running and healthy state. If
-it raises an exception, we log it and try to run the task again.
+Here we `call` some task that should always be in a running and healthy state.
+If it raises an exception, we log it and try to run the task again.
 
 Building on top of that simple supervisor, we can have tasks that always listen
 for events and if they fail, restart them.
 
 ```ts
-import { parallel, run, takeEvery } from "starfx";
+import { parallel, run, take } from "starfx";
 
 function* watchFetch() {
-  yield* takeEvery("FETCH_USERS", function* (action) {
+  while (true) {
+    const action = yield* take("FETCH_USERS");
     console.log(action);
-  });
+  }
 }
 
 function* send() {
@@ -53,11 +53,43 @@ await run(
 );
 ```
 
-Here we create a supervisor function using a helper `takeEvery` to call a
-function for every `FETCH_USERS` event emitted.
+Here we create a supervisor function using a helper `take` to call a function
+for every `FETCH_USERS` event emitted.
+
+While inside a `while` loop, you get full access to its powerful flow control.
+Another example, let's say we we only want to respond to a login action when the
+user isn't logged in and conversely only listen to a logout action when the user
+is logged in:
+
+```ts
+function*() {
+  while (true) {
+    const login = yield* take("LOGIN");
+    // e.g. fetch token with creds inside `login.payload`
+    const logout = yield* take("LOGOUT");
+    // e.g. destroy token from `logout.payload`
+  }
+}
+```
+
+Interesting, we've essentially created a finite state machine within a
+while-loop!
+
+We also built a helper that will abstract the while loop if you don't need it:
+
+```ts
+import { takeEvery } from "starfx";
+
+function* watchFetch() {
+  yield* takeEvery("FETCH_USERS", function* (action) {
+    console.log(action);
+  });
+}
+```
 
 However, this means that we are going to make the same request 3 times, we
-probably want a throttle or debounce to prevent this behavior.
+probably want a throttle or debounce so we only make a fetch request once within
+some interval.
 
 ```ts
 import { takeLeading } from "starfx";
@@ -71,9 +103,9 @@ function* watchFetch() {
 
 That's better, now only one task can be alive at one time.
 
-Both thunks and endpoints simply listen for particular actions being emitted
-onto the `ActionContext` -- which is just an event emitter -- and then call the
-middleware stack with that action.
+Both thunks and endpoints simply listen for
+[actions](/thunks#anatomy-of-an-action) being emitted onto a channel -- which is
+just an event emitter -- and then call the middleware stack with that action.
 
 Both thunks and endpoints support overriding the default `takeEvery` supervisor
 for either our officially supported supervisors `takeLatest` and `takeLeading`,

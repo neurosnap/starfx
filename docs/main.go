@@ -101,6 +101,11 @@ func main() {
 				Page: pager("loaders.md"),
 			},
 			{
+				Text: "Error Handling",
+				Href: "/error-handling",
+				Page: pager("error-handling.md"),
+			},
+			{
 				Text: "Structured Concurrency",
 				Href: "/structured-concurrency",
 				Page: pager("structured-concurrency.md"),

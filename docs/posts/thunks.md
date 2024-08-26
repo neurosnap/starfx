@@ -97,7 +97,7 @@ middleware stack will stop after the code execution leaves the scope of the
 current middleware. This provides the end-user with "exit early" functionality
 for even more control.
 
-# Thunk action
+# Anatomy of an Action
 
 When creating a thunk, the return value is just an action creator:
 
