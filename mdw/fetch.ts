@@ -195,6 +195,10 @@ export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   yield* next();
 }
 
+/*
+ * This middleware simply checks if `ctx.response` already contains a
+ * truthy value, and if it does, bail out of the middleware stack.
+ */
 export function response<CurCtx extends FetchCtx = FetchCtx>(
   response?: Response,
 ) {

@@ -46,6 +46,10 @@ export function supervise<T>(
   };
 }
 
+/**
+ * keepAlive accepts a list of operations and calls them all with
+ * {@link supervise}
+ */
 export function* keepAlive(
   ops: Callable<unknown>[],
   backoff?: (attempt: number) => number,

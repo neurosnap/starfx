@@ -26,6 +26,15 @@ export interface ApiMdwProps<
  * the {@link createApi}.
  *
  * It is not required, however, it is battle-tested and highly recommended.
+ *
+ * List of mdw:
+ *  - {@link mdw.err}
+ *  - {@link mdw.actions}
+ *  - {@link mdw.queryCtx}
+ *  - {@link mdw.customKey}
+ *  - {@link mdw.nameParser}
+ *  - {@link mdw.loaderApi}
+ *  - {@link mdw.cache}
  */
 export function api<Ctx extends ApiCtx = ApiCtx, S extends AnyState = AnyState>(
   props: ApiMdwProps<Ctx, S>,
