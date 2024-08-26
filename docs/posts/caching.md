@@ -1,6 +1,6 @@
 ---
 title: Caching
-description: How to store data in starfx 
+description: How to store data in starfx
 ---
 
 There are two primary ways to store data in `starfx`:
