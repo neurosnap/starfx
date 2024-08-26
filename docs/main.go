@@ -81,54 +81,59 @@ func main() {
 				Page: pager("react.md"),
 			},
 			{
-				Text: "Caching",
-				Href: "/caching",
-				Page: pager("caching.md"),
-			},
-			{
-				Text: "Dependent Queries",
-				Href: "/dependent-queries",
-				Page: pager("dependent.md"),
-			},
-			{
-				Text: "Middleware",
-				Href: "/middleware",
-				Page: pager("mdw.md"),
-			},
-			{
-				Text: "Loaders",
-				Href: "/loaders",
-				Page: pager("loaders.md"),
-			},
-			{
-				Text: "fx",
-				Href: "/fx",
-				Page: pager("fx.md"),
-			},
-			{
-				Text: "Error Handling",
-				Href: "/error-handling",
-				Page: pager("error-handling.md"),
-			},
-			{
-				Text: "Structured Concurrency",
-				Href: "/structured-concurrency",
-				Page: pager("structured-concurrency.md"),
-			},
-			{
-				Text: "Supervisors",
-				Href: "/supervisors",
-				Page: pager("supervisors.md"),
-			},
-			{
-				Text: "Testing",
-				Href: "/testing",
-				Page: pager("testing.md"),
-			},
-			{
-				Text: "Design Philosophy",
-				Href: "/design-philosophy",
-				Page: pager("design-philosophy.md"),
+				Text: "Guides & Concepts",
+				Children: []*pdocs.Sitemap{
+					{
+						Text: "Caching",
+						Href: "/caching",
+						Page: pager("caching.md"),
+					},
+					{
+						Text: "Dependent Queries",
+						Href: "/dependent-queries",
+						Page: pager("dependent.md"),
+					},
+					{
+						Text: "Middleware",
+						Href: "/middleware",
+						Page: pager("mdw.md"),
+					},
+					{
+						Text: "Loaders",
+						Href: "/loaders",
+						Page: pager("loaders.md"),
+					},
+					{
+						Text: "FX",
+						Href: "/fx",
+						Page: pager("fx.md"),
+					},
+					{
+						Text: "Error Handling",
+						Href: "/error-handling",
+						Page: pager("error-handling.md"),
+					},
+					{
+						Text: "Structured Concurrency",
+						Href: "/structured-concurrency",
+						Page: pager("structured-concurrency.md"),
+					},
+					{
+						Text: "Supervisors",
+						Href: "/supervisors",
+						Page: pager("supervisors.md"),
+					},
+					{
+						Text: "Testing",
+						Href: "/testing",
+						Page: pager("testing.md"),
+					},
+					{
+						Text: "Design Philosophy",
+						Href: "/design-philosophy",
+						Page: pager("design-philosophy.md"),
+					},
+				},
 			},
 			{
 				Text: "Resources",
