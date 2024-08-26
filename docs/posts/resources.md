@@ -5,6 +5,7 @@ description: Some useful links to learn more
 
 # Quick links
 
+- [API Docs](https://deno.land/x/starfx@v0.13.2/mod.ts)
 - [blog posts about starfx](https://bower.sh/?tag=starfx)
 - [examples repo](https://github.com/neurosnap/starfx-examples)
 - [production example repo](https://github.com/aptible/app-ui)
@@ -13,6 +14,8 @@ description: Some useful links to learn more
 
 I recently gave a talk about delimited continuations where I also discuss this
 library:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/uRbqLGj_6mI?si=NThzU1CxH-6Abrr7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 - [Delimited continuations are all you need](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
 

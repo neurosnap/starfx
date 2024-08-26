@@ -3,8 +3,11 @@ title: Error handling
 description: How to manage errors
 ---
 
-By leveraging [structured concurrency](/structured-concurrency) we can let it do
-most of the heavy lifting for managing errors.
+By leveraging `effection` and [structured concurrency](/structured-concurrency)
+we can let it do most of the heavy lifting for managing errors.
+
+> Read [error handling](https://frontside.com/effection/docs/errors) doc at
+> `effection`!
 
 There are some tools `starfx` provides to make it a little easier.
 

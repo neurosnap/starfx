@@ -3,7 +3,8 @@ title: fx
 description: Utilities to handle complex async flow control
 ---
 
-`fx` (Effects) are helper functions to make async flow control easier.
+`fx` (pronounced Effects) are helper functions to make async flow control
+easier.
 
 # parallel
 
