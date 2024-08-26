@@ -51,9 +51,9 @@ function*(ctx, next) {
 }
 ```
 
-The state slice for `cache` is simple, every thunk action has special properties
-of one is a `key` field that is a hash of the entire user-defined action
-payload:
+The state slice for `cache` is simple, every thunk action has
+[special properties](/thunks#anatomy-of-an-action) of which one is a `key` field
+that is a hash of the entire user-defined action payload:
 
 ```js
 {
