@@ -17,16 +17,20 @@ library:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/uRbqLGj_6mI?si=NThzU1CxH-6Abrr7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-- [Delimited continuations are all you need](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
+> [Delimited continuations are all you need](https://youtu.be/uRbqLGj_6mI?si=Mok0J8Wp0Z-ahFrN)
 
 Here is another talk I helped facilitate about `effection` with the library
 creator:
 
-- [effection with Charles Lowell](https://youtu.be/lJDgpxRw5WA?si=cCHZiKqNO7vIUhPc)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lJDgpxRw5WA?si=UM5KJ25AH24qNMrs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+> [effection with Charles Lowell](https://youtu.be/lJDgpxRw5WA?si=cCHZiKqNO7vIUhPc)
 
 Here is a deep-dive on how we are using `starfx` in a production App at Aptible:
 
-- [app-ui deep dive](https://youtu.be/3M5VJuIi5fk)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3M5VJuIi5fk?si=QJ-ksn7N6dWXY_tA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+> [app-ui deep dive](https://youtu.be/3M5VJuIi5fk)
 
 # Other notable libraries
 
