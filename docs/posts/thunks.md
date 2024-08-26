@@ -118,6 +118,25 @@ A thunk action adheres to the
 > While not strictly necessary, it is highly recommended to keep actions JSON
 > serializable
 
+For thunks we have a more strict payload type signature with additional
+properties:
+
+```ts
+interface CreateActionPayload<P = any, ApiSuccess = any> {
+  name: string; // the user-defined name
+  options: P; // thunk payload described below
+  key: string; // hash of entire thunk payload
+}
+
+interface ThunkAction<P> {
+  type: string;
+  payload: CreateActionPayload<P>;
+}
+```
+
+This is the type signature for every action created automatically by
+`createThunks` or `createApi`.
+
 # Thunk payload
 
 When calling a thunk, the user can provide a payload that is strictly enforced

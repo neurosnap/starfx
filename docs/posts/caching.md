@@ -30,7 +30,16 @@ When using an endpoint, this method simply stores whatever is put inside
 `ctx.json`. Then you can access that data via `useCache`.
 
 ```tsx
+import { createApi } from "starfx";
+import { useCache } from "starfx/react";
+
+const api = createApi();
 const fetchUsers = api.get("/users", api.cache());
+
+function App() {
+  const { data = [] } = useCache(fetchUsers());
+  return <div>{data.map((user) => <div>{user.name}</div>)}</div>;
+}
 ```
 
 `api.cache()` opts into automatic caching. This is really just an alias for:
@@ -39,6 +48,16 @@ const fetchUsers = api.get("/users", api.cache());
 function*(ctx, next) {
   ctx.cache = true;
   yield* next();
+}
+```
+
+The state slice for `cache` is simple, every thunk action has special properties
+of one is a `key` field that is a hash of the entire user-defined action
+payload:
+
+```js
+{
+  [action.payload.key]: {},
 }
 ```
 
