@@ -24,6 +24,11 @@ function* supervisor() {
     }
   }
 }
+
+function* someTask() {
+  yield* sleep(10 * 1000);
+  throw new Error("boom!");
+}
 ```
 
 Here we `call` some task that should always be in a running and healthy state.
