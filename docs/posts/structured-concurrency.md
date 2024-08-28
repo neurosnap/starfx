@@ -3,6 +3,17 @@ title: Structured Concurrency
 description: What is structured concurrency?
 ---
 
+Resources:
+
+- [wiki](https://en.wikipedia.org/wiki/Structured_concurrency)
+- [await event horizon](https://frontside.com/blog/2023-12-11-await-event-horizon/)
+- [Why structured concurrency?](https://bower.sh/why-structured-concurrency)
+- [Thinking in Effection](https://frontside.com/effection/docs/thinking-in-effection)
+- [Delimited continuation](https://en.wikipedia.org/wiki/Delimited_continuation)
+- [Structured Concurrency](https://ericniebler.com/2020/11/08/structured-concurrency/)
+- [Structured Concurrency explained](https://www.thedevtavern.com/blog/posts/structured-concurrency-explained/)
+- [conc](https://github.com/sourcegraph/conc)
+
 This is a broad term so I'll make this specific to how `starfx` works.
 
 Under-the-hood, thunks and endpoints are registered under the root task. Every
