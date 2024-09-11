@@ -1,13 +1,6 @@
-import {
-  call,
-  createThunks,
-  put,
-  sleep as delay,
-  takeEvery,
-  waitFor,
-} from "../mod.ts";
-import { createStore, updateStore } from "../store/mod.ts";
-import { assertLike, asserts, describe, it } from "../test.ts";
+import { call, createThunks, put, sleep as delay, takeEvery, waitFor } from '../mod.ts';
+import { createStore, updateStore } from '../store/mod.ts';
+import { assertLike, asserts, describe, it } from '../test.ts';
 
 import type { Next, ThunkCtx } from "../mod.ts";
 
@@ -558,7 +551,7 @@ it(
 
 it(
   tests,
-  "should call the API once even if registered more that once, with multiple APIs defined",
+  "Should call the API only once, even if registered multiple times, with multiple APIs defined.",
   () => {
     const api1 = createThunks<RoboCtx>();
     api1.use(api1.routes());
