@@ -1,5 +1,3 @@
-import { assertLike, asserts, describe, it } from "../test.ts";
-import { createStore, updateStore } from "../store/mod.ts";
 import {
   call,
   createThunks,
@@ -8,6 +6,9 @@ import {
   takeEvery,
   waitFor,
 } from "../mod.ts";
+import { createStore, updateStore } from "../store/mod.ts";
+import { assertLike, asserts, describe, it } from "../test.ts";
+
 import type { Next, ThunkCtx } from "../mod.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -535,3 +536,66 @@ it(tests, "should warn when calling thunk before registered", () => {
   asserts.assertEquals(called, true);
   console.warn = err;
 });
+
+it(
+  tests,
+  "it should call the api once even if we register it twice",
+  () => {
+    const api = createThunks<RoboCtx>();
+    api.use(api.routes());
+    const store = createStore({ initialState: {} });
+    store.run(api.register);
+    store.run(api.register);
+
+    let acc = "";
+    const action = api.create("/users", function* () {
+      acc += "a";
+    });
+    store.dispatch(action());
+    asserts.assertEquals(acc, "a");
+  },
+);
+
+it(
+  tests,
+  "should call the API once even if registered twice, with multiple APIs defined",
+  () => {
+    const api1 = createThunks<RoboCtx>();
+    api1.use(api1.routes());
+
+    const api2 = createThunks<RoboCtx>();
+    api2.use(api2.routes());
+
+    const store = createStore({ initialState: {} });
+
+    store.run(api1.register);
+    store.run(api1.register);
+
+    store.run(api2.register);
+    store.run(api2.register);
+
+    let acc = "";
+    const action = api1.create("/users", function* () {
+      acc += "b";
+    });
+    store.dispatch(action());
+
+    asserts.assertEquals(
+      acc,
+      "b",
+      "Expected 'b' after first API call, but got: " + acc,
+    );
+
+    let acc2 = "";
+    const action2 = api2.create("/users", function* () {
+      acc2 += "c";
+    });
+    store.dispatch(action2());
+
+    asserts.assertEquals(
+      acc2,
+      "c",
+      "Expected 'c' after second API call, but got: " + acc2,
+    );
+  },
+);
