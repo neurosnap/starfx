@@ -1,6 +1,13 @@
-import { call, createThunks, put, sleep as delay, takeEvery, waitFor } from '../mod.ts';
-import { createStore, updateStore } from '../store/mod.ts';
-import { assertLike, asserts, describe, it } from '../test.ts';
+import {
+  call,
+  createThunks,
+  put,
+  sleep as delay,
+  takeEvery,
+  waitFor,
+} from "../mod.ts";
+import { createStore, updateStore } from "../store/mod.ts";
+import { assertLike, asserts, describe, it } from "../test.ts";
 
 import type { Next, ThunkCtx } from "../mod.ts";
 
