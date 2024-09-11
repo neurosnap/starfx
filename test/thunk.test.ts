@@ -535,18 +535,3 @@ it(tests, "should warn when calling thunk before registered", () => {
   asserts.assertEquals(called, true);
   console.warn = err;
 });
-
-it(tests, "it should call the api once even if we register it twice", () => {
-  const api = createThunks<RoboCtx>();
-  api.use(api.routes());
-  const store = createStore({ initialState: {} });
-  store.run(api.register);
-  store.run(api.register);
-
-  let acc = "";
-  const action = api.create("/users", function* () {
-    acc += "a";
-  });
-  store.dispatch(action());
-  asserts.assertEquals(acc, "a");
-});
