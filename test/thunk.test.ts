@@ -558,7 +558,7 @@ it(
 
 it(
   tests,
-  "should call the API once even if registered twice, with multiple APIs defined",
+  "should call the API once even if registered more that once, with multiple APIs defined",
   () => {
     const api1 = createThunks<RoboCtx>();
     api1.use(api1.routes());
@@ -568,6 +568,7 @@ it(
 
     const store = createStore({ initialState: {} });
 
+    store.run(api1.register);
     store.run(api1.register);
     store.run(api1.register);
 
