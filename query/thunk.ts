@@ -1,6 +1,6 @@
 import { ActionContext, API_ACTION_PREFIX, takeEvery } from "../action.ts";
 import { compose } from "../compose.ts";
-import { Callable, Ok, Operation, Signal, spawn } from "../deps.ts";
+import { Callable, Ok, Operation, Signal, spawn, Task } from "../deps.ts";
 import { keepAlive, supervise } from "../fx/mod.ts";
 import { createKey } from "./create-key.ts";
 import { isFn, isObject } from "./util.ts";
@@ -82,8 +82,7 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
   ): CreateActionWithPayload<Gtx, P>;
 }
 
-let thunkInstanceCounter = 0;
-const registrationMap: Map<number, boolean> = new Map();
+let thunkCounter = 0;
 
 /**
  * Creates a middleware pipeline.
@@ -126,9 +125,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     supervisor?: Supervisor;
   } = { supervisor: takeEvery },
 ): ThunksApi<Ctx> {
-  thunkInstanceCounter += 1; // Increment to ensure each instance is unique
-  const instanceId = thunkInstanceCounter; // Unique ID for this instance
-
   let signal: Signal<AnyAction, void> | undefined = undefined;
   const middleware: Middleware<Ctx>[] = [];
   const visors: { [key: string]: Callable<unknown> } = {};
@@ -137,6 +133,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const actionMap: {
     [key: string]: CreateActionWithPayload<Ctx, any>;
   } = {};
+  const matchingPair: [number, number] = [++thunkCounter, 0];
 
   function* defaultMiddleware(_: Ctx, next: Next) {
     yield* next();
@@ -206,15 +203,16 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     function* curVisor() {
       yield* tt(type, onApi);
     }
-    // if we have a signal that means the `register()` function has already been called
-    // so that means we can immediately register the thunk
+
+    visors[name] = curVisor;
+
+    // If signal is available, register immediately, otherwise defer
     if (signal) {
       signal.send({
-        type: `${`${API_ACTION_PREFIX}REGISTER_THUNK${instanceId}`}`,
+        type: `${API_ACTION_PREFIX}REGISTER_THUNK_${matchingPair[0]}`,
         payload: curVisor,
       });
     }
-    visors[name] = curVisor;
 
     const errMsg =
       `[${name}] is being called before its thunk has been registered. ` +
@@ -254,31 +252,24 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* register() {
-    if (registrationMap.get(instanceId)) {
-      console.error(`Thunk instance ${instanceId} is already registered.`);
+    if (matchingPair[0] === matchingPair[1]) {
+      console.warn("This thunk instance is already registered.");
       return;
     }
-
-    registrationMap.set(instanceId, true);
-    // cache the signal so we can use it when creating thunks after we
-    // have already called `register()`
+    matchingPair[1] = matchingPair[0];
     signal = yield* ActionContext;
 
+    // Register any thunks created after signal is available
+    yield* keepAlive(Object.values(visors));
+
+    // Spawn a watcher for further thunk matchingPairs
     const task = yield* spawn(function* () {
       yield* takeEvery(
-        `${`${API_ACTION_PREFIX}REGISTER_THUNK${instanceId}`}`,
+        `${API_ACTION_PREFIX}REGISTER_THUNK_${matchingPair[0]}`,
         watcher as any,
       );
     });
-
-    // register any thunks already created
-    yield* keepAlive(Object.values(visors));
-
     yield* task;
-  }
-
-  function* bootup() {
-    yield* register();
   }
 
   function routes() {
@@ -309,7 +300,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     /**
      * @deprecated use `register()` instead
      */
-    bootup,
+    bootup: register,
     reset: resetMdw,
     register,
   };
