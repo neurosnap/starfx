@@ -82,8 +82,6 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
   ): CreateActionWithPayload<Gtx, P>;
 }
 
-let thunkCounter = 0;
-
 /**
  * Creates a middleware pipeline.
  *
@@ -133,7 +131,11 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const actionMap: {
     [key: string]: CreateActionWithPayload<Ctx, any>;
   } = {};
-  const matchingPair: [number, number] = [++thunkCounter, 0];
+
+  const thunkId = `${Date.now().toString(36)}-${
+    Math.random().toString(36).substring(2, 11)
+  }`;
+  const thunkRegistry: Record<string, boolean> = { [thunkId]: false };
 
   function* defaultMiddleware(_: Ctx, next: Next) {
     yield* next();
@@ -209,7 +211,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     // If signal is available, register immediately, otherwise defer
     if (signal) {
       signal.send({
-        type: `${API_ACTION_PREFIX}REGISTER_THUNK_${matchingPair[0]}`,
+        type: `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
         payload: curVisor,
       });
     }
@@ -252,11 +254,11 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* register() {
-    if (matchingPair[0] === matchingPair[1]) {
+    if (thunkRegistry?.[thunkId] === true) {
       console.warn("This thunk instance is already registered.");
       return;
     }
-    matchingPair[1] = matchingPair[0];
+    thunkRegistry[thunkId] = true;
     signal = yield* ActionContext;
 
     // Register any thunks created after signal is available
@@ -265,7 +267,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     // Spawn a watcher for further thunk matchingPairs
     const task = yield* spawn(function* () {
       yield* takeEvery(
-        `${API_ACTION_PREFIX}REGISTER_THUNK_${matchingPair[0]}`,
+        `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
         watcher as any,
       );
     });
