@@ -68,10 +68,7 @@ it(testEvery, "should receive all actions", async () => {
 
   function* root() {
     const task = yield* spawn(() =>
-      takeEvery(
-        "ACTION",
-        (action) => worker("a1", "a2", action),
-      )
+      takeEvery("ACTION", (action) => worker("a1", "a2", action))
     );
     yield* take("CANCEL_WATCHER");
     yield* task.halt();
@@ -109,6 +106,48 @@ it(testEvery, "should receive all actions", async () => {
     ["a1", "a2", 1],
     ["a1", "a2", 2],
     ["a1", "a2", 3],
+    ["a1", "a2", 4],
+    ["a1", "a2", 5],
+  ]);
+});
+
+it(testEvery, "recover from throw", async () => {
+  const loop = 10;
+  const actual: string[][] = [];
+
+  function* root() {
+    const task = yield* spawn(() =>
+      takeEvery("ACTION", (action) => worker("a1", "a2", action))
+    );
+    yield* take("CANCEL_WATCHER");
+    yield* task.halt();
+  }
+
+  // deno-lint-ignore require-yield
+  function* worker(arg1: string, arg2: string, action: AnyAction) {
+    if (action.payload === 3) throw new Error("random error!");
+    actual.push([arg1, arg2, action.payload]);
+  }
+
+  const store = createStore({ initialState: {} });
+  const task = store.run(root);
+
+  for (let i = 1; i <= loop / 2; i += 1) {
+    store.dispatch({
+      type: "ACTION",
+      payload: i,
+    });
+  }
+
+  await task;
+
+  expect(actual).toEqual([
+    ["a1", "a2", 1],
+    ["a1", "a2", 2],
+    // this throws so we should miss this one
+    // ["a1", "a2", 3],
+    // TODO can we observe the throw in a test?
+    // takeEvery should continue and still handle follow events
     ["a1", "a2", 4],
     ["a1", "a2", 5],
   ]);
