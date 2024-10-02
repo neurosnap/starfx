@@ -1,6 +1,6 @@
 import { ActionContext, API_ACTION_PREFIX, takeEvery } from "../action.ts";
 import { compose } from "../compose.ts";
-import { Callable, Ok, Operation, Signal, spawn } from "../deps.ts";
+import { Callable, Ok, Operation, Signal } from "../deps.ts";
 import { keepAlive, supervise } from "../fx/mod.ts";
 import { createKey } from "./create-key.ts";
 import { isFn, isObject } from "./util.ts";
@@ -131,11 +131,10 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const actionMap: {
     [key: string]: CreateActionWithPayload<Ctx, any>;
   } = {};
-
   const thunkId = `${Date.now().toString(36)}-${
     Math.random().toString(36).substring(2, 11)
   }`;
-  const thunkRegistry: Record<string, boolean> = { [thunkId]: false };
+  let hasRegistered = false;
 
   function* defaultMiddleware(_: Ctx, next: Next) {
     yield* next();
@@ -254,24 +253,21 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* register() {
-    if (thunkRegistry?.[thunkId] === true) {
+    if (hasRegistered) {
       console.warn("This thunk instance is already registered.");
       return;
     }
-    thunkRegistry[thunkId] = true;
+    hasRegistered = true;
     signal = yield* ActionContext;
 
     // Register any thunks created after signal is available
     yield* keepAlive(Object.values(visors));
 
     // Spawn a watcher for further thunk matchingPairs
-    const task = yield* spawn(function* () {
-      yield* takeEvery(
-        `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
-        watcher as any,
-      );
-    });
-    yield* task;
+    yield* takeEvery(
+      `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
+      watcher as any,
+    );
   }
 
   function routes() {

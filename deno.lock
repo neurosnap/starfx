@@ -4,7 +4,7 @@
     "https://crux.land/api/get/2KNRVU": "https://crux.land/api/get/2KNRVU.ts",
     "https://crux.land/api/get/router@0.0.5": "https://crux.land/api/get/2KNRVU",
     "https://crux.land/router@0.0.5": "https://crux.land/api/get/router@0.0.5",
-    "https://esm.sh/v135/@types/react@~18.2/index.d.ts": "https://esm.sh/v135/@types/react@18.2.38/index.d.ts"
+    "https://esm.sh/v128/@types/react@~18.2/index.d.ts": "https://esm.sh/v128/@types/react@18.2.38/index.d.ts"
   },
   "remote": {
     "https://crux.land/api/get/2KNRVU.ts": "6a77d55844aba78d01520c5ff0b2f0af7f24cc1716a0de8b3bb6bd918c47b5ba",
@@ -68,7 +68,7 @@
     "https://deno.land/x/mock_fetch@0.3.0/mod.ts": "7e7806c65ab17b2b684c334c4e565812bdaf504a3e9c938d2bb52bb67428bc89",
     "https://esm.sh/immer@10.0.2?pin=v122": "7ac87b9c76176de8384a67f8cd93d44f75be1a7496c92707252acb669595c393",
     "https://esm.sh/react-redux@8.0.5?pin=v122": "fa98e94dc8803fb84bee9eb08a13f11833f634d381003247207682823887dc51",
-    "https://esm.sh/react@18.2.0?pin=v122": "04ad7dc6d11fa27b24c136686a334ecdd19e972fae627cd98cbdc13cdac238c2",
+    "https://esm.sh/react@18.2.0?pin=v122": "8950a34a030620fce8349d6bd3913b3bdb186c5ec7968fa5ba4d054e22d78e6c",
     "https://esm.sh/reselect@4.1.8?pin=v122": "486407fec8db8f0c87ba540ff6457dbec3c8ec8fa93a4845383bc8cdb33c6008",
     "https://esm.sh/stable/react@18.2.0/denonext/react.mjs": "3c4f23bcfc53b256fcfaf6f834fa9f584c3bb7be667b2682c6cb6ba8ef88f8e6",
     "https://esm.sh/v122/@babel/runtime@7.22.5/denonext/helpers/esm/extends.js": "3955a0ef35db01cd4efff831a9027924f90fa7d55621cd2b6b8519283e573c21",
