@@ -27,20 +27,20 @@ async function init() {
         name: "effection",
         version: "3.0.0-beta.3",
       },
-      "https://esm.sh/react@18.2.0?pin=v122": {
+      "https://esm.sh/react@18.2.0?pin=v135": {
         name: "react",
         version: "^18.2.0",
         peerDependency: true,
       },
-      "https://esm.sh/react-redux@8.0.5?pin=v122": {
+      "https://esm.sh/react-redux@8.0.5?pin=v135": {
         name: "react-redux",
         version: "^8.0.5",
       },
-      "https://esm.sh/immer@10.0.2?pin=v122": {
+      "https://esm.sh/immer@10.0.2?pin=v135": {
         name: "immer",
         version: "^10.0.2",
       },
-      "https://esm.sh/reselect@4.1.8?pin=v122": {
+      "https://esm.sh/reselect@4.1.8?pin=v135": {
         name: "reselect",
         version: "^4.1.8",
       },
