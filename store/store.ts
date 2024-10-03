@@ -13,6 +13,7 @@ import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { ActionContext, emit } from "../action.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
 import { createRun } from "./run.ts";
+import { ThunkRegistryContext } from "../context.ts";
 
 const stubMsg = "This is merely a stub, not implemented";
 
@@ -53,6 +54,7 @@ export function createStore<S extends AnyState>({
 
   const signal = createSignal<AnyAction, void>();
   scope.set(ActionContext, signal);
+  scope.set(ThunkRegistryContext, {});
 
   function getScope() {
     return scope;

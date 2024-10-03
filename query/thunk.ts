@@ -1,7 +1,7 @@
 import { ActionContext, API_ACTION_PREFIX, takeEvery } from "../action.ts";
 import { compose } from "../compose.ts";
-import { Callable, ensure, Ok, Operation, Signal } from "../deps.ts";
-import { keepAlive, supervise } from "../fx/mod.ts";
+import { Callable, ensure, Ok, Operation, Signal, spawn } from "../deps.ts";
+import { keepAlive, parallel, supervise } from "../fx/mod.ts";
 import { createKey } from "./create-key.ts";
 import { isFn, isObject } from "./util.ts";
 
@@ -15,6 +15,7 @@ import type {
   Supervisor,
   ThunkCtx,
 } from "./types.ts";
+import { ThunkRegistryContext } from "../context.ts";
 
 export interface ThunksApi<Ctx extends ThunkCtx> {
   use: (fn: Middleware<Ctx>) => void;
@@ -134,7 +135,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const thunkId = `${Date.now().toString(36)}-${
     Math.random().toString(36).substring(2, 11)
   }`;
-  let hasRegistered = false;
 
   function* defaultMiddleware(_: Ctx, next: Next) {
     yield* next();
@@ -209,6 +209,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     // If signal is available, register immediately, otherwise defer
     if (signal) {
+      console.log('REGISTER');
       signal.send({
         type: `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
         payload: curVisor,
@@ -253,25 +254,30 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* register() {
-    if (hasRegistered) {
+    const registry = yield* ThunkRegistryContext;
+    if (registry[thunkId] === true) {
       console.warn("This thunk instance is already registered.");
       return;
     }
-    hasRegistered = true;
-    signal = yield* ActionContext;
-
+    registry[thunkId] = true;
     yield* ensure(function* () {
-      hasRegistered = false;
+      registry[thunkId] = false;
     });
 
-    // Register any thunks created after signal is available
-    yield* keepAlive(Object.values(visors));
+    signal = yield* ActionContext;
 
-    // Spawn a watcher for further thunk matchingPairs
-    yield* takeEvery(
-      `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
-      watcher as any,
+    // Register any thunks created immediately after signal is available
+    const taskA = yield* spawn(() => keepAlive(Object.values(visors)));
+    // Spawn a watcher for further thunks created after registry
+    const taskB = yield* spawn(() =>
+      takeEvery(
+        `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
+        watcher as any,
+      )
     );
+
+    const group = yield* parallel<any>([taskA, taskB]);
+    yield* group;
   }
 
   function routes() {
