@@ -1,6 +1,6 @@
 import { ActionContext, API_ACTION_PREFIX, takeEvery } from "../action.ts";
 import { compose } from "../compose.ts";
-import { Callable, Ok, Operation, Signal } from "../deps.ts";
+import { Callable, ensure, Ok, Operation, Signal } from "../deps.ts";
 import { keepAlive, supervise } from "../fx/mod.ts";
 import { createKey } from "./create-key.ts";
 import { isFn, isObject } from "./util.ts";
@@ -259,6 +259,10 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     }
     hasRegistered = true;
     signal = yield* ActionContext;
+
+    yield* ensure(function* () {
+      hasRegistered = false;
+    });
 
     // Register any thunks created after signal is available
     yield* keepAlive(Object.values(visors));

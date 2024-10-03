@@ -8,7 +8,6 @@ import {
 } from "../mod.ts";
 import { createStore, updateStore } from "../store/mod.ts";
 import { assertLike, asserts, describe, it } from "../test.ts";
-
 import type { Next, ThunkCtx } from "../mod.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -597,6 +596,32 @@ it(
       acc2,
       "c",
       "Expected 'c' after second API call, but got: " + acc2,
+    );
+  },
+);
+
+it(
+  tests,
+  "should unregister the thunk when the registration function exits",
+  async () => {
+    const api1 = createThunks<RoboCtx>();
+    api1.use(api1.routes());
+
+    const store = createStore({ initialState: {} });
+    const task = store.run(api1.register);
+    await task.halt();
+    store.run(api1.register);
+
+    let acc = "";
+    const action = api1.create("/users", function* () {
+      acc += "b";
+    });
+    store.dispatch(action());
+
+    asserts.assertEquals(
+      acc,
+      "b",
+      "Expected 'b' after first API call, but got: " + acc,
     );
   },
 );
