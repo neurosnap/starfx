@@ -67,10 +67,6 @@ export function createStore<S extends AnyState>({
     return state;
   }
 
-  function getStoreId() {
-    return scope.get(IdContext);
-  }
-
   function subscribe(fn: Listener) {
     listeners.add(fn);
     return () => listeners.delete(fn);
@@ -173,7 +169,6 @@ export function createStore<S extends AnyState>({
   const store = {
     getScope,
     getState,
-    getStoreId,
     subscribe,
     update,
     reset,
