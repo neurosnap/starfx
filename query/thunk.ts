@@ -2,6 +2,7 @@ import { ActionContext, API_ACTION_PREFIX, takeEvery } from "../action.ts";
 import { compose } from "../compose.ts";
 import { Callable, ensure, Ok, Operation, Signal } from "../deps.ts";
 import { keepAlive, supervise } from "../fx/mod.ts";
+import { IdContext } from "../store/store.ts";
 import { createKey } from "./create-key.ts";
 import { isFn, isObject } from "./util.ts";
 
@@ -15,7 +16,6 @@ import type {
   Supervisor,
   ThunkCtx,
 } from "./types.ts";
-
 export interface ThunksApi<Ctx extends ThunkCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
@@ -82,6 +82,8 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
   ): CreateActionWithPayload<Gtx, P>;
 }
 
+let id = 0;
+
 /**
  * Creates a middleware pipeline.
  *
@@ -124,6 +126,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   } = { supervisor: takeEvery },
 ): ThunksApi<Ctx> {
   let signal: Signal<AnyAction, void> | undefined = undefined;
+  let storeId: number | undefined = undefined;
   const middleware: Middleware<Ctx>[] = [];
   const visors: { [key: string]: Callable<unknown> } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
@@ -131,10 +134,9 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const actionMap: {
     [key: string]: CreateActionWithPayload<Ctx, any>;
   } = {};
-  const thunkId = `${Date.now().toString(36)}-${
-    Math.random().toString(36).substring(2, 11)
-  }`;
-  let hasRegistered = false;
+  const thunkId = id++;
+
+  const storeMap = new Map<number, Signal<AnyAction, void>>();
 
   function* defaultMiddleware(_: Ctx, next: Next) {
     yield* next();
@@ -207,10 +209,10 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     visors[name] = curVisor;
 
-    // If signal is available, register immediately, otherwise defer
-    if (signal) {
-      signal.send({
-        type: `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
+    // If signal is already referenced, register immediately, otherwise defer
+    for (const [storeId, storeSignal] of storeMap.entries()) {
+      storeSignal.send({
+        type: `${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
         payload: curVisor,
       });
     }
@@ -253,15 +255,19 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* register() {
-    if (hasRegistered) {
+    storeId = yield* IdContext;
+    if (storeId && storeMap.has(storeId)) {
       console.warn("This thunk instance is already registered.");
       return;
     }
-    hasRegistered = true;
+
     signal = yield* ActionContext;
+    storeMap.set(storeId, signal);
 
     yield* ensure(function* () {
-      hasRegistered = false;
+      if (storeId) {
+        storeMap.delete(storeId);
+      }
     });
 
     // Register any thunks created after signal is available
@@ -269,7 +275,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     // Spawn a watcher for further thunk matchingPairs
     yield* takeEvery(
-      `${API_ACTION_PREFIX}REGISTER_THUNK_${thunkId}`,
+      `${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
       watcher as any,
     );
   }

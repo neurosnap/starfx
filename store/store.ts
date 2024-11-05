@@ -1,4 +1,7 @@
+import { ActionContext, API_ACTION_PREFIX, emit } from "../action.ts";
+import { BaseMiddleware, compose } from "../compose.ts";
 import {
+  createContext,
   createScope,
   createSignal,
   enablePatches,
@@ -6,15 +9,14 @@ import {
   produceWithPatches,
   Scope,
 } from "../deps.ts";
-import { BaseMiddleware, compose } from "../compose.ts";
-import type { AnyAction, AnyState, Next } from "../types.ts";
-import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
-import { ActionContext, emit } from "../action.ts";
-import { API_ACTION_PREFIX } from "../action.ts";
 import { createRun } from "./run.ts";
 
+import type { AnyAction, AnyState, Next } from "../types.ts";
+import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 const stubMsg = "This is merely a stub, not implemented";
+
+let id = 0;
 
 // https://github.com/reduxjs/redux/blob/4a6d2fb227ba119d3498a43fab8f53fe008be64c/src/createStore.ts#L344
 function observable() {
@@ -33,6 +35,8 @@ export interface CreateStore<S extends AnyState> {
   initialState: S;
   middleware?: BaseMiddleware<UpdaterCtx<S>>[];
 }
+
+export const IdContext = createContext("starfx:id", 0);
 
 export function createStore<S extends AnyState>({
   initialState,
@@ -53,6 +57,7 @@ export function createStore<S extends AnyState>({
 
   const signal = createSignal<AnyAction, void>();
   scope.set(ActionContext, signal);
+  scope.set(IdContext, id++);
 
   function getScope() {
     return scope;
@@ -60,6 +65,10 @@ export function createStore<S extends AnyState>({
 
   function getState() {
     return state;
+  }
+
+  function getStoreId() {
+    return scope.get(IdContext);
   }
 
   function subscribe(fn: Listener) {
@@ -164,6 +173,7 @@ export function createStore<S extends AnyState>({
   const store = {
     getScope,
     getState,
+    getStoreId,
     subscribe,
     update,
     reset,
