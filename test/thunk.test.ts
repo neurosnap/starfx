@@ -8,6 +8,7 @@ import {
 } from "../mod.ts";
 import { createStore, updateStore } from "../store/mod.ts";
 import { assertLike, asserts, describe, it } from "../test.ts";
+
 import type { Next, ThunkCtx } from "../mod.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -622,6 +623,31 @@ it(
       acc,
       "b",
       "Expected 'b' after first API call, but got: " + acc,
+    );
+  },
+);
+
+it(
+  tests,
+  "should allow multiple stores to register a thunk",
+  () => {
+    const api1 = createThunks<RoboCtx>();
+    api1.use(api1.routes());
+    const storeA = createStore({ initialState: {} });
+    const storeB = createStore({ initialState: {} });
+    storeA.run(api1.register);
+    storeB.run(api1.register);
+    let acc = "";
+    const action = api1.create("/users", function* () {
+      acc += "b";
+    });
+    storeA.dispatch(action());
+    storeB.dispatch(action());
+
+    asserts.assertEquals(
+      acc,
+      "bb",
+      "Expected 'bb' after first API call, but got: " + acc,
     );
   },
 );
