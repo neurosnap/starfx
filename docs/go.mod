@@ -4,7 +4,7 @@ go 1.22
 
 // replace github.com/picosh/pdocs => /home/erock/dev/pico/pdocs
 
-require github.com/picosh/pdocs v0.0.0-20240621181009-3827cd3af2d3
+require github.com/picosh/pdocs v0.0.0-20241118044720-1a43b70d33b7
 
 require (
 	github.com/alecthomas/chroma v0.10.0 // indirect

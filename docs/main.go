@@ -2,6 +2,8 @@ package main
 
 import (
 	"log/slog"
+	"math/rand"
+	"strconv"
 
 	"github.com/picosh/pdocs"
 )
@@ -150,6 +152,7 @@ func main() {
 		Out:      "./public",
 		Tmpl:     "./tmpl",
 		PageTmpl: "post.page.tmpl",
+		CacheId:  strconv.Itoa(rand.Intn(10000)),
 	}
 
 	err := config.GenSite()

@@ -12,7 +12,7 @@ ssg:
 	cp ./static/* ./public
 .PHONY: ssg
 
-local: ssg
+dev: ssg
 	rsync -vr ./public/ erock@pgs.sh:/starfx-local
 .PHONY: dev
 
