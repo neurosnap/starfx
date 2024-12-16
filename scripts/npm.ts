@@ -26,7 +26,7 @@ async function init() {
       // use the deno module in this repo, but use the npm module when publishing
       "https://deno.land/x/effection@3.0.0-beta.3/mod.ts": {
         name: "effection",
-        version: "3.0.0-beta.3",
+        version: "4.0.0-alpha.3",
       },
     },
     importMap: "deno.json",

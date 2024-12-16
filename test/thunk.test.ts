@@ -428,8 +428,8 @@ it(tests, "middleware order of execution", async () => {
   store.run(api.bootup);
   store.dispatch(action());
 
-  await store.run(waitFor(() => acc === "abcdefg"));
-  expect(acc).toBe("abcdefg");
+  await store.run(() => waitFor(() => acc === "abcdefg"));
+  asserts.assert(acc === "abcdefg");
 });
 
 it(tests, "retry with actionFn", async () => {
@@ -458,8 +458,8 @@ it(tests, "retry with actionFn", async () => {
   store.run(api.bootup);
   store.dispatch(action());
 
-  await store.run(waitFor(() => acc === "agag"));
-  expect(acc).toBe("agag");
+  await store.run(() => waitFor(() => acc === "agag"));
+  asserts.assertEquals(acc, "agag");
 });
 
 it(tests, "retry with actionFn with payload", async () => {
@@ -489,8 +489,8 @@ it(tests, "retry with actionFn with payload", async () => {
   store.run(api.bootup);
   store.dispatch(action({ page: 1 }));
 
-  await store.run(waitFor(() => acc === "agag"));
-  expect(acc).toBe("agag");
+  await store.run(() => waitFor(() => acc === "agag"));
+  asserts.assertEquals(acc, "agag");
 });
 
 it(tests, "should only call thunk once", () => {
