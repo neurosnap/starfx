@@ -400,7 +400,7 @@ it(tests, "createApi with own key", async () => {
 
   store.dispatch(createUserCustomKey({ email: newUEmail }));
 
-  await store.run(waitForLoader(schema.loaders, createUserCustomKey));
+  await store.run(() => waitForLoader(schema.loaders, createUserCustomKey));
 
   const expectedKey = theTestKey
     ? `/users [POST]|${theTestKey}`
@@ -469,7 +469,7 @@ it(tests, "createApi with custom key but no payload", async () => {
   store.run(query.bootup);
   store.dispatch(getUsers());
 
-  await store.run(waitForLoader(schema.loaders, getUsers));
+  await store.run(() => waitForLoader(schema.loaders, getUsers));
 
   const expectedKey = theTestKey
     ? `/users [GET]|${theTestKey}`
@@ -571,7 +571,7 @@ it(tests, "stub predicate", async () => {
   store.run(api.bootup);
   store.dispatch(fetchUsers());
 
-  await store.run(waitFor(() => actual.ok));
+  await store.run(() => waitFor(() => actual.ok));
 
   expect(actual).toEqual({
     ok: true,

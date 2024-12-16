@@ -230,7 +230,7 @@ export function* request<CurCtx extends FetchCtx = FetchCtx>(
 
   const { url, ...req } = ctx.req();
   const request = new Request(url, req);
-  const result = yield* safe(fetch(request));
+  const result = yield* safe(() => fetch(request));
   if (result.ok) {
     ctx.response = result.value;
   } else {

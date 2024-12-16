@@ -28,7 +28,7 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
     // last called middleware #
     let index = -1;
 
-    function* dispatch(i: number): Generator<Instruction, void, void> {
+    function* dispatch(i: number): Generator<Instruction, void, unknown> {
       if (i <= index) {
         throw new Error("next() called multiple times");
       }
