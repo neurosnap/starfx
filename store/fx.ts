@@ -10,7 +10,7 @@ import { getIdFromAction, take } from "../action.ts";
 export function* updateStore<S extends AnyState>(
   updater: StoreUpdater<S> | StoreUpdater<S>[],
 ): Operation<UpdaterCtx<S>> {
-  const store = yield* StoreContext;
+  const store = yield* StoreContext.expect();
   // had to cast the store since StoreContext has a generic store type
   const st = store as FxStore<S>;
   const ctx = yield* st.update(updater);
@@ -26,7 +26,7 @@ export function* select<S, R, P>(
   selectorFn: (s: S, p?: P) => R,
   p?: P,
 ): Operation<R> {
-  const store = yield* StoreContext;
+  const store = yield* StoreContext.expect();
   return selectorFn(store.getState() as S, p);
 }
 
@@ -57,7 +57,7 @@ export function* waitForLoaders<M extends AnyState>(
   actions: (ThunkAction | ActionFnWithPayload)[],
 ) {
   const group = yield* parallel(
-    actions.map((action) => waitForLoader(loaders, action)),
+    actions.map((action) => () => waitForLoader(loaders, action)),
   );
   return yield* group;
 }

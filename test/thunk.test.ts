@@ -413,7 +413,7 @@ it(tests, "middleware order of execution", async () => {
   store.run(api.bootup);
   store.dispatch(action());
 
-  await store.run(waitFor(() => acc === "abcdefg"));
+  await store.run(() => waitFor(() => acc === "abcdefg"));
   asserts.assert(acc === "abcdefg");
 });
 
@@ -445,7 +445,7 @@ it(tests, "retry with actionFn", async () => {
   store.run(api.bootup);
   store.dispatch(action());
 
-  await store.run(waitFor(() => acc === "agag"));
+  await store.run(() => waitFor(() => acc === "agag"));
   asserts.assertEquals(acc, "agag");
 });
 
@@ -475,7 +475,7 @@ it(tests, "retry with actionFn with payload", async () => {
   store.run(api.bootup);
   store.dispatch(action({ page: 1 }));
 
-  await store.run(waitFor(() => acc === "agag"));
+  await store.run(() => waitFor(() => acc === "agag"));
   asserts.assertEquals(acc, "agag");
 });
 

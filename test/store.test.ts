@@ -64,9 +64,9 @@ it(
     await scope.run(function* (): Operation<Result<void>[]> {
       const result = yield* parallel([
         function* () {
-          const store = yield* StoreContext;
-          const chan = yield* StoreUpdateContext;
-          const msgList = yield* chan.subscribe();
+          const store = yield* StoreContext.expect();
+          const chan = yield* StoreUpdateContext.expect();
+          const msgList = yield* chan;
           yield* msgList.next();
           asserts.assertEquals(store.getState(), {
             users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
@@ -163,7 +163,7 @@ it(tests, "resets store", async () => {
     dev: true,
   });
 
-  await store.run(store.reset(["users"]));
+  await store.run(() => store.reset(["users"]));
 
   asserts.assertEquals(store.getState(), {
     users: { 3: { id: "3", name: "hehe" } },
