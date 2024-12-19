@@ -12,7 +12,7 @@ import { nameParser } from "./fetch.ts";
 
 export interface ApiMdwProps<
   Ctx extends ApiCtx = ApiCtx,
-  M extends AnyState = AnyState,
+  M extends AnyState = AnyState
 > {
   schema: {
     loaders: LoaderOutput<M, AnyState>;
@@ -37,7 +37,7 @@ export interface ApiMdwProps<
  *  - {@link mdw.cache}
  */
 export function api<Ctx extends ApiCtx = ApiCtx, S extends AnyState = AnyState>(
-  props: ApiMdwProps<Ctx, S>,
+  props: ApiMdwProps<Ctx, S>
 ) {
   return compose<Ctx>([
     err,
@@ -54,15 +54,10 @@ export function api<Ctx extends ApiCtx = ApiCtx, S extends AnyState = AnyState>(
  * This middleware will automatically cache any data found inside `ctx.json`
  * which is where we store JSON data from the {@link mdw.fetch} middleware.
  */
-export function cache<
-  Ctx extends ApiCtx = ApiCtx,
->(schema: {
+export function cache<Ctx extends ApiCtx = ApiCtx>(schema: {
   cache: TableOutput<any, AnyState>;
 }) {
-  return function* cache(
-    ctx: Ctx,
-    next: Next,
-  ) {
+  return function* cache(ctx: Ctx, next: Next) {
     ctx.cacheData = yield* select(schema.cache.selectById, { id: ctx.key });
     yield* next();
     if (!ctx.cache) return;
@@ -83,9 +78,10 @@ export function cache<
 export function loader<M extends AnyState = AnyState>(schema: {
   loaders: LoaderOutput<M, AnyState>;
 }) {
-  return function* <
-    Ctx extends ThunkCtxWLoader = ThunkCtxWLoader,
-  >(ctx: Ctx, next: Next) {
+  return function* <Ctx extends ThunkCtxWLoader = ThunkCtxWLoader>(
+    ctx: Ctx,
+    next: Next
+  ) {
     yield* updateStore([
       schema.loaders.start({ id: ctx.name }),
       schema.loaders.start({ id: ctx.key }),
@@ -104,7 +100,7 @@ export function loader<M extends AnyState = AnyState>(schema: {
         schema.loaders.success({ id: ctx.name, ...ctx.loader }),
         schema.loaders.success({ id: ctx.key, ...ctx.loader }),
       ]);
-    } catch (err) {
+    } catch (err: any) {
       if (!ctx.loader) {
         ctx.loader = {};
       }
@@ -147,10 +143,8 @@ function defaultErrorFn<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx) {
  */
 export function loaderApi<
   Ctx extends ApiCtx = ApiCtx,
-  S extends AnyState = AnyState,
->(
-  { schema, errorFn = defaultErrorFn }: ApiMdwProps<Ctx, S>,
-) {
+  S extends AnyState = AnyState
+>({ schema, errorFn = defaultErrorFn }: ApiMdwProps<Ctx, S>) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     try {
       yield* updateStore([
@@ -162,9 +156,7 @@ export function loaderApi<
       yield* next();
 
       if (!ctx.response) {
-        yield* updateStore(
-          schema.loaders.resetByIds([ctx.name, ctx.key]),
-        );
+        yield* updateStore(schema.loaders.resetByIds([ctx.name, ctx.key]));
         return;
       }
 
@@ -192,7 +184,7 @@ export function loaderApi<
         schema.loaders.success({ id: ctx.name, ...ctx.loader }),
         schema.loaders.success({ id: ctx.key, ...ctx.loader }),
       ]);
-    } catch (err) {
+    } catch (err: any) {
       const message = err?.message || "unknown exception";
       yield* updateStore([
         schema.loaders.error({
