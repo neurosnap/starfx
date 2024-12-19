@@ -1,5 +1,63 @@
 {
-  "version": "3",
+  "version": "4",
+  "specifiers": {
+    "jsr:@std/assert@*": "1.0.10",
+    "jsr:@std/assert@^1.0.10": "1.0.10",
+    "jsr:@std/internal@^1.0.5": "1.0.5",
+    "jsr:@std/testing@*": "1.0.7",
+    "npm:@types/node@*": "22.5.4",
+    "npm:yjs@*": "13.6.20"
+  },
+  "jsr": {
+    "@std/assert@1.0.9": {
+      "integrity": "a9f0c611a869cc791b26f523eec54c7e187aab7932c2c8e8bea0622d13680dcd",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/assert@1.0.10": {
+      "integrity": "59b5cbac5bd55459a19045d95cc7c2ff787b4f8527c0dd195078ff6f9481fbb3",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.5": {
+      "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    },
+    "@std/testing@1.0.7": {
+      "integrity": "aa5f0507352449064b09eff70ac1b6da3f765ee66bcc20dad9e5e433776580d5",
+      "dependencies": [
+        "jsr:@std/assert@^1.0.10",
+        "jsr:@std/internal"
+      ]
+    }
+  },
+  "npm": {
+    "@types/node@22.5.4": {
+      "integrity": "sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
+    "isomorphic.js@0.2.5": {
+      "integrity": "sha512-PIeMbHqMt4DnUP3MA/Flc0HElYjMXArsw1qwJZcm9sqR8mq3l8NYizFMty0pWwE/tzIGH3EKK5+jes5mAr85yw=="
+    },
+    "lib0@0.2.99": {
+      "integrity": "sha512-vwztYuUf1uf/1zQxfzRfO5yzfNKhTtgOByCruuiQQxWQXnPb8Itaube5ylofcV0oM0aKal9Mv+S1s1Ky0UYP1w==",
+      "dependencies": [
+        "isomorphic.js"
+      ]
+    },
+    "undici-types@6.19.8": {
+      "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
+    },
+    "yjs@13.6.20": {
+      "integrity": "sha512-Z2YZI+SYqK7XdWlloI3lhMiKnCdFCVC4PchpdO+mCYwtiTwncjUbnRK9R1JmkNfdmHyDXuWN3ibJAt0wsqTbLQ==",
+      "dependencies": [
+        "lib0"
+      ]
+    }
+  },
   "redirects": {
     "https://crux.land/api/get/2KNRVU": "https://crux.land/api/get/2KNRVU.ts",
     "https://crux.land/api/get/router@0.0.5": "https://crux.land/api/get/2KNRVU",
@@ -155,21 +213,30 @@
     "https://deno.land/x/wasmbuild@0.15.0/cache.ts": "89eea5f3ce6035a1164b3e655c95f21300498920575ade23161421f5b01967f4",
     "https://deno.land/x/wasmbuild@0.15.0/loader.ts": "d98d195a715f823151cbc8baa3f32127337628379a02d9eb2a3c5902dbccfc02",
     "https://esm.sh/immer@10.0.2?pin=v135": "c9a37633ebd7643f9618f0e3263ca12dc16eecb898feb579f94cc81c4a367c20",
-    "https://esm.sh/react-redux@8.0.5?pin=v135": "c5a1b9dcf3c39bb53bdd3efadb7541b91830b736165c4ed6f5edb08b982fff9f",
+    "https://esm.sh/react-redux@8.0.5?pin=v135": "f4407491c014946b8bed7e54c27e11edb42de4e3199af43c27884b143436d5f5",
     "https://esm.sh/react@18.2.0?pin=v135": "04ad7dc6d11fa27b24c136686a334ecdd19e972fae627cd98cbdc13cdac238c2",
     "https://esm.sh/reselect@4.1.8?pin=v135": "a88008b1d6ad1c4e4023172edebfe699cf9e8e0716132a48bb9f24617d478f4d",
     "https://esm.sh/stable/react@18.2.0/denonext/react.mjs": "3c4f23bcfc53b256fcfaf6f834fa9f584c3bb7be667b2682c6cb6ba8ef88f8e6",
+    "https://esm.sh/stable/react@18.3.1/denonext/react.mjs": "fc048ffc55366baf7669519127d186761db72046e2bebf35fe8d0de3964defa3",
+    "https://esm.sh/stable/react@19.0.0/denonext/react.mjs": "79056e5ef2a1c9601ae005ce23828f148d5e47291a65c573b275e19f19fa282f",
     "https://esm.sh/v135/@babel/runtime@7.24.4/denonext/helpers/esm/extends.js": "6945975ff02714e9d9e48cc7b2b84215c7f0bcf77b407c7499e497b20d2d7f6b",
     "https://esm.sh/v135/@babel/runtime@7.24.4/denonext/helpers/esm/objectWithoutPropertiesLoose.js": "476b0a7a26e15b0defbc5505ae3f4c7ef4a52e350eb861e090c4ea00f4a80670",
+    "https://esm.sh/v135/@babel/runtime@7.26.0/denonext/helpers/esm/extends.js": "9c4bf30c0ad96abb55ca7cda2f05685069d3c4f8bfd2fba5735dfbc040e39beb",
+    "https://esm.sh/v135/@babel/runtime@7.26.0/denonext/helpers/esm/objectWithoutPropertiesLoose.js": "1fffdffb33d197b964c753ebd42f4ab5bf3189860ec00ec2ece9b596785e06df",
     "https://esm.sh/v135/hoist-non-react-statics@3.3.2/denonext/hoist-non-react-statics.mjs": "1e1b0fbe9a9537eb408d6e7017e668b1381814eb9592a1dd18c39ee09a6d9fbb",
     "https://esm.sh/v135/immer@10.0.2/denonext/immer.mjs": "e23064a10c38638e3fa18f56a8864b32a41551e0c4dd32b18008431c57629e88",
     "https://esm.sh/v135/react-dom@18.2.0/denonext/react-dom.mjs": "8191fc377ea7083cca5640699c4abd75de033089eb932799e29aa04bb136838f",
+    "https://esm.sh/v135/react-dom@18.3.1/denonext/react-dom.mjs": "0c4ad76e514ad1c9d8987d49679c5f2a6299b34c1b7fbf10a5da056ae4a0963f",
     "https://esm.sh/v135/react-is@16.13.1/denonext/react-is.mjs": "4fc2bb5cfecb53c0f28cd7b730101ff83c05ca06fdd373bc2d6a9bdf662f96d4",
     "https://esm.sh/v135/react-is@18.2.0/denonext/react-is.mjs": "07ca6a7473ccbb06466e805c8253ade80bd664a0f486cf020864c22c27a60479",
+    "https://esm.sh/v135/react-is@18.3.1/denonext/react-is.mjs": "415473e8864f8022052049e9203c542bbe24f901dee5e66ae07c887356e6a278",
     "https://esm.sh/v135/react-redux@8.0.5/denonext/react-redux.mjs": "aad652363f5339e3814db446148deb093aadf80d57f8dc8d10d4c43b066b258c",
     "https://esm.sh/v135/reselect@4.1.8/denonext/reselect.mjs": "f8199f9e44453876a9ea6b5d1caedc0fe1ae789a73217543b1e6193e1edc0db7",
     "https://esm.sh/v135/scheduler@0.23.0/denonext/scheduler.mjs": "cdbc6d2823e2c6fffcb14501146ff2602a38c48d3c9dd9268f308e833ede2b49",
+    "https://esm.sh/v135/scheduler@0.23.2/denonext/scheduler.mjs": "dc96e5be52b14a40ce36295d938d5211e520c4da3183fe2ad4283ed103747d82",
     "https://esm.sh/v135/use-sync-external-store@1.2.0/denonext/shim.js": "ee51a93766077d32104ee8090cafb05c1bd2e23e256f3516368f8e9a8516f177",
-    "https://esm.sh/v135/use-sync-external-store@1.2.0/denonext/shim/with-selector.js": "6aaca98d5bc53815f1c14fb8d096f13d41ecf99d91923fa831bc19a880ba929d"
+    "https://esm.sh/v135/use-sync-external-store@1.2.0/denonext/shim/with-selector.js": "6aaca98d5bc53815f1c14fb8d096f13d41ecf99d91923fa831bc19a880ba929d",
+    "https://esm.sh/v135/use-sync-external-store@1.4.0/denonext/shim.js": "56a0f587507b9c77dfe311d2f55eba84341f559f94b3f660edd3ba43693ba3dc",
+    "https://esm.sh/v135/use-sync-external-store@1.4.0/denonext/shim/with-selector.js": "0dabd5368d24d1296688b679a9e1a123d5fccca41710f4e3b639af05cb366ad4"
   }
 }

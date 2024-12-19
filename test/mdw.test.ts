@@ -497,7 +497,7 @@ it(tests, "errorHandler", () => {
       a = 1;
       yield* next();
       a = 2;
-    } catch (err) {
+    } catch (err: any) {
       console.error(
         `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
         ctx,

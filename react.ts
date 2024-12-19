@@ -254,7 +254,7 @@ export function useLoaderSuccess(
 
 interface PersistGateProps {
   children: React.ReactNode;
-  loading?: JSX.Element;
+  loading?: React.JSX.Element;
 }
 
 function Loading({ text }: { text: string }) {

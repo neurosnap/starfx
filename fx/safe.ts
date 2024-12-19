@@ -23,7 +23,7 @@ export function* safe<T>(operator: Callable<T>): Operation<Result<T>> {
   try {
     const value = yield* call<T>(operator as any);
     return Ok(value);
-  } catch (error) {
+  } catch (error: any) {
     return Err(error);
   }
 }
