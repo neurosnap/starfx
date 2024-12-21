@@ -1,4 +1,4 @@
-import { asserts, describe, expect, it } from "../test.ts";
+import { asserts, describe, it } from "../test.ts";
 import {
   createStore,
   StoreContext,
