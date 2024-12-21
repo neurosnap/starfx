@@ -1,4 +1,4 @@
-import type { Instruction, Operation } from "./deps.ts";
+import type { Instruction, Operation } from "effection";
 
 export interface Computation<T = unknown> {
   // deno-lint-ignore no-explicit-any
@@ -20,9 +20,8 @@ export interface LoaderItemState<
   meta: M;
 }
 
-export interface LoaderState<
-  M extends AnyState = AnyState,
-> extends LoaderItemState<M> {
+export interface LoaderState<M extends AnyState = AnyState>
+  extends LoaderItemState<M> {
   isIdle: boolean;
   isLoading: boolean;
   isError: boolean;

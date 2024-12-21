@@ -104,9 +104,7 @@ it(tests, "can work with a nested object", async () => {
     const curUser = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser, { id: "", name: "vvv", roles: [] });
 
-    yield* db.update(
-      db.currentUser.update({ key: "roles", value: ["admin"] }),
-    );
+    yield* db.update(db.currentUser.update({ key: "roles", value: ["admin"] }));
     const curUser2 = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser2, { id: "", name: "vvv", roles: ["admin"] });
 

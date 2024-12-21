@@ -1,8 +1,8 @@
 {
   "tasks": {
     "types": "deno run --allow-write ./api-type-template.ts",
-    "npm": "deno run -A ./npm.ts",
-    "test": "deno test --allow-env --allow-read",
+    "npm": "deno run -A ./scripts/npm.ts",
+    "test": "deno test --allow-env --allow-read --allow-import",
     "sync-build-to": "deno run -A ./scripts/sync.ts"
   },
   "lint": {
@@ -14,5 +14,20 @@
   },
   "fmt": {
     "exclude": ["npm/", "examples/"]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.window", "dom"],
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment"
+  },
+  "imports": {
+    "react": "npm:react@^18.2.0",
+    "react-dom": "npm:react-dom@^18.2.0",
+    "react-redux": "npm:react-redux@^8.0.5",
+    "reselect": "npm:reselect@^4.1.8",
+    "immer": "npm:immer@^10.0.2",
+    "effection": "https://deno.land/x/effection@3.0.0-beta.3/mod.ts"
   }
 }

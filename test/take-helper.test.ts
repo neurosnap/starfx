@@ -1,8 +1,8 @@
+import { spawn } from "effection";
 import { describe, expect, it } from "../test.ts";
 import { createStore } from "../store/mod.ts";
 import type { AnyAction } from "../mod.ts";
 import { sleep, take, takeEvery, takeLatest, takeLeading } from "../mod.ts";
-import { spawn } from "../deps.ts";
 
 const testEvery = describe("takeEvery()");
 const testLatest = describe("takeLatest()");
@@ -68,10 +68,7 @@ it(testEvery, "should receive all actions", async () => {
 
   function* root() {
     const task = yield* spawn(() =>
-      takeEvery(
-        "ACTION",
-        (action) => worker("a1", "a2", action),
-      )
+      takeEvery("ACTION", (action) => worker("a1", "a2", action))
     );
     yield* take("CANCEL_WATCHER");
     yield* task.halt();

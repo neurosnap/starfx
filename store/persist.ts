@@ -1,8 +1,8 @@
-import { Err, Ok, Operation, Result } from "../deps.ts";
+import { Err, Ok, Operation, Result } from "effection";
 import { select, updateStore } from "./fx.ts";
-
 import type { AnyState, Next } from "../types.ts";
 import type { UpdaterCtx } from "./types.ts";
+
 export const PERSIST_LOADER_ID = "@@starfx/persist";
 
 export interface PersistAdapter<S extends AnyState> {
@@ -48,9 +48,9 @@ export function createTransform<S extends AnyState>() {
   };
 }
 
-export function createLocalStorageAdapter<S extends AnyState>(): PersistAdapter<
-  S
-> {
+export function createLocalStorageAdapter<
+  S extends AnyState,
+>(): PersistAdapter<S> {
   return {
     getItem: function* (key: string) {
       const storage = localStorage.getItem(key) || "{}";
@@ -79,17 +79,15 @@ export function shallowReconciler<S extends AnyState>(
   return { ...original, ...persisted };
 }
 
-export function createPersistor<S extends AnyState>(
-  {
-    adapter,
-    key = "starfx",
-    reconciler = shallowReconciler,
-    allowlist = [],
-    transform,
-  }:
-    & Pick<PersistProps<S>, "adapter">
-    & Partial<PersistProps<S>>,
-): PersistProps<S> {
+export function createPersistor<S extends AnyState>({
+  adapter,
+  key = "starfx",
+  reconciler = shallowReconciler,
+  allowlist = [],
+  transform,
+}:
+  & Pick<PersistProps<S>, "adapter">
+  & Partial<PersistProps<S>>): PersistProps<S> {
   function* rehydrate(): Operation<Result<undefined>> {
     const persistedState = yield* adapter.getItem(key);
     if (!persistedState.ok) {
@@ -126,9 +124,12 @@ export function createPersistor<S extends AnyState>(
   };
 }
 
-export function persistStoreMdw<S extends AnyState>(
-  { allowlist, adapter, key, transform }: PersistProps<S>,
-) {
+export function persistStoreMdw<S extends AnyState>({
+  allowlist,
+  adapter,
+  key,
+  transform,
+}: PersistProps<S>) {
   return function* (_: UpdaterCtx<S>, next: Next) {
     yield* next();
     const state = yield* select((s: S) => s);

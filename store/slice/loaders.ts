@@ -1,4 +1,4 @@
-import { createSelector } from "../../deps.ts";
+import { createSelector } from "reselect";
 import type {
   AnyState,
   LoaderItemState,
@@ -17,9 +17,9 @@ interface PropIds {
 
 const excludesFalse = <T>(n?: T): n is T => Boolean(n);
 
-export function defaultLoaderItem<
-  M extends AnyState = AnyState,
->(li: Partial<LoaderItemState<M>> = {}): LoaderItemState<M> {
+export function defaultLoaderItem<M extends AnyState = AnyState>(
+  li: Partial<LoaderItemState<M>> = {},
+): LoaderItemState<M> {
   return {
     id: "",
     status: "idle",
@@ -76,10 +76,8 @@ function loaderSelectors<
     data: Record<string, LoaderItemState<M>>,
   ): LoaderItemState<M>[] => Object.values(data).filter(excludesFalse);
 
-  const findById = (
-    data: Record<string, LoaderItemState<M>>,
-    { id }: PropId,
-  ) => (defaultLoader<M>(data[id]) || empty);
+  const findById = (data: Record<string, LoaderItemState<M>>, { id }: PropId) =>
+    defaultLoader<M>(data[id]) || empty;
   const findByIds = (
     data: Record<string, LoaderItemState<M>>,
     { ids }: PropIds,
@@ -184,8 +182,8 @@ export const createLoaders = <
   };
 };
 
-export function loaders<
-  M extends AnyState = AnyState,
->(initialState?: Record<string, LoaderItemState<M>>) {
+export function loaders<M extends AnyState = AnyState>(
+  initialState?: Record<string, LoaderItemState<M>>,
+) {
   return (name: string) => createLoaders<M>({ name, initialState });
 }

@@ -1,6 +1,6 @@
-import type { Callable, Channel, Operation, Result } from "../deps.ts";
+import type { Callable, Channel, Operation, Result } from "effection";
+import { createChannel, resource, spawn } from "effection";
 import type { Computation } from "../types.ts";
-import { createChannel, resource, spawn } from "../deps.ts";
 import { safe } from "./safe.ts";
 
 export interface ParallelRet<T> extends Computation<Result<T>[]> {

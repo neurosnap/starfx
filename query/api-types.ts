@@ -2,6 +2,7 @@
  * This is an auto-generated file, do not edit directly!
  * Run "yarn template" to generate this file.
  */
+import type { Operation } from "effection";
 import type { ThunksApi } from "./thunk.ts";
 import type {
   ApiCtx,
@@ -12,7 +13,6 @@ import type {
   Supervisor,
 } from "./types.ts";
 import type { Next, Payload } from "../types.ts";
-import type { Operation } from "../deps.ts";
 
 export type ApiName = string | string[];
 
@@ -27,12 +27,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     get(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    get<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    get<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    get<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    get<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -57,9 +57,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     get(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    get<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    get<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     get<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -149,12 +147,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     post(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    post<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    post<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    post<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    post<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -179,9 +177,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     post(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    post<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    post<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     post<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -271,12 +267,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     put(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    put<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    put<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    put<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    put<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -301,9 +297,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     put(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    put<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    put<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     put<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -393,12 +387,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     patch(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    patch<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    patch<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    patch<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    patch<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -423,9 +417,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     patch(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    patch<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    patch<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     patch<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -515,12 +507,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     delete(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    delete<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    delete<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    delete<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    delete<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -545,9 +537,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     delete(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    delete<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    delete<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     delete<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -637,12 +627,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     options(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    options<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    options<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    options<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    options<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -667,9 +657,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     options(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    options<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    options<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     options<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -759,12 +747,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     head(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    head<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    head<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    head<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    head<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -789,9 +777,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     head(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    head<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    head<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     head<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -881,12 +867,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     connect(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    connect<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    connect<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    connect<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    connect<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -911,9 +897,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     connect(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    connect<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    connect<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     connect<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
@@ -1003,12 +987,12 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     trace(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    trace<P>(
-      req: { supervisor?: Supervisor },
-    ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
-    trace<P extends never, ApiSuccess, ApiError = unknown>(
-      req: { supervisor?: Supervisor },
-    ): CreateAction<
+    trace<P>(req: {
+      supervisor?: Supervisor;
+    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    trace<P extends never, ApiSuccess, ApiError = unknown>(req: {
+      supervisor?: Supervisor;
+    }): CreateAction<
       & Omit<Ctx, "json">
       & FetchJson<
         ApiSuccess,
@@ -1033,9 +1017,7 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Middleware only
      */
     trace(fn: MiddlewareApiCo<Ctx>): CreateAction<Ctx>;
-    trace<Gtx extends Ctx = Ctx>(
-      fn: MiddlewareApiCo<Gtx>,
-    ): CreateAction<Gtx>;
+    trace<Gtx extends Ctx = Ctx>(fn: MiddlewareApiCo<Gtx>): CreateAction<Gtx>;
     trace<P>(
       fn: MiddlewareApiCo<Omit<Ctx, "payload"> & Payload<P>>,
     ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;

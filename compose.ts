@@ -1,4 +1,4 @@
-import { Instruction, Operation } from "./deps.ts";
+import { Instruction, Operation } from "effection";
 import type { Next } from "./types.ts";
 
 export interface BaseCtx {

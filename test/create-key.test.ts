@@ -23,15 +23,12 @@ it(
     const api = createApi();
     api.use(api.routes());
     // no param
-    const action0 = api.get(
-      "/users",
-      function* (ctx, next) {
-        ctx.request = {
-          method: "GET",
-        };
-        yield* next();
-      },
-    );
+    const action0 = api.get("/users", function* (ctx, next) {
+      ctx.request = {
+        method: "GET",
+      };
+      yield* next();
+    });
     const sendNop0 = action0();
     const sendNop1 = action0();
     expect(getKeyOf(sendNop0)).toEqual(getKeyOf(sendNop1));
@@ -47,15 +44,12 @@ it(
     // no param
     const action0 = api.get<{
       [key: string]: string | boolean | number | null | undefined;
-    }>(
-      "/users",
-      function* (ctx, next) {
-        ctx.request = {
-          method: "GET",
-        };
-        yield* next();
-      },
-    );
+    }>("/users", function* (ctx, next) {
+      ctx.request = {
+        method: "GET",
+      };
+      yield* next();
+    });
     const sendPojo0 = action0({
       a: "a",
       b: "b",

@@ -1,5 +1,4 @@
 import type { AnyState } from "../../types.ts";
-
 import type { BaseSchema } from "../types.ts";
 
 export interface NumOutput<S extends AnyState> extends BaseSchema<number> {
@@ -12,9 +11,13 @@ export interface NumOutput<S extends AnyState> extends BaseSchema<number> {
   select: (s: S) => number;
 }
 
-export function createNum<S extends AnyState = AnyState>(
-  { name, initialState = 0 }: { name: keyof S; initialState?: number },
-): NumOutput<S> {
+export function createNum<S extends AnyState = AnyState>({
+  name,
+  initialState = 0,
+}: {
+  name: keyof S;
+  initialState?: number;
+}): NumOutput<S> {
   return {
     name: name as string,
     schema: "num",

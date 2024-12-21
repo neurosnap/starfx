@@ -21,6 +21,14 @@ export interface ApiMdwProps<
   errorFn?: (ctx: Ctx) => string;
 }
 
+interface ErrorLike {
+  message: string;
+}
+
+function isErrorLike(err: unknown): err is ErrorLike {
+  return typeof err === "object" && err !== null && "message" in err;
+}
+
 /**
  * This middleware is a composition of many middleware used to faciliate
  * the {@link createApi}.
@@ -54,15 +62,10 @@ export function api<Ctx extends ApiCtx = ApiCtx, S extends AnyState = AnyState>(
  * This middleware will automatically cache any data found inside `ctx.json`
  * which is where we store JSON data from the {@link mdw.fetch} middleware.
  */
-export function cache<
-  Ctx extends ApiCtx = ApiCtx,
->(schema: {
+export function cache<Ctx extends ApiCtx = ApiCtx>(schema: {
   cache: TableOutput<any, AnyState>;
 }) {
-  return function* cache(
-    ctx: Ctx,
-    next: Next,
-  ) {
+  return function* cache(ctx: Ctx, next: Next) {
     ctx.cacheData = yield* select(schema.cache.selectById, { id: ctx.key });
     yield* next();
     if (!ctx.cache) return;
@@ -83,9 +86,10 @@ export function cache<
 export function loader<M extends AnyState = AnyState>(schema: {
   loaders: LoaderOutput<M, AnyState>;
 }) {
-  return function* <
-    Ctx extends ThunkCtxWLoader = ThunkCtxWLoader,
-  >(ctx: Ctx, next: Next) {
+  return function* <Ctx extends ThunkCtxWLoader = ThunkCtxWLoader>(
+    ctx: Ctx,
+    next: Next,
+  ) {
     yield* updateStore([
       schema.loaders.start({ id: ctx.name }),
       schema.loaders.start({ id: ctx.key }),
@@ -109,15 +113,16 @@ export function loader<M extends AnyState = AnyState>(schema: {
         ctx.loader = {};
       }
 
+      const message = isErrorLike(err) ? err.message : "unknown exception";
       yield* updateStore([
         schema.loaders.error({
           id: ctx.name,
-          message: err.message,
+          message,
           ...ctx.loader,
         }),
         schema.loaders.error({
           id: ctx.key,
-          message: err.message,
+          message,
           ...ctx.loader,
         }),
       ]);
@@ -148,9 +153,7 @@ function defaultErrorFn<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx) {
 export function loaderApi<
   Ctx extends ApiCtx = ApiCtx,
   S extends AnyState = AnyState,
->(
-  { schema, errorFn = defaultErrorFn }: ApiMdwProps<Ctx, S>,
-) {
+>({ schema, errorFn = defaultErrorFn }: ApiMdwProps<Ctx, S>) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     try {
       yield* updateStore([
@@ -162,9 +165,7 @@ export function loaderApi<
       yield* next();
 
       if (!ctx.response) {
-        yield* updateStore(
-          schema.loaders.resetByIds([ctx.name, ctx.key]),
-        );
+        yield* updateStore(schema.loaders.resetByIds([ctx.name, ctx.key]));
         return;
       }
 
@@ -193,7 +194,7 @@ export function loaderApi<
         schema.loaders.success({ id: ctx.key, ...ctx.loader }),
       ]);
     } catch (err) {
-      const message = err?.message || "unknown exception";
+      const message = isErrorLike(err) ? err.message : "unknown exception";
       yield* updateStore([
         schema.loaders.error({
           id: ctx.name,

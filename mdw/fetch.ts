@@ -1,4 +1,4 @@
-import { sleep } from "../deps.ts";
+import { sleep } from "effection";
 import { safe } from "../fx/mod.ts";
 import type { FetchCtx, FetchJsonCtx } from "../query/mod.ts";
 import { isObject, noop } from "../query/util.ts";
@@ -202,10 +202,7 @@ export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 export function response<CurCtx extends FetchCtx = FetchCtx>(
   response?: Response,
 ) {
-  return function* responseMdw(
-    ctx: CurCtx,
-    next: Next,
-  ) {
+  return function* responseMdw(ctx: CurCtx, next: Next) {
     if (response) {
       ctx.response = response;
     }

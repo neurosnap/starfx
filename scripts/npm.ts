@@ -1,4 +1,4 @@
-import { build, emptyDir } from "https://deno.land/x/dnt@0.38.1/mod.ts";
+import { build, emptyDir } from "jsr:@deno/dnt@0.41.3";
 
 const [version] = Deno.args;
 if (!version) {
@@ -23,33 +23,19 @@ async function init() {
       },
     ],
     mappings: {
+      // use the deno module in this repo, but use the npm module when publishing
       "https://deno.land/x/effection@3.0.0-beta.3/mod.ts": {
         name: "effection",
         version: "3.0.0-beta.3",
       },
-      "https://esm.sh/react@18.2.0?pin=v135": {
-        name: "react",
-        version: "^18.2.0",
-        peerDependency: true,
-      },
-      "https://esm.sh/react-redux@8.0.5?pin=v135": {
-        name: "react-redux",
-        version: "^8.0.5",
-      },
-      "https://esm.sh/immer@10.0.2?pin=v135": {
-        name: "immer",
-        version: "^10.0.2",
-      },
-      "https://esm.sh/reselect@4.1.8?pin=v135": {
-        name: "reselect",
-        version: "^4.1.8",
-      },
     },
+    importMap: "deno.json",
     outDir: "./npm",
     shims: {
       deno: false,
     },
     test: false,
+
     typeCheck: "both",
     compilerOptions: {
       target: "ES2020",

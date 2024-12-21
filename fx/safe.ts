@@ -1,5 +1,5 @@
-import type { Callable, Operation, Result } from "../deps.ts";
-import { call, Err, Ok } from "../deps.ts";
+import type { Callable, Operation, Result } from "effection";
+import { call, Err, Ok } from "effection";
 
 /**
  * The goal of `safe` is to wrap Operations to prevent them from raising
@@ -19,11 +19,15 @@ import { call, Err, Ok } from "../deps.ts";
  * }
  * ```
  */
+function isError(error: unknown): error is Error {
+  return error instanceof Error;
+}
+
 export function* safe<T>(operator: Callable<T>): Operation<Result<T>> {
   try {
     const value = yield* call<T>(operator as any);
     return Ok(value);
   } catch (error) {
-    return Err(error);
+    return Err(isError(error) ? error : new Error(String(error)));
   }
 }

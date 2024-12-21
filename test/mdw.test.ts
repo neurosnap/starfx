@@ -98,9 +98,7 @@ it(tests, "basic", () => {
   store.run(query.bootup);
 
   store.dispatch(fetchUsers());
-  expect(store.getState().users).toEqual(
-    { [mockUser.id]: mockUser },
-  );
+  expect(store.getState().users).toEqual({ [mockUser.id]: mockUser });
   store.dispatch(fetchUser({ id: "2" }));
   expect(store.getState().users).toEqual({
     [mockUser.id]: mockUser,
@@ -498,8 +496,9 @@ it(tests, "errorHandler", () => {
       yield* next();
       a = 2;
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
       console.error(
-        `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
+        `Error: ${errorMessage}.  Check the endpoint [${ctx.name}]`,
         ctx,
       );
     }

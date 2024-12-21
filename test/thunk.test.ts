@@ -161,17 +161,21 @@ it(
     api.use(processUsers);
     api.use(processTickets);
     const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
-    const fetchTickets = api.create(`/ticket-wrong-url`, {
-      supervisor: takeEvery,
-    }, function* (ctx, next) {
-      // before middleware has been triggered
-      ctx.url = "/tickets";
+    const fetchTickets = api.create(
+      `/ticket-wrong-url`,
+      {
+        supervisor: takeEvery,
+      },
+      function* (ctx, next) {
+        // before middleware has been triggered
+        ctx.url = "/tickets";
 
-      // triggers all middleware
-      yield* next();
+        // triggers all middleware
+        yield* next();
 
-      yield* put(fetchUsers());
-    });
+        yield* put(fetchUsers());
+      },
+    );
 
     const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
@@ -424,22 +428,19 @@ it(tests, "retry with actionFn", async () => {
   const api = createThunks();
   api.use(api.routes());
 
-  const action = api.create(
-    "/api",
-    function* (ctx, next) {
-      acc += "a";
-      yield* next();
-      acc += "g";
-      if (acc === "agag") {
-        yield* put({ type: "DONE" });
-      }
+  const action = api.create("/api", function* (ctx, next) {
+    acc += "a";
+    yield* next();
+    acc += "g";
+    if (acc === "agag") {
+      yield* put({ type: "DONE" });
+    }
 
-      if (!called) {
-        called = true;
-        yield* put(ctx.actionFn());
-      }
-    },
-  );
+    if (!called) {
+      called = true;
+      yield* put(ctx.actionFn());
+    }
+  });
 
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
@@ -537,24 +538,20 @@ it(tests, "should warn when calling thunk before registered", () => {
   console.warn = err;
 });
 
-it(
-  tests,
-  "it should call the api once even if we register it twice",
-  () => {
-    const api = createThunks<RoboCtx>();
-    api.use(api.routes());
-    const store = createStore({ initialState: {} });
-    store.run(api.register);
-    store.run(api.register);
+it(tests, "it should call the api once even if we register it twice", () => {
+  const api = createThunks<RoboCtx>();
+  api.use(api.routes());
+  const store = createStore({ initialState: {} });
+  store.run(api.register);
+  store.run(api.register);
 
-    let acc = "";
-    const action = api.create("/users", function* () {
-      acc += "a";
-    });
-    store.dispatch(action());
-    asserts.assertEquals(acc, "a");
-  },
-);
+  let acc = "";
+  const action = api.create("/users", function* () {
+    acc += "a";
+  });
+  store.dispatch(action());
+  asserts.assertEquals(acc, "a");
+});
 
 it(
   tests,
@@ -627,27 +624,23 @@ it(
   },
 );
 
-it(
-  tests,
-  "should allow multiple stores to register a thunk",
-  () => {
-    const api1 = createThunks<RoboCtx>();
-    api1.use(api1.routes());
-    const storeA = createStore({ initialState: {} });
-    const storeB = createStore({ initialState: {} });
-    storeA.run(api1.register);
-    storeB.run(api1.register);
-    let acc = "";
-    const action = api1.create("/users", function* () {
-      acc += "b";
-    });
-    storeA.dispatch(action());
-    storeB.dispatch(action());
+it(tests, "should allow multiple stores to register a thunk", () => {
+  const api1 = createThunks<RoboCtx>();
+  api1.use(api1.routes());
+  const storeA = createStore({ initialState: {} });
+  const storeB = createStore({ initialState: {} });
+  storeA.run(api1.register);
+  storeB.run(api1.register);
+  let acc = "";
+  const action = api1.create("/users", function* () {
+    acc += "b";
+  });
+  storeA.dispatch(action());
+  storeB.dispatch(action());
 
-    asserts.assertEquals(
-      acc,
-      "bb",
-      "Expected 'bb' after first API call, but got: " + acc,
-    );
-  },
-);
+  asserts.assertEquals(
+    acc,
+    "bb",
+    "Expected 'bb' after first API call, but got: " + acc,
+  );
+});

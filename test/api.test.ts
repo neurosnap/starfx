@@ -9,7 +9,7 @@ import {
 } from "../store/mod.ts";
 import {
   AnyState,
-  type ApiCtx,
+  ApiCtx,
   call,
   createApi,
   createKey,
@@ -105,10 +105,12 @@ it(tests, "POST", async () => {
 
   store.dispatch(createUser({ email: mockUser.email }));
 
-  await store.run(waitFor(function* (): Operation<boolean> {
-    const res = yield* select((state: AnyState) => state.users["1"].id);
-    return res !== "";
-  }));
+  await store.run(
+    waitFor(function* (): Operation<boolean> {
+      const res = yield* select((state: AnyState) => state.users["1"].id);
+      return res !== "";
+    }),
+  );
 
   expect(store.getState().users).toEqual({
     "1": { id: "1", name: "test", email: "test@test.com" },
@@ -214,12 +216,16 @@ it(tests, "run() from a normal saga", () => {
   const api = createApi();
   api.use(api.routes());
   let acc = "";
-  const action1 = api.get<{ id: string }>("/users/:id", {
-    supervisor: takeEvery,
-  }, function* (_, next) {
-    yield* next();
-    acc += "a";
-  });
+  const action1 = api.get<{ id: string }>(
+    "/users/:id",
+    {
+      supervisor: takeEvery,
+    },
+    function* (_, next) {
+      yield* next();
+      acc += "a";
+    },
+  );
   const action2 = () => ({ type: "ACTION" });
   function* onAction() {
     const ctx = yield* safe(() => action1.run(action1({ id: "1" })));
@@ -318,21 +324,15 @@ it(tests, "two identical endpoints", () => {
   api.use(mdw.api({ schema }));
   api.use(api.routes());
 
-  const first = api.get(
-    "/health",
-    function* (ctx, next) {
-      actual.push(ctx.req().url);
-      yield* next();
-    },
-  );
+  const first = api.get("/health", function* (ctx, next) {
+    actual.push(ctx.req().url);
+    yield* next();
+  });
 
-  const second = api.get(
-    ["/health", "poll"],
-    function* (ctx, next) {
-      actual.push(ctx.req().url);
-      yield* next();
-    },
-  );
+  const second = api.get(["/health", "poll"], function* (ctx, next) {
+    actual.push(ctx.req().url);
+    yield* next();
+  });
 
   store.run(api.bootup);
   store.dispatch(first());
@@ -483,45 +483,41 @@ it(tests, "should bubble up error", () => {
 });
 
 // this is strictly for testing types
-it(
-  tests,
-  "useCache - derive api success from endpoint",
-  () => {
-    const api = createApi<TestCtx>();
-    api.use(api.routes());
-    api.use(function* (ctx, next) {
+it(tests, "useCache - derive api success from endpoint", () => {
+  const api = createApi<TestCtx>();
+  api.use(api.routes());
+  api.use(function* (ctx, next) {
+    yield* next();
+    const data = { result: "wow" };
+    ctx.json = { ok: true, value: data };
+  });
+
+  const acc: string[] = [];
+  const action1 = api.get<never, { result: string }>(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.something = false;
+
       yield* next();
-      const data = { result: "wow" };
-      ctx.json = { ok: true, value: data };
-    });
 
-    const acc: string[] = [];
-    const action1 = api.get<never, { result: string }>(
-      "/users",
-      { supervisor: takeEvery },
-      function* (ctx, next) {
-        ctx.something = false;
+      if (ctx.json.ok) {
+        acc.push(ctx.json.value.result);
+      } else {
+        // EXPECT { message: string }
+        ctx.json.error;
+      }
+    },
+  );
 
-        yield* next();
+  const store = createStore({ initialState: { users: {} } });
+  store.run(api.bootup);
 
-        if (ctx.json.ok) {
-          acc.push(ctx.json.value.result);
-        } else {
-          // EXPECT { message: string }
-          ctx.json.error;
-        }
-      },
-    );
-
-    const store = createStore({ initialState: { users: {} } });
-    store.run(api.bootup);
-
-    function _App() {
-      const act = action1();
-      act.payload._result;
-      const users = useCache(act);
-      // EXPECT { result: string } | undefined
-      users.data;
-    }
-  },
-);
+  function _App() {
+    const act = action1();
+    act.payload._result;
+    const users = useCache(act);
+    // EXPECT { result: string } | undefined
+    users.data;
+  }
+});

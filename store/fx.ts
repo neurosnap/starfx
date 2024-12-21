@@ -1,4 +1,4 @@
-import { Operation, Result } from "../deps.ts";
+import { Operation, Result } from "effection";
 import type { ActionFnWithPayload, AnyState } from "../types.ts";
 import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext } from "./context.ts";

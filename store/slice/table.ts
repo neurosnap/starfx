@@ -1,4 +1,4 @@
-import { createSelector } from "../../deps.ts";
+import { createSelector } from "reselect";
 import type { AnyState, IdProp } from "../../types.ts";
 import { BaseSchema } from "../types.ts";
 
@@ -53,7 +53,7 @@ function tableSelectors<
   const selectById = (
     state: S,
     { id }: PropId,
-  ): typeof empty extends undefined ? (Entity | undefined) : Entity => {
+  ): typeof empty extends undefined ? Entity | undefined : Entity => {
     const data = selectTable(state);
     return findById(data, { id });
   };
@@ -92,18 +92,12 @@ export interface TableOutput<
   patch: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
   merge: (e: PatchEntity<Record<IdProp, Entity>>) => (s: S) => void;
   reset: () => (s: S) => void;
-  findById: (
-    d: Record<IdProp, Entity>,
-    { id }: PropId,
-  ) => Empty;
+  findById: (d: Record<IdProp, Entity>, { id }: PropId) => Empty;
   findByIds: (d: Record<IdProp, Entity>, { ids }: PropIds) => Entity[];
   tableAsList: (d: Record<IdProp, Entity>) => Entity[];
   selectTable: (s: S) => Record<IdProp, Entity>;
   selectTableAsList: (state: S) => Entity[];
-  selectById: (
-    s: S,
-    p: PropId,
-  ) => Empty;
+  selectById: (s: S, p: PropId) => Empty;
   selectByIds: (s: S, p: PropIds) => Entity[];
 }
 
@@ -207,11 +201,12 @@ export function table<
 export function table<
   Entity extends AnyState = AnyState,
   S extends AnyState = AnyState,
->(
-  { initialState, empty }: {
-    initialState?: Record<IdProp, Entity>;
-    empty?: Entity | (() => Entity);
-  } = {},
-): (n: string) => TableOutput<Entity, S, Entity | undefined> {
+>({
+  initialState,
+  empty,
+}: {
+  initialState?: Record<IdProp, Entity>;
+  empty?: Entity | (() => Entity);
+} = {}): (n: string) => TableOutput<Entity, S, Entity | undefined> {
   return (name: string) => createTable<Entity>({ name, empty, initialState });
 }

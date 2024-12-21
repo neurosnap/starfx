@@ -1,18 +1,18 @@
 import {
   Provider as ReduxProvider,
-  React,
   useDispatch,
   useSelector,
   useStore as useReduxStore,
-} from "./deps.ts";
+} from "react-redux";
+import React, { type ReactElement } from "react";
 import type { AnyState, LoaderState } from "./types.ts";
 import type { ThunkAction } from "./query/mod.ts";
 import { type FxSchema, type FxStore, PERSIST_LOADER_ID } from "./store/mod.ts";
 import { ActionFn, ActionFnWithPayload } from "./types.ts";
 import { getIdFromAction } from "./action.ts";
 
-export { useDispatch, useSelector } from "./deps.ts";
-export type { TypedUseSelectorHook } from "./deps.ts";
+export { useDispatch, useSelector } from "react-redux";
+export type { TypedUseSelectorHook } from "react-redux";
 
 const {
   useContext,
@@ -47,22 +47,19 @@ export interface UseCacheResult<D = any, A extends ThunkAction = ThunkAction>
 
 const SchemaContext = createContext<FxSchema<any, any> | null>(null);
 
-export function Provider(
-  { store, schema, children }: {
-    store: FxStore<any>;
-    schema: FxSchema<any, any>;
-    children: React.ReactNode;
-  },
-) {
-  return (
-    h(ReduxProvider, {
-      store,
-      children: h(
-        SchemaContext.Provider,
-        { value: schema, children },
-      ) as any,
-    })
-  );
+export function Provider({
+  store,
+  schema,
+  children,
+}: {
+  store: FxStore<any>;
+  schema: FxSchema<any, any>;
+  children: React.ReactNode;
+}) {
+  return h(ReduxProvider, {
+    store,
+    children: h(SchemaContext.Provider, { value: schema, children }) as any,
+  });
 }
 
 export function useSchema<S extends AnyState>() {
@@ -254,16 +251,17 @@ export function useLoaderSuccess(
 
 interface PersistGateProps {
   children: React.ReactNode;
-  loading?: JSX.Element;
+  loading?: ReactElement;
 }
 
 function Loading({ text }: { text: string }) {
   return h("div", null, text);
 }
 
-export function PersistGate(
-  { children, loading = h(Loading) }: PersistGateProps,
-) {
+export function PersistGate({
+  children,
+  loading = h(Loading),
+}: PersistGateProps) {
   const schema = useSchema();
   const ldr = useSelector((s: any) =>
     schema.loaders.selectById(s, { id: PERSIST_LOADER_ID })

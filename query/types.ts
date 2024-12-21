@@ -1,4 +1,4 @@
-import type { Operation, Result } from "../deps.ts";
+import type { Operation, Result } from "effection";
 import type {
   Action,
   ActionWithPayload,
@@ -105,10 +105,8 @@ export type CreateActionFn<ApiSuccess = any> = () => ActionWithPayload<
   CreateActionPayload<Record<string | number | symbol, never>, ApiSuccess>
 >;
 
-export interface CreateAction<
-  Ctx extends ThunkCtx = ThunkCtx,
-  ApiSuccess = any,
-> extends CreateActionFn<ApiSuccess> {
+export interface CreateAction<Ctx extends ThunkCtx = ThunkCtx, ApiSuccess = any>
+  extends CreateActionFn<ApiSuccess> {
   run: (
     p?: ActionWithPayload<
       CreateActionPayload<Record<string | number | symbol, never>, ApiSuccess>

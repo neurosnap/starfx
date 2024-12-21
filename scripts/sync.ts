@@ -1,4 +1,4 @@
-import { call, main, type Operation } from "./deps.ts";
+import { call, main, type Operation } from "effection";
 
 await main(function* (): Operation<void> {
   const [syncMethod, folderFromArgs] = Deno.args;

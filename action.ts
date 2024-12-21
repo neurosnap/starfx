@@ -9,7 +9,7 @@ import {
   SignalQueueFactory,
   spawn,
   Stream,
-} from "./deps.ts";
+} from "effection";
 import { ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";
@@ -105,9 +105,7 @@ export function* takeLeading<T>(
   }
 }
 
-export function* waitFor(
-  predicate: Callable<boolean>,
-) {
+export function* waitFor(predicate: Callable<boolean>) {
   const init = yield* call(predicate as any);
   if (init) {
     return;

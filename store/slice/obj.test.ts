@@ -1,5 +1,5 @@
 import { asserts, describe, it } from "../../test.ts";
-import { configureStore, updateStore } from "../../store/mod.ts";
+import { configureStore, updateStore } from "../mod.ts";
 
 import { createObj } from "./obj.ts";
 const tests = describe("createObj()");
@@ -32,12 +32,14 @@ it(tests, "sets up an obj", async () => {
   });
 
   await store.run(function* () {
-    yield* updateStore(slice.set({
-      username: "bob",
-      userId: 1,
-      isadmin: true,
-      roles: ["admin", "user"],
-    }));
+    yield* updateStore(
+      slice.set({
+        username: "bob",
+        userId: 1,
+        isadmin: true,
+        roles: ["admin", "user"],
+      }),
+    );
   });
 
   asserts.assertEquals(store.getState()["currentUser"], {
