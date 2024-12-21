@@ -38,7 +38,7 @@ it(tests, "sets up an obj", async () => {
         userId: 1,
         isadmin: true,
         roles: ["admin", "user"],
-      })
+      }),
     );
   });
 
@@ -62,7 +62,7 @@ it(tests, "sets up an obj", async () => {
 
   await store.run(function* () {
     yield* updateStore(
-      slice.update({ key: "roles", value: ["admin", "superuser"] })
+      slice.update({ key: "roles", value: ["admin", "superuser"] }),
     );
   });
 

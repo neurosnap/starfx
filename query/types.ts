@@ -32,13 +32,13 @@ export interface LoaderCtx<P = unknown> extends ThunkCtx<P> {
 
 export type ApiFetchResult<ApiSuccess = any, ApiError = any> =
   | {
-      ok: true;
-      value: ApiSuccess;
-    }
+    ok: true;
+    value: ApiSuccess;
+  }
   | {
-      ok: false;
-      error: ApiError;
-    };
+    ok: false;
+    error: ApiError;
+  };
 
 export type ApiRequest = Partial<{ url: string } & RequestInit>;
 export type RequiredApiRequest = {
@@ -58,8 +58,7 @@ export interface FetchJson<ApiSuccess = any, ApiError = any> {
 }
 
 export interface FetchJsonCtx<P = any, ApiSuccess = any, ApiError = any>
-  extends FetchCtx<P>,
-    FetchJson<ApiSuccess, ApiError> {}
+  extends FetchCtx<P>, FetchJson<ApiSuccess, ApiError> {}
 
 export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   extends FetchJsonCtx<Payload, ApiSuccess, ApiError> {
@@ -81,7 +80,7 @@ export interface PerfCtx<P = unknown> extends ThunkCtx<P> {
 
 export type Middleware<Ctx extends ThunkCtx = ThunkCtx> = (
   ctx: Ctx,
-  next: Next
+  next: Next,
 ) => Operation<any>;
 export type MiddlewareCo<Ctx extends ThunkCtx = ThunkCtx> =
   | Middleware<Ctx>
@@ -89,7 +88,7 @@ export type MiddlewareCo<Ctx extends ThunkCtx = ThunkCtx> =
 
 export type MiddlewareApi<Ctx extends ApiCtx = ApiCtx> = (
   ctx: Ctx,
-  next: Next
+  next: Next,
 ) => Operation<any>;
 export type MiddlewareApiCo<Ctx extends ApiCtx = ApiCtx> =
   | Middleware<Ctx>
@@ -111,22 +110,22 @@ export interface CreateAction<Ctx extends ThunkCtx = ThunkCtx, ApiSuccess = any>
   run: (
     p?: ActionWithPayload<
       CreateActionPayload<Record<string | number | symbol, never>, ApiSuccess>
-    >
+    >,
   ) => Operation<Ctx>;
   use: (mdw: Middleware<Ctx>) => void;
 }
 
 export type CreateActionFnWithPayload<P = any, ApiSuccess = any> = (
-  p: P
+  p: P,
 ) => ActionWithPayload<CreateActionPayload<P, ApiSuccess>>;
 
 export interface CreateActionWithPayload<
   Ctx extends ThunkCtx,
   P,
-  ApiSuccess = any
+  ApiSuccess = any,
 > extends CreateActionFnWithPayload<P, ApiSuccess> {
   run: (
-    a: ActionWithPayload<CreateActionPayload<P, ApiSuccess>> | P
+    a: ActionWithPayload<CreateActionPayload<P, ApiSuccess>> | P,
   ) => Operation<Ctx>;
   use: (mdw: Middleware<Ctx>) => void;
 }
@@ -137,5 +136,5 @@ export type ThunkAction<P = any, ApiSuccess = any> = ActionWithPayload<
 
 export type Supervisor<T = unknown> = (
   pattern: string,
-  op: (action: Action) => Operation<T>
+  op: (action: Action) => Operation<T>,
 ) => Operation<T>;

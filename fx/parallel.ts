@@ -74,7 +74,7 @@ export function parallel<T>(operations: Callable<T>[]) {
             const result = yield* safe(op);
             yield* immediate.send(result);
             return result;
-          })
+          }),
         );
       }
 

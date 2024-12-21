@@ -49,7 +49,7 @@ export function createTransform<S extends AnyState>() {
 }
 
 export function createLocalStorageAdapter<
-  S extends AnyState
+  S extends AnyState,
 >(): PersistAdapter<S> {
   return {
     getItem: function* (key: string) {
@@ -74,7 +74,7 @@ export function createLocalStorageAdapter<
 
 export function shallowReconciler<S extends AnyState>(
   original: S,
-  persisted: Partial<S>
+  persisted: Partial<S>,
 ): S {
   return { ...original, ...persisted };
 }
@@ -85,8 +85,9 @@ export function createPersistor<S extends AnyState>({
   reconciler = shallowReconciler,
   allowlist = [],
   transform,
-}: Pick<PersistProps<S>, "adapter"> &
-  Partial<PersistProps<S>>): PersistProps<S> {
+}:
+  & Pick<PersistProps<S>, "adapter">
+  & Partial<PersistProps<S>>): PersistProps<S> {
   function* rehydrate(): Operation<Result<undefined>> {
     const persistedState = yield* adapter.getItem(key);
     if (!persistedState.ok) {

@@ -83,7 +83,7 @@ it(tests, "gets a row", async () => {
   });
   await store.run(function* () {
     yield* updateStore(
-      slice.add({ [first.id]: first, [second.id]: second, [third.id]: third })
+      slice.add({ [first.id]: first, [second.id]: second, [third.id]: third }),
     );
   });
 

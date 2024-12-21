@@ -12,7 +12,7 @@ import { nameParser } from "./fetch.ts";
 
 export interface ApiMdwProps<
   Ctx extends ApiCtx = ApiCtx,
-  M extends AnyState = AnyState
+  M extends AnyState = AnyState,
 > {
   schema: {
     loaders: LoaderOutput<M, AnyState>;
@@ -45,7 +45,7 @@ function isErrorLike(err: unknown): err is ErrorLike {
  *  - {@link mdw.cache}
  */
 export function api<Ctx extends ApiCtx = ApiCtx, S extends AnyState = AnyState>(
-  props: ApiMdwProps<Ctx, S>
+  props: ApiMdwProps<Ctx, S>,
 ) {
   return compose<Ctx>([
     err,
@@ -88,7 +88,7 @@ export function loader<M extends AnyState = AnyState>(schema: {
 }) {
   return function* <Ctx extends ThunkCtxWLoader = ThunkCtxWLoader>(
     ctx: Ctx,
-    next: Next
+    next: Next,
   ) {
     yield* updateStore([
       schema.loaders.start({ id: ctx.name }),
@@ -152,7 +152,7 @@ function defaultErrorFn<Ctx extends ApiCtx = ApiCtx>(ctx: Ctx) {
  */
 export function loaderApi<
   Ctx extends ApiCtx = ApiCtx,
-  S extends AnyState = AnyState
+  S extends AnyState = AnyState,
 >({ schema, errorFn = defaultErrorFn }: ApiMdwProps<Ctx, S>) {
   return function* trackLoading(ctx: Ctx, next: Next) {
     try {

@@ -24,7 +24,7 @@ export const CIRCULAR_SELECTOR = new Error("Encountered a circular selector");
 export function assertLike(
   lhs: Record<any, any>,
   selector: Record<any, any>,
-  circular = new Set()
+  circular = new Set(),
 ) {
   if (circular.has(selector)) {
     throw CIRCULAR_SELECTOR;

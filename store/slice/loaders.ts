@@ -18,7 +18,7 @@ interface PropIds {
 const excludesFalse = <T>(n?: T): n is T => Boolean(n);
 
 export function defaultLoaderItem<M extends AnyState = AnyState>(
-  li: Partial<LoaderItemState<M>> = {}
+  li: Partial<LoaderItemState<M>> = {},
 ): LoaderItemState<M> {
   return {
     id: "",
@@ -32,7 +32,7 @@ export function defaultLoaderItem<M extends AnyState = AnyState>(
 }
 
 export function defaultLoader<M extends AnyState = AnyState>(
-  l: Partial<LoaderItemState<M>> = {}
+  l: Partial<LoaderItemState<M>> = {},
 ): LoaderState<M> {
   const loading = defaultLoaderItem(l);
   return {
@@ -49,15 +49,15 @@ export function defaultLoader<M extends AnyState = AnyState>(
 
 interface LoaderSelectors<
   M extends AnyState = AnyState,
-  S extends AnyState = AnyState
+  S extends AnyState = AnyState,
 > {
   findById: (
     d: Record<string, LoaderItemState<M>>,
-    { id }: PropId
+    { id }: PropId,
   ) => LoaderState<M>;
   findByIds: (
     d: Record<string, LoaderItemState<M>>,
-    { ids }: PropIds
+    { ids }: PropIds,
   ) => LoaderState<M>[];
   selectTable: (s: S) => Record<string, LoaderItemState<M>>;
   selectTableAsList: (state: S) => LoaderItemState<M>[];
@@ -67,26 +67,26 @@ interface LoaderSelectors<
 
 function loaderSelectors<
   M extends AnyState = AnyState,
-  S extends AnyState = AnyState
+  S extends AnyState = AnyState,
 >(
-  selectTable: (s: S) => Record<string, LoaderItemState<M>>
+  selectTable: (s: S) => Record<string, LoaderItemState<M>>,
 ): LoaderSelectors<M, S> {
   const empty = defaultLoader();
   const tableAsList = (
-    data: Record<string, LoaderItemState<M>>
+    data: Record<string, LoaderItemState<M>>,
   ): LoaderItemState<M>[] => Object.values(data).filter(excludesFalse);
 
   const findById = (data: Record<string, LoaderItemState<M>>, { id }: PropId) =>
     defaultLoader<M>(data[id]) || empty;
   const findByIds = (
     data: Record<string, LoaderItemState<M>>,
-    { ids }: PropIds
+    { ids }: PropIds,
   ): LoaderState<M>[] =>
     ids.map((id) => defaultLoader<M>(data[id])).filter(excludesFalse);
   const selectById = createSelector(
     selectTable,
     (_: S, p: PropId) => p.id,
-    (loaders, id): LoaderState<M> => findById(loaders, { id })
+    (loaders, id): LoaderState<M> => findById(loaders, { id }),
   );
 
   return {
@@ -95,22 +95,23 @@ function loaderSelectors<
     selectTable,
     selectTableAsList: createSelector(
       selectTable,
-      (data): LoaderItemState<M>[] => tableAsList(data)
+      (data): LoaderItemState<M>[] => tableAsList(data),
     ),
     selectById,
     selectByIds: createSelector(
       selectTable,
       (_: S, p: PropIds) => p.ids,
-      (loaders, ids) => findByIds(loaders, { ids })
+      (loaders, ids) => findByIds(loaders, { ids }),
     ),
   };
 }
 
 export interface LoaderOutput<
   M extends Record<string, unknown>,
-  S extends AnyState
-> extends LoaderSelectors<M, S>,
-    BaseSchema<Record<string, LoaderItemState<M>>> {
+  S extends AnyState,
+> extends
+  LoaderSelectors<M, S>,
+  BaseSchema<Record<string, LoaderItemState<M>>> {
   schema: "loader";
   initialState: Record<string, LoaderItemState<M>>;
   start: (e: LoaderPayload<M>) => (s: S) => void;
@@ -124,7 +125,7 @@ const ts = () => new Date().getTime();
 
 export const createLoaders = <
   M extends AnyState = AnyState,
-  S extends AnyState = AnyState
+  S extends AnyState = AnyState,
 >({
   name,
   initialState = {},
@@ -182,7 +183,7 @@ export const createLoaders = <
 };
 
 export function loaders<M extends AnyState = AnyState>(
-  initialState?: Record<string, LoaderItemState<M>>
+  initialState?: Record<string, LoaderItemState<M>>,
 ) {
   return (name: string) => createLoaders<M>({ name, initialState });
 }

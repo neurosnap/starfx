@@ -34,7 +34,7 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
    */
   create(name: string): CreateAction<Ctx>;
   create<P>(
-    name: string
+    name: string,
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
 
   /**
@@ -43,7 +43,7 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
   create(name: string, req: { supervisor?: Supervisor }): CreateAction<Ctx>;
   create<P>(
     name: string,
-    req: { supervisor?: Supervisor }
+    req: { supervisor?: Supervisor },
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
 
   /**
@@ -52,15 +52,15 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
   create(name: string, fn: MiddlewareCo<Ctx>): CreateAction<Ctx>;
   create<Gtx extends Ctx = Ctx>(
     name: string,
-    fn: MiddlewareCo<Gtx>
+    fn: MiddlewareCo<Gtx>,
   ): CreateAction<Gtx>;
   create<P>(
     name: string,
-    fn: MiddlewareCo<Omit<Ctx, "payload"> & Payload<P>>
+    fn: MiddlewareCo<Omit<Ctx, "payload"> & Payload<P>>,
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   create<P, Gtx extends Ctx = Ctx>(
     name: string,
-    fn: MiddlewareCo<Gtx>
+    fn: MiddlewareCo<Gtx>,
   ): CreateActionWithPayload<Gtx, P>;
 
   /*
@@ -69,22 +69,22 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
   create(
     name: string,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareCo<Ctx>
+    fn: MiddlewareCo<Ctx>,
   ): CreateAction<Ctx>;
   create<Gtx extends Ctx = Ctx>(
     name: string,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareCo<Gtx>
+    fn: MiddlewareCo<Gtx>,
   ): CreateAction<Gtx>;
   create<P>(
     name: string,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareCo<Omit<Ctx, "payload"> & Payload<P>>
+    fn: MiddlewareCo<Omit<Ctx, "payload"> & Payload<P>>,
   ): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
   create<P, Gtx extends Ctx = Ctx>(
     name: string,
     req: { supervisor?: Supervisor },
-    fn: MiddlewareCo<Gtx>
+    fn: MiddlewareCo<Gtx>,
   ): CreateActionWithPayload<Gtx, P>;
 }
 
@@ -129,7 +129,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     supervisor = takeEvery,
   }: {
     supervisor?: Supervisor;
-  } = { supervisor: takeEvery }
+  } = { supervisor: takeEvery },
 ): ThunksApi<Ctx> {
   let signal: Signal<AnyAction, void> | undefined = undefined;
   let storeId: number | undefined = undefined;
@@ -151,7 +151,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const createType = (post: string) => `${API_ACTION_PREFIX}${post}`;
 
   function* onApi<P extends CreateActionPayload>(
-    action: ActionWithPayload<P>
+    action: ActionWithPayload<P>,
   ): Operation<Ctx> {
     const { name, key, options } = action.payload;
     const actionFn = actionMap[name];
@@ -170,7 +170,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
   function create(name: string, ...args: any[]) {
     if (Object.hasOwn(visors, name)) {
-      const msg = `[${name}] already exists, do you have two thunks with the same name?`;
+      const msg =
+        `[${name}] already exists, do you have two thunks with the same name?`;
       console.warn(msg);
     }
 
@@ -281,7 +282,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     // Spawn a watcher for further thunk matchingPairs
     yield* takeEvery(
       `${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
-      watcher as any
+      watcher as any,
     );
   }
 

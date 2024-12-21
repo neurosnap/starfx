@@ -20,7 +20,20 @@ describe("superviseBackoff", () => {
       actual.push(superviseBackoff(i));
     }
     expect(actual).toEqual([
-      20, 40, 80, 160, 320, 640, 1280, 2560, 5120, 10240, -1, -1, -1, -1,
+      20,
+      40,
+      80,
+      160,
+      320,
+      640,
+      1280,
+      2560,
+      5120,
+      10240,
+      -1,
+      -1,
+      -1,
+      -1,
     ]);
   });
 });
@@ -53,15 +66,15 @@ it(test, "should recover with backoff pressure", async () => {
   expect(actions.length).toEqual(3);
   expect(actions[0].type).toEqual(`${API_ACTION_PREFIX}supervise`);
   expect(actions[0].meta).toEqual(
-    "Exception caught, waiting 1ms before restarting operation"
+    "Exception caught, waiting 1ms before restarting operation",
   );
   expect(actions[1].type).toEqual(`${API_ACTION_PREFIX}supervise`);
   expect(actions[1].meta).toEqual(
-    "Exception caught, waiting 2ms before restarting operation"
+    "Exception caught, waiting 2ms before restarting operation",
   );
   expect(actions[2].type).toEqual(`${API_ACTION_PREFIX}supervise`);
   expect(actions[2].meta).toEqual(
-    "Exception caught, waiting 3ms before restarting operation"
+    "Exception caught, waiting 3ms before restarting operation",
   );
 
   console.error = err;

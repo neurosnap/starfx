@@ -30,12 +30,10 @@ export function createObj<V extends AnyState, S extends AnyState = AnyState>({
       // deno-lint-ignore no-explicit-any
       (state as any)[name] = initialState;
     },
-    update:
-      <P extends keyof V>(prop: { key: P; value: V[P] }) =>
-      (state) => {
-        // deno-lint-ignore no-explicit-any
-        (state as any)[name][prop.key] = prop.value;
-      },
+    update: <P extends keyof V>(prop: { key: P; value: V[P] }) => (state) => {
+      // deno-lint-ignore no-explicit-any
+      (state as any)[name][prop.key] = prop.value;
+    },
     select: (state) => {
       // deno-lint-ignore no-explicit-any
       return (state as any)[name];

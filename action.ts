@@ -17,7 +17,7 @@ import { ActionFnWithPayload } from "./types.ts";
 
 export const ActionContext = createContext(
   "starfx:action",
-  createSignal<AnyAction, void>()
+  createSignal<AnyAction, void>(),
 );
 
 export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
@@ -57,7 +57,7 @@ export function* put(action: AnyAction | AnyAction[]) {
 }
 
 export function take<P>(
-  pattern: ActionPattern
+  pattern: ActionPattern,
 ): Operation<ActionWithPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
   const fd = useActions(pattern);
@@ -70,7 +70,7 @@ export function* take(pattern: ActionPattern): Operation<Action> {
 
 export function* takeEvery<T>(
   pattern: ActionPattern,
-  op: (action: AnyAction) => Operation<T>
+  op: (action: AnyAction) => Operation<T>,
 ) {
   const fd = useActions(pattern);
   for (const action of yield* each(fd)) {
@@ -81,7 +81,7 @@ export function* takeEvery<T>(
 
 export function* takeLatest<T>(
   pattern: ActionPattern,
-  op: (action: AnyAction) => Operation<T>
+  op: (action: AnyAction) => Operation<T>,
 ) {
   const fd = useActions(pattern);
   let lastTask;
@@ -97,7 +97,7 @@ export function* takeLatest<T>(
 
 export function* takeLeading<T>(
   pattern: ActionPattern,
-  op: (action: AnyAction) => Operation<T>
+  op: (action: AnyAction) => Operation<T>,
 ) {
   while (true) {
     const action = yield* take(pattern);
@@ -121,7 +121,7 @@ export function* waitFor(predicate: Callable<boolean>) {
 }
 
 export function getIdFromAction(
-  action: ActionWithPayload<{ key: string }> | ActionFnWithPayload
+  action: ActionWithPayload<{ key: string }> | ActionFnWithPayload,
 ): string {
   return typeof action === "function" ? action.toString() : action.payload.key;
 }
@@ -130,7 +130,7 @@ export const API_ACTION_PREFIX = "";
 
 export function createAction(actionType: string): () => Action;
 export function createAction<P>(
-  actionType: string
+  actionType: string,
 ): (p: P) => ActionWithPayload<P>;
 export function createAction(actionType: string) {
   if (!actionType) {

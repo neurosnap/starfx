@@ -31,7 +31,7 @@ it(tests, "default schema", async () => {
   });
   asserts.assertEquals(
     schema.loaders.selectById(store.getState(), { id: "1" }).status,
-    "loading"
+    "loading",
   );
 });
 
@@ -109,7 +109,7 @@ it(tests, "can work with a nested object", async () => {
     asserts.assertEquals(curUser2, { id: "", name: "vvv", roles: ["admin"] });
 
     yield* db.update(
-      db.currentUser.update({ key: "roles", value: ["admin", "users"] })
+      db.currentUser.update({ key: "roles", value: ["admin", "users"] }),
     );
     const curUser3 = yield* select(db.currentUser.select);
     asserts.assertEquals(curUser3, {

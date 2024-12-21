@@ -31,7 +31,7 @@ it(
       { type: "action-1", payload: 1 },
       { type: "action-1", payload: 2 },
     ]);
-  }
+  },
 );
 
 it(takeTests, "take from default channel", async () => {
@@ -71,13 +71,13 @@ it(takeTests, "take from default channel", async () => {
         yield* take([
           "action-3",
           (a: AnyAction) => a.payload?.isMixedWithPredicate,
-        ])
+        ]),
       ); // take if match any from the mixed array
       actual.push(
         yield* take([
           "action-3",
           (a: AnyAction) => a.payload?.isMixedWithPredicate,
-        ])
+        ]),
       ); // take if match any from the mixed array
     } finally {
       actual.push({ type: "auto ended" });

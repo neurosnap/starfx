@@ -5,7 +5,7 @@ export function createRun(scope: Scope) {
   function run<T>(op: Callable<T>[]): Task<Result<T>[]>;
   function run<T>(op: Callable<T>): Task<Result<T>>;
   function run<T>(
-    op: Callable<T> | Callable<T>[]
+    op: Callable<T> | Callable<T>[],
   ): Task<Result<T> | Result<T>[]> {
     if (Array.isArray(op)) {
       return scope.run(function* (): Operation<Result<T>[]> {

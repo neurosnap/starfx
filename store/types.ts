@@ -37,9 +37,11 @@ export interface FxMap {
   [key: string]: (name: string) => BaseSchema<unknown>;
 }
 
-export type FxSchema<S extends AnyState, O extends FxMap = FxMap> = {
-  [key in keyof O]: ReturnType<O[key]>;
-} & { update: FxStore<S>["update"] };
+export type FxSchema<S extends AnyState, O extends FxMap = FxMap> =
+  & {
+    [key in keyof O]: ReturnType<O[key]>;
+  }
+  & { update: FxStore<S>["update"] };
 
 export interface FxStore<S extends AnyState> {
   getScope: () => Scope;

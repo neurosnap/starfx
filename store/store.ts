@@ -152,7 +152,7 @@ export function createStore<S extends AnyState>({
           acc[key] = s[key];
           return acc;
         },
-        { ...initialState }
+        { ...initialState },
       );
 
       Object.keys(s).forEach((key: keyof S) => {
@@ -174,7 +174,7 @@ export function createStore<S extends AnyState>({
     // stubs so `react-redux` is happy
     // deno-lint-ignore no-explicit-any
     replaceReducer<S = any>(
-      _nextReducer: (_s: S, _a: AnyAction) => void
+      _nextReducer: (_s: S, _a: AnyAction) => void,
     ): void {
       throw new Error(stubMsg);
     },

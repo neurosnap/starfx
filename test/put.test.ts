@@ -77,7 +77,7 @@ it(
     const store = createStore({ initialState: {} });
     await store.run(() => root());
     expect(true).toBe(true);
-  }
+  },
 );
 
 it(
@@ -106,5 +106,5 @@ it(
     await store.run(root);
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
-  }
+  },
 );

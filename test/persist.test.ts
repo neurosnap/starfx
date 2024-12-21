@@ -280,7 +280,7 @@ it(tests, "persists a filtered nested part of a slice", async () => {
           schema.loaders.start({
             id: "A [POST]|1234",
             message: "loading A-first",
-          })
+          }),
         );
         yield* schema.update(schema.loaders.start({ id: "B" }));
         yield* schema.update(schema.loaders.start({ id: "C" }));
@@ -292,7 +292,7 @@ it(tests, "persists a filtered nested part of a slice", async () => {
           schema.loaders.start({
             id: "A [POST]|5678",
             message: "loading A-second",
-          })
+          }),
         );
         yield* schema.update(schema.loaders.start({ id: "B" }));
         yield* schema.update(schema.loaders.start({ id: "C" }));
@@ -409,7 +409,7 @@ it(
     });
 
     asserts.assertEquals(ls, '{"token":"1234"}');
-  }
+  },
 );
 
 it(
@@ -456,7 +456,7 @@ it(
       yield* schema.update(schema.token.set("1234"));
     });
     asserts.assertEquals(store.getState().token, "1234");
-  }
+  },
 );
 
 it(
@@ -512,7 +512,7 @@ it(
     });
 
     asserts.assertEquals(ls, '{"token":"54321"}');
-  }
+  },
 );
 
 it(
@@ -579,7 +579,7 @@ it(
     });
 
     asserts.assertEquals(ls, '{"token":"0123456789"}');
-  }
+  },
 );
 
 it(tests, "persists state using transform 'out' function", async () => {

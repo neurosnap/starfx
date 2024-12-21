@@ -8,11 +8,11 @@ export interface BaseCtx {
 
 export type BaseMiddleware<Ctx extends BaseCtx = BaseCtx, T = unknown> = (
   ctx: Ctx,
-  next: Next
+  next: Next,
 ) => Operation<T | undefined>;
 
 export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
-  middleware: BaseMiddleware<Ctx, T>[]
+  middleware: BaseMiddleware<Ctx, T>[],
 ) {
   if (!Array.isArray(middleware)) {
     throw new TypeError("Middleware stack must be an array!");

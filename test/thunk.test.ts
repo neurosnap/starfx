@@ -106,7 +106,7 @@ function* processUsers(ctx: RoboCtx<{ users?: UserResponse[] }>, next: Next) {
 
 function* processTickets(
   ctx: RoboCtx<{ tickets?: UserResponse[] }>,
-  next: Next
+  next: Next,
 ) {
   if (!ctx.response.tickets) {
     yield* next();
@@ -147,7 +147,7 @@ it(
       users: { [mockUser.id]: deserializeUser(mockUser) },
       tickets: {},
     });
-  }
+  },
 );
 
 it(
@@ -174,7 +174,7 @@ it(
         yield* next();
 
         yield* put(fetchUsers());
-      }
+      },
     );
 
     const store = createStore<TestState>({
@@ -187,7 +187,7 @@ it(
       users: { [mockUser.id]: deserializeUser(mockUser) },
       tickets: { [mockTicket.id]: deserializeTicket(mockTicket) },
     });
-  }
+  },
 );
 
 it(tests, "error handling", () => {
@@ -230,7 +230,7 @@ it(tests, "error handling inside create", () => {
       } catch (_) {
         called = true;
       }
-    }
+    },
   );
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
@@ -256,7 +256,7 @@ it(tests, "error inside endpoint mdw", () => {
     { supervisor: takeEvery },
     function* processUsers() {
       throw new Error("some error");
-    }
+    },
   );
 
   const store = createStore({
@@ -310,7 +310,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
       yield* next();
       ctx.request = { method: "expect this" };
       acc += "a";
-    }
+    },
   );
   const action2 = api.create(
     "/users2",
@@ -330,7 +330,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
         name: "/users",
         request: { method: "expect this" },
       });
-    }
+    },
   );
 
   const store = createStore({ initialState: {} });
@@ -352,7 +352,7 @@ it(
         yield* next();
         ctx.request = { method: "expect this" };
         acc += "a";
-      }
+      },
     );
     const action2 = api.create(
       "/users2",
@@ -372,13 +372,13 @@ it(
           name: "/users",
           request: { method: "expect this" },
         });
-      }
+      },
     );
 
     const store = createStore({ initialState: {} });
     store.run(api.bootup);
     store.dispatch(action2());
-  }
+  },
 );
 
 it(tests, "middleware order of execution", async () => {
@@ -410,7 +410,7 @@ it(tests, "middleware order of execution", async () => {
       yield* next();
       acc += "g";
       yield* put({ type: "DONE" });
-    }
+    },
   );
 
   const store = createStore({ initialState: {} });
@@ -469,7 +469,7 @@ it(tests, "retry with actionFn with payload", async () => {
       acc += "a";
       yield* next();
       acc += "g";
-    }
+    },
   );
 
   const store = createStore({ initialState: {} });
@@ -491,7 +491,7 @@ it(tests, "should only call thunk once", () => {
     function* (_, next) {
       yield* next();
       acc += "a";
-    }
+    },
   );
   const action2 = api.create(
     "/users2",
@@ -499,7 +499,7 @@ it(tests, "should only call thunk once", () => {
     function* (_, next) {
       yield* next();
       yield* put(action1(1));
-    }
+    },
   );
 
   const store = createStore({ initialState: {} });
@@ -581,7 +581,7 @@ it(
     asserts.assertEquals(
       acc,
       "b",
-      "Expected 'b' after first API call, but got: " + acc
+      "Expected 'b' after first API call, but got: " + acc,
     );
 
     let acc2 = "";
@@ -593,9 +593,9 @@ it(
     asserts.assertEquals(
       acc2,
       "c",
-      "Expected 'c' after second API call, but got: " + acc2
+      "Expected 'c' after second API call, but got: " + acc2,
     );
-  }
+  },
 );
 
 it(
@@ -619,9 +619,9 @@ it(
     asserts.assertEquals(
       acc,
       "b",
-      "Expected 'b' after first API call, but got: " + acc
+      "Expected 'b' after first API call, but got: " + acc,
     );
-  }
+  },
 );
 
 it(tests, "should allow multiple stores to register a thunk", () => {
@@ -641,6 +641,6 @@ it(tests, "should allow multiple stores to register a thunk", () => {
   asserts.assertEquals(
     acc,
     "bb",
-    "Expected 'bb' after first API call, but got: " + acc
+    "Expected 'bb' after first API call, but got: " + acc,
   );
 });

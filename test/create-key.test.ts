@@ -32,7 +32,7 @@ it(
     const sendNop0 = action0();
     const sendNop1 = action0();
     expect(getKeyOf(sendNop0)).toEqual(getKeyOf(sendNop1));
-  }
+  },
 );
 
 it(
@@ -114,7 +114,7 @@ it(
     expect(getKeyOf(sendPojo0)).toEqual(getKeyOf(sendPojo2));
     expect(getKeyOf(sendPojo0)).not.toEqual(getKeyOf(sendPojo3));
     expect(getKeyOf(sendPojo4)).toEqual(getKeyOf(sendPojo5));
-  }
+  },
 );
 
 it(
@@ -134,14 +134,14 @@ it(
           method: "GET",
         };
         yield* next();
-      }
+      },
     );
     const sendFirst = action({ param1: "1", param2: ["2", "e", "f"] });
     const sendSecond = action({ param2: ["2", "f", "e"], param1: "1" });
     const sendThird = action({ param2: ["2", "e", "f"], param1: "1" });
     expect(getKeyOf(sendFirst)).not.toEqual(getKeyOf(sendSecond));
     expect(getKeyOf(sendFirst)).toEqual(getKeyOf(sendThird));
-  }
+  },
 );
 
 it(
@@ -189,7 +189,7 @@ it(
           method: "GET",
         };
         yield* next();
-      }
+      },
     );
     const sendO1 = action2(o1);
     const sendO2 = action2(o2);
@@ -199,7 +199,7 @@ it(
     });
     expect(getKeyOf(sendO1)).toEqual(getKeyOf(sendO2));
     expect(getKeyOf(sendO1)).not.toEqual(getKeyOf(sendO3));
-  }
+  },
 );
 
 it(
@@ -264,7 +264,7 @@ it(
           method: "GET",
         };
         yield* next();
-      }
+      },
     );
     const send_oo1 = action4(oo1);
     const send_oo1_shuff = action4({ param2: oo1.param2, param1: oo1.param1 });
@@ -274,7 +274,7 @@ it(
     expect(getKeyOf(send_oo1)).toEqual(getKeyOf(send_oo1_shuff));
     expect(getKeyOf(send_oo1)).not.toEqual(getKeyOf(send_oo1_value_changed));
     expect(getKeyOf(send_oo1)).toEqual(getKeyOf(send_oo2));
-  }
+  },
 );
 
 it(
@@ -353,5 +353,5 @@ it(
     expect(getKeyOf(aObjects1)).not.toEqual(getKeyOf(aObjects3));
     expect(getKeyOf(aObjects1)).toEqual(getKeyOf(aObjects4));
     expect(getKeyOf(aObjects1)).not.toEqual(getKeyOf(aObjects5));
-  }
+  },
 );

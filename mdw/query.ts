@@ -30,7 +30,8 @@ export * from "./fetch.ts";
 export function* err<Ctx extends ThunkCtx = ThunkCtx>(ctx: Ctx, next: Next) {
   ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
-    const message = `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;
+    const message =
+      `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;
     console.error(message, ctx);
     yield* put({
       type: "error:query",
@@ -60,7 +61,7 @@ export function* err<Ctx extends ThunkCtx = ThunkCtx>(ctx: Ctx, next: Next) {
  */
 export function* customKey<Ctx extends ThunkCtx = ThunkCtx>(
   ctx: Ctx,
-  next: Next
+  next: Next,
 ) {
   if (
     ctx?.key &&
@@ -127,7 +128,7 @@ export function fetch<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     baseUrl = "",
   }: {
     baseUrl?: string;
-  } = { baseUrl: "" }
+  } = { baseUrl: "" },
 ) {
   return compose<CurCtx>([
     fetchMdw.composeUrl(baseUrl),
@@ -141,7 +142,7 @@ export function fetch<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * This middleware will only be activated if predicate is true.
  */
 export function predicate<Ctx extends ApiCtx = ApiCtx>(
-  predicate: ((ctx: Ctx) => boolean) | ((ctx: Ctx) => Callable<boolean>)
+  predicate: ((ctx: Ctx) => boolean) | ((ctx: Ctx) => Callable<boolean>),
 ) {
   return (mdw: MiddlewareApi) => {
     return function* (ctx: Ctx, next: Next) {

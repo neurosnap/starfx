@@ -94,7 +94,7 @@ export function useStore<S extends AnyState>() {
  * ```
  */
 export function useLoader<S extends AnyState>(
-  action: ThunkAction | ActionFnWithPayload
+  action: ThunkAction | ActionFnWithPayload,
 ) {
   const schema = useSchema();
   const id = getIdFromAction(action);
@@ -129,13 +129,13 @@ export function useLoader<S extends AnyState>(
  * ```
  */
 export function useApi<P = any, A extends ThunkAction = ThunkAction<P>>(
-  action: A
+  action: A,
 ): UseApiAction<A>;
 export function useApi<P = any, A extends ThunkAction = ThunkAction<P>>(
-  action: ActionFnWithPayload<P>
+  action: ActionFnWithPayload<P>,
 ): UseApiProps<P>;
 export function useApi<A extends ThunkAction = ThunkAction>(
-  action: ActionFn
+  action: ActionFn,
 ): UseApiSimpleProps;
 export function useApi(action: any): any {
   const dispatch = useDispatch();
@@ -170,7 +170,7 @@ export function useApi(action: any): any {
  * ```
  */
 export function useQuery<P = any, A extends ThunkAction = ThunkAction<P>>(
-  action: A
+  action: A,
 ): UseApiAction<A> {
   const api = useApi(action);
   useEffect(() => {
@@ -198,7 +198,7 @@ export function useQuery<P = any, A extends ThunkAction = ThunkAction<P>>(
  * ```
  */
 export function useCache<P = any, ApiSuccess = any>(
-  action: ThunkAction<P, ApiSuccess>
+  action: ThunkAction<P, ApiSuccess>,
 ): UseCacheResult<typeof action.payload._result, ThunkAction<P, ApiSuccess>> {
   const schema = useSchema();
   const id = action.payload.key;
@@ -238,7 +238,7 @@ export function useCache<P = any, ApiSuccess = any>(
  */
 export function useLoaderSuccess(
   cur: Pick<LoaderState, "status">,
-  success: () => any
+  success: () => any,
 ) {
   const prev = useRef(cur);
   useEffect(() => {

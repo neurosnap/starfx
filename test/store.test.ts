@@ -34,23 +34,21 @@ interface UpdateUserProps {
   name: string;
 }
 
-const updateUser =
-  ({ id, name }: UpdateUserProps) =>
-  (state: State) => {
-    // use selectors to find the data you want to mutate
-    const user = findUserById(state, { id });
-    user.name = name;
+const updateUser = ({ id, name }: UpdateUserProps) => (state: State) => {
+  // use selectors to find the data you want to mutate
+  const user = findUserById(state, { id });
+  user.name = name;
 
-    // different ways to update a `zod` record
-    const users = findUsers(state);
-    users[id].name = name;
+  // different ways to update a `zod` record
+  const users = findUsers(state);
+  users[id].name = name;
 
-    delete users[2];
-    users[3] = { id: "", name: "" };
+  delete users[2];
+  users[3] = { id: "", name: "" };
 
-    // or mutate state directly without selectors
-    state.dev = true;
-  };
+  // or mutate state directly without selectors
+  state.dev = true;
+};
 
 it(
   tests,
@@ -85,7 +83,7 @@ it(
 
       return yield* result;
     });
-  }
+  },
 );
 
 it(tests, "update store and receives update from `subscribe()`", async () => {

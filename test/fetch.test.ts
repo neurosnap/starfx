@@ -53,7 +53,7 @@ it(
 
         actual.push(ctx.request);
         actual.push(ctx.json);
-      }
+      },
     );
 
     store.run(api.bootup);
@@ -75,7 +75,7 @@ it(
       },
       { ok: true, value: mockUser },
     ]);
-  }
+  },
 );
 
 it(
@@ -101,7 +101,7 @@ it(
         ctx.bodyType = "text";
         yield* next();
         actual = ctx.json;
-      }
+      },
     );
 
     store.run(api.bootup);
@@ -113,7 +113,7 @@ it(
 
     const data = "this is some text";
     expect(actual).toEqual({ ok: true, value: data });
-  }
+  },
 );
 
 it(tests, "error handling", async () => {
@@ -137,7 +137,7 @@ it(tests, "error handling", async () => {
       yield* next();
 
       actual = ctx.json;
-    }
+    },
   );
 
   store.run(api.bootup);
@@ -176,7 +176,7 @@ it(tests, "status 204", async () => {
       ctx.cache = true;
       yield* next();
       actual = ctx.json;
-    }
+    },
   );
 
   store.run(api.bootup);
@@ -216,7 +216,7 @@ it(tests, "malformed json", async () => {
       yield* next();
 
       actual = ctx.json;
-    }
+    },
   );
 
   store.run(api.bootup);
@@ -257,7 +257,7 @@ it(tests, "POST", async () => {
       yield* next();
 
       ctx.loader = { meta: getTestData(ctx) };
-    }
+    },
   );
 
   store.run(api.bootup);
@@ -305,7 +305,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
       yield* next();
 
       ctx.loader = { meta: getTestData(ctx) };
-    }
+    },
   );
 
   const fetchUsersSecond = api.post<{ id: string }>(
@@ -316,7 +316,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
       ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
       yield* next();
       ctx.loader = { meta: getTestData(ctx) };
-    }
+    },
   );
 
   store.run(api.bootup);
@@ -327,7 +327,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
   store.dispatch(action2);
 
   const results = await store.run(
-    waitForLoaders(schema.loaders, [action1, action2])
+    waitForLoaders(schema.loaders, [action1, action2]),
   );
   if (!results.ok) {
     throw results.error;
@@ -389,7 +389,7 @@ it(tests, "slug in url but payload has empty string for slug value", () => {
       if (!ctx.json.ok) {
         actual = ctx.json.error;
       }
-    }
+    },
   );
 
   store.run(api.bootup);
@@ -485,7 +485,7 @@ it(
     }
     const data = { message: "error" };
     expect(actual).toEqual({ ok: false, error: data });
-  }
+  },
 );
 
 it(
@@ -515,7 +515,7 @@ it(
       throw loader.error;
     }
     expect(actual).toEqual({ ok: true, value: mockUser });
-  }
+  },
 );
 
 it(tests, "should use dynamic mdw to mock response", async () => {

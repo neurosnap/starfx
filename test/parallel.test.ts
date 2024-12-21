@@ -48,7 +48,7 @@ it(
     });
 
     expect(result).toEqual([Ok("first"), Ok("second")]);
-  }
+  },
 );
 
 it(
@@ -78,7 +78,7 @@ it(
     });
 
     expect(result).toEqual([Ok("second"), Ok("first")]);
-  }
+  },
 );
 
 it(
@@ -101,7 +101,7 @@ it(
     });
 
     expect(result).toEqual([Ok("second"), Ok("first")]);
-  }
+  },
 );
 
 it(test, "should return empty array", async () => {

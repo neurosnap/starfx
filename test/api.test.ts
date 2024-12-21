@@ -99,7 +99,7 @@ it(tests, "POST", async () => {
           state.users[u.id] = u;
         });
       });
-    }
+    },
   );
 
   const store = createStore({ initialState: { users: {} } });
@@ -111,7 +111,7 @@ it(tests, "POST", async () => {
     waitFor(function* (): Operation<boolean> {
       const res = yield* select((state: AnyState) => state.users["1"].id);
       return res !== "";
-    })
+    }),
   );
 
   expect(store.getState().users).toEqual({
@@ -144,7 +144,7 @@ it(tests, "POST with uri", () => {
     { supervisor: takeEvery },
     function* processUsers(
       ctx: ApiCtx<{ email: string }, { users: User[] }>,
-      next
+      next,
     ) {
       ctx.request = ctx.req({
         body: JSON.stringify({ email: ctx.payload.email }),
@@ -158,7 +158,7 @@ it(tests, "POST with uri", () => {
           state.users[u.id] = u;
         });
       });
-    }
+    },
   );
 
   const store = createStore({ initialState: { users: {} } });
@@ -179,7 +179,7 @@ it(tests, "middleware - with request fn", () => {
   const createUser = query.create(
     "/users",
     { supervisor: takeEvery },
-    query.request({ method: "POST" })
+    query.request({ method: "POST" }),
   );
   const store = createStore({ initialState: { users: {} } });
   store.run(query.bootup);
@@ -196,7 +196,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     function* (_, next) {
       yield* next();
       acc += "a";
-    }
+    },
   );
   const action2 = api.get(
     "/users2",
@@ -206,7 +206,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
       yield* call(() => action1.run(action1({ id: "1" })));
       acc += "b";
       expect(acc).toEqual("ab");
-    }
+    },
   );
 
   const store = createStore({ initialState: { users: {} } });
@@ -226,7 +226,7 @@ it(tests, "run() from a normal saga", () => {
     function* (_, next) {
       yield* next();
       acc += "a";
-    }
+    },
   );
   const action2 = () => ({ type: "ACTION" });
   function* onAction() {
@@ -288,14 +288,14 @@ it(tests, "with hash key on a large post", async () => {
           acc[u.id] = u;
           return acc;
         },
-        {}
+        {},
       );
       ctx.response = new Response();
       ctx.json = {
         ok: true,
         value: curUsers,
       };
-    }
+    },
   );
 
   const email = mockUser.email + "9";
@@ -370,7 +370,7 @@ it(tests, "ensure types for get() endpoint", () => {
       if (ctx.json.ok) {
         acc.push(ctx.json.value.result);
       }
-    }
+    },
   );
 
   const store = createStore({ initialState: { users: {} } });
@@ -408,7 +408,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
       if (ctx.json.ok) {
         acc.push(ctx.json.value.result);
       }
-    }
+    },
   );
 
   const store = createStore({ initialState: { users: {} } });
@@ -444,14 +444,14 @@ it(
         if (ctx.json.ok) {
           acc.push(ctx.json.value.result);
         }
-      }
+      },
     );
 
     const store = createStore({ initialState: { users: {} } });
     store.run(api.bootup);
     store.dispatch(action1());
     expect(acc).toEqual(["wow"]);
-  }
+  },
 );
 
 it(tests, "should bubble up error", () => {
@@ -474,13 +474,13 @@ it(tests, "should bubble up error", () => {
     function* (ctx, _) {
       (ctx.loader as any).meta = { key: ctx.payload.thisKeyDoesNotExist };
       throw new Error("GENERATING AN ERROR");
-    }
+    },
   );
 
   store.run(api.bootup);
   store.dispatch(fetchUser());
   expect(error.message).toBe(
-    "Cannot read properties of undefined (reading 'thisKeyDoesNotExist')"
+    "Cannot read properties of undefined (reading 'thisKeyDoesNotExist')",
   );
 });
 
@@ -509,7 +509,7 @@ it(tests, "useCache - derive api success from endpoint", () => {
         // EXPECT { message: string }
         ctx.json.error;
       }
-    }
+    },
   );
 
   const store = createStore({ initialState: { users: {} } });
