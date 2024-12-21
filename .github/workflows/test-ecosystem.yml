@@ -34,9 +34,7 @@ jobs:
           path: "starfx"
 
       - name: setup deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: v1.x
+        uses: denoland/setup-deno@v2
 
       # determines branch and sets it as output available through the `id`
       - name: dynamically determine ${{ matrix.example.owner }}/${{ matrix.example.repo }} branch

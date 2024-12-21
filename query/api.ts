@@ -28,7 +28,7 @@ import type { ApiName, QueryApi } from "./api-types.ts";
  * ```
  */
 export function createApi<Ctx extends ApiCtx = ApiCtx>(
-  baseThunk?: ThunksApi<Ctx>,
+  baseThunk?: ThunksApi<Ctx>
 ): QueryApi<Ctx> {
   const thunks = baseThunk || createThunks<Ctx>();
   const uri = (prename: ApiName) => {
@@ -39,7 +39,7 @@ export function createApi<Ctx extends ApiCtx = ApiCtx>(
     if (Array.isArray(name)) {
       if (name.length === 0) {
         throw new Error(
-          "createApi requires a non-empty array for the name of the endpoint",
+          "createApi requires a non-empty array for the name of the endpoint"
         );
       }
       name = prename[0];

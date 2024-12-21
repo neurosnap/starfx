@@ -1,4 +1,4 @@
-import { Operation, Result } from "../deps.ts";
+import { Operation, Result } from "effection";
 import type { ActionFnWithPayload, AnyState } from "../types.ts";
 import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext } from "./context.ts";
@@ -8,7 +8,7 @@ import { ThunkAction } from "../query/mod.ts";
 import { getIdFromAction, take } from "../action.ts";
 
 export function* updateStore<S extends AnyState>(
-  updater: StoreUpdater<S> | StoreUpdater<S>[],
+  updater: StoreUpdater<S> | StoreUpdater<S>[]
 ): Operation<UpdaterCtx<S>> {
   const store = yield* StoreContext;
   // had to cast the store since StoreContext has a generic store type
@@ -20,11 +20,11 @@ export function* updateStore<S extends AnyState>(
 export function select<S, R>(selectorFn: (s: S) => R): Operation<R>;
 export function select<S, R, P>(
   selectorFn: (s: S, p: P) => R,
-  p: P,
+  p: P
 ): Operation<R>;
 export function* select<S, R, P>(
   selectorFn: (s: S, p?: P) => R,
-  p?: P,
+  p?: P
 ): Operation<R> {
   const store = yield* StoreContext;
   return selectorFn(store.getState() as S, p);
@@ -32,7 +32,7 @@ export function* select<S, R, P>(
 
 export function* waitForLoader<M extends AnyState>(
   loaders: LoaderOutput<M, AnyState>,
-  action: ThunkAction | ActionFnWithPayload,
+  action: ThunkAction | ActionFnWithPayload
 ) {
   const id = getIdFromAction(action);
   const selector = (s: AnyState) => loaders.selectById(s, { id });
@@ -54,16 +54,16 @@ export function* waitForLoader<M extends AnyState>(
 
 export function* waitForLoaders<M extends AnyState>(
   loaders: LoaderOutput<M, AnyState>,
-  actions: (ThunkAction | ActionFnWithPayload)[],
+  actions: (ThunkAction | ActionFnWithPayload)[]
 ) {
   const group = yield* parallel(
-    actions.map((action) => waitForLoader(loaders, action)),
+    actions.map((action) => waitForLoader(loaders, action))
   );
   return yield* group;
 }
 
 export function createTracker<T, M extends Record<string, unknown>>(
-  loader: LoaderOutput<M, AnyState>,
+  loader: LoaderOutput<M, AnyState>
 ) {
   return (id: string) => {
     return function* (op: () => Operation<Result<T>>) {
@@ -76,7 +76,7 @@ export function createTracker<T, M extends Record<string, unknown>>(
           loader.error({
             id,
             message: result.error.message,
-          }),
+          })
         );
       }
       return result;

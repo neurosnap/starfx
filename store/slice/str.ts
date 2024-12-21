@@ -1,5 +1,4 @@
 import type { AnyState } from "../../types.ts";
-
 import type { BaseSchema } from "../types.ts";
 
 export interface StrOutput<S extends AnyState = AnyState>
@@ -11,9 +10,13 @@ export interface StrOutput<S extends AnyState = AnyState>
   select: (s: S) => string;
 }
 
-export function createStr<S extends AnyState = AnyState>(
-  { name, initialState = "" }: { name: keyof S; initialState?: string },
-): StrOutput<S> {
+export function createStr<S extends AnyState = AnyState>({
+  name,
+  initialState = "",
+}: {
+  name: keyof S;
+  initialState?: string;
+}): StrOutput<S> {
   return {
     schema: "str",
     name: name as string,

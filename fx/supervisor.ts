@@ -1,8 +1,8 @@
-import { Callable, Operation, Result, sleep } from "../deps.ts";
+import { type Callable, type Operation, sleep } from "effection";
 import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
-import { put } from "../action.ts";
-import { API_ACTION_PREFIX } from "../action.ts";
+import { put, API_ACTION_PREFIX } from "../action.ts";
+import type { Result } from "effection"; // Adjust the import path as needed
 
 export function superviseBackoff(attempt: number, max = 10): number {
   if (attempt > max) return -1;
@@ -19,7 +19,7 @@ export function superviseBackoff(attempt: number, max = 10): number {
  */
 export function supervise<T>(
   op: Callable<T>,
-  backoff: (attemp: number) => number = superviseBackoff,
+  backoff: (attemp: number) => number = superviseBackoff
 ) {
   return function* () {
     let attempt = 1;
@@ -34,8 +34,7 @@ export function supervise<T>(
         yield* put({
           type: `${API_ACTION_PREFIX}supervise`,
           payload: res.error,
-          meta:
-            `Exception caught, waiting ${waitFor}ms before restarting operation`,
+          meta: `Exception caught, waiting ${waitFor}ms before restarting operation`,
         });
         yield* sleep(waitFor);
       }
@@ -52,11 +51,9 @@ export function supervise<T>(
  */
 export function* keepAlive(
   ops: Callable<unknown>[],
-  backoff?: (attempt: number) => number,
+  backoff?: (attempt: number) => number
 ): Operation<Result<void>[]> {
-  const group = yield* parallel(
-    ops.map((op) => supervise(op, backoff)),
-  );
+  const group = yield* parallel(ops.map((op) => supervise(op, backoff)));
   const results = yield* group;
   return results;
 }

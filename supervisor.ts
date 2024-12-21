@@ -1,5 +1,5 @@
 import { createAction, take } from "./action.ts";
-import { call, Callable, Operation, race, sleep, spawn, Task } from "./deps.ts";
+import { call, Callable, Operation, race, sleep, spawn, Task } from "effection";
 import type { ActionWithPayload, AnyAction } from "./types.ts";
 import type { CreateActionPayload } from "./query/mod.ts";
 import { getIdFromAction } from "./action.ts";
@@ -24,10 +24,7 @@ export function poll(parentTimer: number = 5 * SECONDS, cancelType?: string) {
     while (true) {
       const action = yield* take<{ timer?: number }>(actionType);
       const timer = action.payload?.timer || parentTimer;
-      yield* race([
-        fire(action, timer),
-        take(`${cancel}`) as Operation<void>,
-      ]);
+      yield* race([fire(action, timer), take(`${cancel}`) as Operation<void>]);
     }
   };
 }
@@ -75,10 +72,7 @@ export function timer(timer: number = 5 * MINUTES) {
           }
         });
       };
-      yield* race([
-        sleep(timer),
-        take(matchFn as any) as Operation<void>,
-      ]);
+      yield* race([sleep(timer), take(matchFn as any) as Operation<void>]);
 
       delete map[action.payload.key];
     }

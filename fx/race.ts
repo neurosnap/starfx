@@ -1,13 +1,11 @@
-import type { Callable, Operation, Task } from "../deps.ts";
-import { action, call, resource, spawn } from "../deps.ts";
+import type { Callable, Operation, Task } from "effection";
+import { action, call, resource, spawn } from "effection";
 
 interface OpMap<T = unknown> {
   [key: string]: Callable<T>;
 }
 
-export function raceMap<T>(
-  opMap: OpMap,
-): Operation<
+export function raceMap<T>(opMap: OpMap): Operation<
   {
     [K in keyof OpMap<T>]: OpMap[K] extends (...args: any[]) => any
       ? ReturnType<OpMap[K]>

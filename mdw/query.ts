@@ -1,5 +1,7 @@
+import { call, type Callable } from "effection";
 import { safe } from "../fx/mod.ts";
 import { compose } from "../compose.ts";
+import { put } from "../action.ts";
 import type {
   ApiCtx,
   ApiRequest,
@@ -12,8 +14,6 @@ import type {
 import type { AnyAction, Next } from "../types.ts";
 import { mergeRequest } from "../query/util.ts";
 import * as fetchMdw from "./fetch.ts";
-import { call, Callable } from "../deps.ts";
-import { put } from "../action.ts";
 export * from "./fetch.ts";
 
 /**
@@ -27,14 +27,10 @@ export * from "./fetch.ts";
  * middleware pipeline succeeded or not. Think the `.catch()` case for
  * `window.fetch`.
  */
-export function* err<Ctx extends ThunkCtx = ThunkCtx>(
-  ctx: Ctx,
-  next: Next,
-) {
+export function* err<Ctx extends ThunkCtx = ThunkCtx>(ctx: Ctx, next: Next) {
   ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
-    const message =
-      `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;
+    const message = `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;
     console.error(message, ctx);
     yield* put({
       type: "error:query",
@@ -64,7 +60,7 @@ export function* err<Ctx extends ThunkCtx = ThunkCtx>(
  */
 export function* customKey<Ctx extends ThunkCtx = ThunkCtx>(
   ctx: Ctx,
-  next: Next,
+  next: Next
 ) {
   if (
     ctx?.key &&
@@ -114,10 +110,7 @@ export function* actions(ctx: { actions: AnyAction[] }, next: Next) {
  * This middleware will add `performance.now()` before and after your
  * middleware pipeline.
  */
-export function* perf<Ctx extends PerfCtx = PerfCtx>(
-  ctx: Ctx,
-  next: Next,
-) {
+export function* perf<Ctx extends PerfCtx = PerfCtx>(ctx: Ctx, next: Next) {
   const t0 = performance.now();
   yield* next();
   const t1 = performance.now();
@@ -134,7 +127,7 @@ export function fetch<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
     baseUrl = "",
   }: {
     baseUrl?: string;
-  } = { baseUrl: "" },
+  } = { baseUrl: "" }
 ) {
   return compose<CurCtx>([
     fetchMdw.composeUrl(baseUrl),
@@ -148,7 +141,7 @@ export function fetch<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * This middleware will only be activated if predicate is true.
  */
 export function predicate<Ctx extends ApiCtx = ApiCtx>(
-  predicate: ((ctx: Ctx) => boolean) | ((ctx: Ctx) => Callable<boolean>),
+  predicate: ((ctx: Ctx) => boolean) | ((ctx: Ctx) => Callable<boolean>)
 ) {
   return (mdw: MiddlewareApi) => {
     return function* (ctx: Ctx, next: Next) {

@@ -76,7 +76,7 @@ it(tests, "basic", () => {
           state.users[u.id] = u;
         });
       });
-    },
+    }
   );
 
   const fetchUser = query.create<{ id: string }>(
@@ -92,15 +92,13 @@ it(tests, "basic", () => {
       yield* updateStore((state) => {
         state.users[curUser.id] = curUser;
       });
-    },
+    }
   );
 
   store.run(query.bootup);
 
   store.dispatch(fetchUsers());
-  expect(store.getState().users).toEqual(
-    { [mockUser.id]: mockUser },
-  );
+  expect(store.getState().users).toEqual({ [mockUser.id]: mockUser });
   store.dispatch(fetchUser({ id: "2" }));
   expect(store.getState().users).toEqual({
     [mockUser.id]: mockUser,
@@ -134,7 +132,7 @@ it(tests, "with loader", () => {
           state.users[u.id] = u;
         });
       });
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -175,7 +173,7 @@ it(tests, "with item loader", () => {
           state.users[u.id] = u;
         });
       });
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -222,7 +220,7 @@ it(tests, "with POST", () => {
     { supervisor: takeEvery },
     function* processUsers(
       ctx: ApiCtx<{ email: string }, { users: User[] }>,
-      next,
+      next
     ) {
       ctx.request = ctx.req({
         method: "POST",
@@ -239,7 +237,7 @@ it(tests, "with POST", () => {
           state.users[u.id] = u;
         });
       });
-    },
+    }
   );
 
   store.run(query.bootup);
@@ -303,7 +301,7 @@ it(tests, "overriding default loader behavior", () => {
           state.users[u.id] = u;
         });
       });
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -327,7 +325,7 @@ it(tests, "mdw.api() - error handler", () => {
     if (err) return;
     asserts.assertEquals(
       msg,
-      "Error: something happened.  Check the endpoint [/users]",
+      "Error: something happened.  Check the endpoint [/users]"
     );
     err = true;
   };
@@ -385,14 +383,14 @@ it(tests, "createApi with own key", async () => {
           acc[u.id] = u;
           return acc;
         },
-        {},
+        {}
       );
       ctx.response = new Response();
       ctx.json = {
         ok: true,
         value: curUsers,
       };
-    },
+    }
   );
   const newUEmail = mockUser.email + ".org";
 
@@ -413,7 +411,7 @@ it(tests, "createApi with own key", async () => {
 
   asserts.assert(
     expectedKey.split("|")[1] === theTestKey,
-    "the keypart should match the input",
+    "the keypart should match the input"
   );
 });
 
@@ -456,14 +454,14 @@ it(tests, "createApi with custom key but no payload", async () => {
           acc[u.id] = u;
           return acc;
         },
-        {},
+        {}
       );
       ctx.response = new Response();
       ctx.json = {
         ok: true,
         value: curUsers,
       };
-    },
+    }
   );
 
   store.run(query.bootup);
@@ -482,7 +480,7 @@ it(tests, "createApi with custom key but no payload", async () => {
 
   asserts.assert(
     expectedKey.split("|")[1] === theTestKey,
-    "the keypart should match the input",
+    "the keypart should match the input"
   );
 });
 
@@ -491,16 +489,17 @@ it(tests, "errorHandler", () => {
   const query = createApi<ApiCtx>();
   query.use(function* errorHandler<Ctx extends ThunkCtx = ThunkCtx>(
     ctx: Ctx,
-    next: Next,
+    next: Next
   ) {
     try {
       a = 1;
       yield* next();
       a = 2;
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
       console.error(
-        `Error: ${err.message}.  Check the endpoint [${ctx.name}]`,
-        ctx,
+        `Error: ${errorMessage}.  Check the endpoint [${ctx.name}]`,
+        ctx
       );
     }
   });
@@ -525,7 +524,7 @@ it(tests, "errorHandler", () => {
     function* processUsers(_: ApiCtx<unknown, { users: User[] }>, next) {
       // throw new Error("some error");
       yield* next();
-    },
+    }
   );
 
   const store = createStore({

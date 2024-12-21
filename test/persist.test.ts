@@ -1,4 +1,4 @@
-import { sleep } from "../deps.ts";
+import { sleep } from "effection";
 import { Ok, Operation, parallel, put, take } from "../mod.ts";
 import {
   createPersistor,
@@ -11,7 +11,7 @@ import {
   slice,
 } from "../store/mod.ts";
 import { asserts, describe, it } from "../test.ts";
-import { LoaderItemState } from "../types.ts";
+import type { LoaderItemState } from "../types.ts";
 
 const tests = describe("store");
 
@@ -57,10 +57,7 @@ it(tests, "can persist to storage adapters", async () => {
     yield* group;
   });
 
-  asserts.assertEquals(
-    ls,
-    '{"token":"1234"}',
-  );
+  asserts.assertEquals(ls, '{"token":"1234"}');
 });
 
 it(tests, "rehydrates state", async () => {
@@ -95,10 +92,7 @@ it(tests, "rehydrates state", async () => {
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
   });
 
-  asserts.assertEquals(
-    store.getState().token,
-    "123",
-  );
+  asserts.assertEquals(store.getState().token, "123");
 });
 
 it(tests, "persists inbound state using transform 'in' function", async () => {
@@ -155,79 +149,69 @@ it(tests, "persists inbound state using transform 'in' function", async () => {
     ]);
     yield* group;
   });
-  asserts.assertEquals(
-    ls,
-    '{"token":"4321","cache":{}}',
-  );
+  asserts.assertEquals(ls, '{"token":"4321","cache":{}}');
 });
 
-it(
-  tests,
-  "persists inbound state using tranform in (2)",
-  async () => {
-    const [schema, initialState] = createSchema({
-      token: slice.str(),
-      loaders: slice.loaders(),
-      cache: slice.table({ empty: {} }),
-    });
-    type State = typeof initialState;
-    let ls = "{}";
+it(tests, "persists inbound state using tranform in (2)", async () => {
+  const [schema, initialState] = createSchema({
+    token: slice.str(),
+    loaders: slice.loaders(),
+    cache: slice.table({ empty: {} }),
+  });
+  type State = typeof initialState;
+  let ls = "{}";
 
-    const adapter: PersistAdapter<State> = {
-      getItem: function* (_: string) {
-        return Ok(JSON.parse(ls));
-      },
-      setItem: function* (_: string, s: Partial<State>) {
-        ls = JSON.stringify(s);
-        return Ok(undefined);
-      },
-      removeItem: function* (_: string) {
-        return Ok(undefined);
-      },
+  const adapter: PersistAdapter<State> = {
+    getItem: function* (_: string) {
+      return Ok(JSON.parse(ls));
+    },
+    setItem: function* (_: string, s: Partial<State>) {
+      ls = JSON.stringify(s);
+      return Ok(undefined);
+    },
+    removeItem: function* (_: string) {
+      return Ok(undefined);
+    },
+  };
+
+  function revertToken(state: Partial<State>) {
+    const res = {
+      ...state,
+      token: state?.token?.split("").reverse().join(""),
     };
+    return res;
+  }
+  const transform = createTransform<State>();
+  transform.in = revertToken;
 
-    function revertToken(state: Partial<State>) {
-      const res = {
-        ...state,
-        token: state?.token?.split("").reverse().join(""),
-      };
-      return res;
-    }
-    const transform = createTransform<State>();
-    transform.in = revertToken;
+  const persistor = createPersistor<State>({
+    adapter,
+    allowlist: ["token", "cache"],
+    transform,
+  });
 
-    const persistor = createPersistor<State>({
-      adapter,
-      allowlist: ["token", "cache"],
-      transform,
-    });
+  const mdw = persistStoreMdw(persistor);
+  const store = createStore({
+    initialState,
+    middleware: [mdw],
+  });
 
-    const mdw = persistStoreMdw(persistor);
-    const store = createStore({
-      initialState,
-      middleware: [mdw],
-    });
+  await store.run(function* (): Operation<void> {
+    yield* persistor.rehydrate();
 
-    await store.run(function* (): Operation<void> {
-      yield* persistor.rehydrate();
-
-      const group = yield* parallel([
-        function* (): Operation<void> {
-          const action = yield* take<string>("SET_TOKEN");
-          yield* schema.update(schema.token.set(action.payload));
-        },
-        function* () {
-          yield* put({ type: "SET_TOKEN", payload: "1234" });
-        },
-      ]);
-      yield* group;
-    });
-    asserts.assertEquals(
-      ls,
-      '{"token":"4321","cache":{}}',
-    );
-  },
-);
+    const group = yield* parallel([
+      function* (): Operation<void> {
+        const action = yield* take<string>("SET_TOKEN");
+        yield* schema.update(schema.token.set(action.payload));
+      },
+      function* () {
+        yield* put({ type: "SET_TOKEN", payload: "1234" });
+      },
+    ]);
+    yield* group;
+  });
+  asserts.assertEquals(ls, '{"token":"4321","cache":{}}');
+});
 
 it(tests, "persists a filtered nested part of a slice", async () => {
   const [schema, initialState] = createSchema({
@@ -251,9 +235,7 @@ it(tests, "persists a filtered nested part of a slice", async () => {
     },
   };
 
-  function pickLatestOfLoadersAandC(
-    state: Partial<State>,
-  ): Partial<State> {
+  function pickLatestOfLoadersAandC(state: Partial<State>): Partial<State> {
     const nextState = { ...state };
 
     if (state.loaders) {
@@ -298,7 +280,7 @@ it(tests, "persists a filtered nested part of a slice", async () => {
           schema.loaders.start({
             id: "A [POST]|1234",
             message: "loading A-first",
-          }),
+          })
         );
         yield* schema.update(schema.loaders.start({ id: "B" }));
         yield* schema.update(schema.loaders.start({ id: "C" }));
@@ -310,7 +292,7 @@ it(tests, "persists a filtered nested part of a slice", async () => {
           schema.loaders.start({
             id: "A [POST]|5678",
             message: "loading A-second",
-          }),
+          })
         );
         yield* schema.update(schema.loaders.start({ id: "B" }));
         yield* schema.update(schema.loaders.start({ id: "C" }));
@@ -323,26 +305,11 @@ it(tests, "persists a filtered nested part of a slice", async () => {
     ]);
     yield* group;
   });
-  asserts.assertStringIncludes(
-    ls,
-    '{"token":"1"',
-  );
-  asserts.assertStringIncludes(
-    ls,
-    '"message":"loading A-second"',
-  );
-  asserts.assertStringIncludes(
-    ls,
-    '"id":"C"',
-  );
-  asserts.assertNotMatch(
-    ls,
-    /"message":"loading A-first"/,
-  );
-  asserts.assertNotMatch(
-    ls,
-    /"id":"B"/,
-  );
+  asserts.assertStringIncludes(ls, '{"token":"1"');
+  asserts.assertStringIncludes(ls, '"message":"loading A-second"');
+  asserts.assertStringIncludes(ls, '"id":"C"');
+  asserts.assertNotMatch(ls, /"message":"loading A-first"/);
+  asserts.assertNotMatch(ls, /"id":"B"/);
 });
 
 it(tests, "handles the empty state correctly", async () => {
@@ -388,10 +355,7 @@ it(tests, "handles the empty state correctly", async () => {
     yield* persistor.rehydrate();
   });
 
-  asserts.assertEquals(
-    ls,
-    "{}",
-  );
+  asserts.assertEquals(ls, "{}");
 });
 
 it(
@@ -444,11 +408,8 @@ it(
       yield* group;
     });
 
-    asserts.assertEquals(
-      ls,
-      '{"token":"1234"}',
-    );
-  },
+    asserts.assertEquals(ls, '{"token":"1234"}');
+  }
 );
 
 it(
@@ -494,11 +455,8 @@ it(
       yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
       yield* schema.update(schema.token.set("1234"));
     });
-    asserts.assertEquals(
-      store.getState().token,
-      "1234",
-    );
-  },
+    asserts.assertEquals(store.getState().token, "1234");
+  }
 );
 
 it(
@@ -553,11 +511,8 @@ it(
       yield* schema.update(schema.counter.set(5));
     });
 
-    asserts.assertEquals(
-      ls,
-      '{"token":"54321"}',
-    );
-  },
+    asserts.assertEquals(ls, '{"token":"54321"}');
+  }
 );
 
 it(
@@ -610,10 +565,7 @@ it(
       yield* schema.update(schema.token.set("01234"));
     });
 
-    asserts.assertEquals(
-      ls,
-      '{"token":"43210"}',
-    );
+    asserts.assertEquals(ls, '{"token":"43210"}');
 
     transform.in = function (state) {
       return {
@@ -626,11 +578,8 @@ it(
       yield* schema.update(schema.token.set("01234"));
     });
 
-    asserts.assertEquals(
-      ls,
-      '{"token":"0123456789"}',
-    );
-  },
+    asserts.assertEquals(ls, '{"token":"0123456789"}');
+  }
 );
 
 it(tests, "persists state using transform 'out' function", async () => {
@@ -679,10 +628,7 @@ it(tests, "persists state using transform 'out' function", async () => {
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
   });
 
-  asserts.assertEquals(
-    store.getState().token,
-    "43210",
-  );
+  asserts.assertEquals(store.getState().token, "43210");
 });
 
 it("persists outbound state using tranform setOutTransformer", async () => {
@@ -711,9 +657,10 @@ it("persists outbound state using tranform setOutTransformer", async () => {
   function revertToken(state: Partial<State>) {
     return {
       ...state,
-      token: (["5"].concat(...state?.token?.split("") || [])).reverse().join(
-        "",
-      ),
+      token: ["5"]
+        .concat(...(state?.token?.split("") || []))
+        .reverse()
+        .join(""),
     };
   }
   const transform = createTransform<State>();
@@ -736,10 +683,7 @@ it("persists outbound state using tranform setOutTransformer", async () => {
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
   });
 
-  asserts.assertEquals(
-    ls,
-    '{"token":"012345"}',
-  );
+  asserts.assertEquals(ls, '{"token":"012345"}');
 });
 
 it(tests, "persists outbound a filtered nested part of a slice", async () => {
@@ -765,9 +709,7 @@ it(tests, "persists outbound a filtered nested part of a slice", async () => {
     },
   };
 
-  function extractMetaAndSetToken(
-    state: Partial<State>,
-  ): Partial<State> {
+  function extractMetaAndSetToken(state: Partial<State>): Partial<State> {
     const nextState = { ...state };
     if (state.loaders) {
       const savedLoader = state.loaders["A"];
@@ -796,10 +738,7 @@ it(tests, "persists outbound a filtered nested part of a slice", async () => {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
   });
-  asserts.assertEquals(
-    store.getState().token,
-    "01234_FLAG_PERSISTED",
-  );
+  asserts.assertEquals(store.getState().token, "01234_FLAG_PERSISTED");
 });
 
 it(tests, "the outbound transformer can be reset during runtime", async () => {
@@ -854,19 +793,13 @@ it(tests, "the outbound transformer can be reset during runtime", async () => {
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
   });
 
-  asserts.assertEquals(
-    store.getState().token,
-    "4321_",
-  );
+  asserts.assertEquals(store.getState().token, "4321_");
 
   await store.run(function* (): Operation<void> {
     yield* schema.update(schema.token.set("01234"));
   });
 
-  asserts.assertEquals(
-    ls,
-    '{"token":"01234"}',
-  );
+  asserts.assertEquals(ls, '{"token":"01234"}');
 
   transform.out = postpendToken;
 
@@ -875,8 +808,5 @@ it(tests, "the outbound transformer can be reset during runtime", async () => {
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
   });
 
-  asserts.assertEquals(
-    store.getState().token,
-    "0123456789",
-  );
+  asserts.assertEquals(store.getState().token, "0123456789");
 });

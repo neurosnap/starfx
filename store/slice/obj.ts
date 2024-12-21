@@ -1,5 +1,4 @@
 import type { AnyState } from "../../types.ts";
-
 import type { BaseSchema } from "../types.ts";
 
 export interface ObjOutput<V extends AnyState, S extends AnyState>
@@ -12,9 +11,13 @@ export interface ObjOutput<V extends AnyState, S extends AnyState>
   select: (s: S) => V;
 }
 
-export function createObj<V extends AnyState, S extends AnyState = AnyState>(
-  { name, initialState }: { name: keyof S; initialState: V },
-): ObjOutput<V, S> {
+export function createObj<V extends AnyState, S extends AnyState = AnyState>({
+  name,
+  initialState,
+}: {
+  name: keyof S;
+  initialState: V;
+}): ObjOutput<V, S> {
   return {
     schema: "obj",
     name: name as string,
@@ -27,10 +30,12 @@ export function createObj<V extends AnyState, S extends AnyState = AnyState>(
       // deno-lint-ignore no-explicit-any
       (state as any)[name] = initialState;
     },
-    update: <P extends keyof V>(prop: { key: P; value: V[P] }) => (state) => {
-      // deno-lint-ignore no-explicit-any
-      (state as any)[name][prop.key] = prop.value;
-    },
+    update:
+      <P extends keyof V>(prop: { key: P; value: V[P] }) =>
+      (state) => {
+        // deno-lint-ignore no-explicit-any
+        (state as any)[name][prop.key] = prop.value;
+      },
     select: (state) => {
       // deno-lint-ignore no-explicit-any
       return (state as any)[name];

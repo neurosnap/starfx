@@ -1,17 +1,9 @@
+import { createContext, createScope, createSignal, Ok, Scope } from "effection";
+import { enablePatches, produceWithPatches } from "immer";
 import { ActionContext, API_ACTION_PREFIX, emit } from "../action.ts";
 import { BaseMiddleware, compose } from "../compose.ts";
-import {
-  createContext,
-  createScope,
-  createSignal,
-  enablePatches,
-  Ok,
-  produceWithPatches,
-  Scope,
-} from "../deps.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { createRun } from "./run.ts";
-
 import type { AnyAction, AnyState, Next } from "../types.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
 const stubMsg = "This is merely a stub, not implemented";
@@ -155,10 +147,13 @@ export function createStore<S extends AnyState>({
 
   function* reset(ignoreList: (keyof S)[] = []) {
     return yield* update((s) => {
-      const keep = ignoreList.reduce<S>((acc, key) => {
-        acc[key] = s[key];
-        return acc;
-      }, { ...initialState });
+      const keep = ignoreList.reduce<S>(
+        (acc, key) => {
+          acc[key] = s[key];
+          return acc;
+        },
+        { ...initialState }
+      );
 
       Object.keys(s).forEach((key: keyof S) => {
         s[key] = keep[key];
@@ -179,7 +174,7 @@ export function createStore<S extends AnyState>({
     // stubs so `react-redux` is happy
     // deno-lint-ignore no-explicit-any
     replaceReducer<S = any>(
-      _nextReducer: (_s: S, _a: AnyAction) => void,
+      _nextReducer: (_s: S, _a: AnyAction) => void
     ): void {
       throw new Error(stubMsg);
     },

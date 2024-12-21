@@ -1,4 +1,4 @@
-import { sleep } from "../deps.ts";
+import { sleep } from "effection";
 import { safe } from "../fx/mod.ts";
 import type { FetchCtx, FetchJsonCtx } from "../query/mod.ts";
 import { isObject, noop } from "../query/util.ts";
@@ -10,7 +10,7 @@ import type { Next } from "../types.ts";
  */
 export function* nameParser<Ctx extends FetchJsonCtx = FetchJsonCtx>(
   ctx: Ctx,
-  next: Next,
+  next: Next
 ) {
   const httpMethods = [
     "get",
@@ -61,7 +61,7 @@ export function* nameParser<Ctx extends FetchJsonCtx = FetchJsonCtx>(
  */
 export function* headers<CurCtx extends FetchCtx = FetchCtx>(
   ctx: CurCtx,
-  next: Next,
+  next: Next
 ) {
   if (!ctx.request) {
     yield* next();
@@ -93,7 +93,7 @@ export function* headers<CurCtx extends FetchCtx = FetchCtx>(
  */
 export function* json<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   ctx: CurCtx,
-  next: Next,
+  next: Next
 ) {
   if (!ctx.response) {
     yield* next();
@@ -143,7 +143,7 @@ export function* json<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * with the url from `ctx.request.url`.
  */
 export function composeUrl<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
-  baseUrl = "",
+  baseUrl = ""
 ) {
   return function* (ctx: CurCtx, next: Next) {
     const req = ctx.req();
@@ -165,7 +165,7 @@ export function composeUrl<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  */
 export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
   ctx: CurCtx,
-  next: Next,
+  next: Next
 ) {
   const payload = ctx.payload;
   if (!payload) {
@@ -182,8 +182,7 @@ export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 
     const val = payload[key];
     if (!val) {
-      const data =
-        `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`;
+      const data = `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`;
       ctx.json = {
         ok: false,
         error: data,
@@ -200,12 +199,9 @@ export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * truthy value, and if it does, bail out of the middleware stack.
  */
 export function response<CurCtx extends FetchCtx = FetchCtx>(
-  response?: Response,
+  response?: Response
 ) {
-  return function* responseMdw(
-    ctx: CurCtx,
-    next: Next,
-  ) {
+  return function* responseMdw(ctx: CurCtx, next: Next) {
     if (response) {
       ctx.response = response;
     }
@@ -219,7 +215,7 @@ export function response<CurCtx extends FetchCtx = FetchCtx>(
  */
 export function* request<CurCtx extends FetchCtx = FetchCtx>(
   ctx: CurCtx,
-  next: Next,
+  next: Next
 ) {
   // if there is already a response then we want to bail so we don't
   // override it.
@@ -280,7 +276,7 @@ function backoffExp(attempt: number): number {
  * ```
  */
 export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
-  backoff: (attempt: number) => number = backoffExp,
+  backoff: (attempt: number) => number = backoffExp
 ) {
   return function* (ctx: CurCtx, next: Next) {
     yield* next();

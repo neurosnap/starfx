@@ -53,7 +53,7 @@ it(
 
         actual.push(ctx.request);
         actual.push(ctx.json);
-      },
+      }
     );
 
     store.run(api.bootup);
@@ -65,14 +65,17 @@ it(
 
     const state = store.getState();
     expect(state.cache[action.payload.key]).toEqual(mockUser);
-    expect(actual).toEqual([{
-      url: `${baseUrl}/users`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
+    expect(actual).toEqual([
+      {
+        url: `${baseUrl}/users`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    }, { ok: true, value: mockUser }]);
-  },
+      { ok: true, value: mockUser },
+    ]);
+  }
 );
 
 it(
@@ -98,7 +101,7 @@ it(
         ctx.bodyType = "text";
         yield* next();
         actual = ctx.json;
-      },
+      }
     );
 
     store.run(api.bootup);
@@ -110,7 +113,7 @@ it(
 
     const data = "this is some text";
     expect(actual).toEqual({ ok: true, value: data });
-  },
+  }
 );
 
 it(tests, "error handling", async () => {
@@ -134,7 +137,7 @@ it(tests, "error handling", async () => {
       yield* next();
 
       actual = ctx.json;
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -173,7 +176,7 @@ it(tests, "status 204", async () => {
       ctx.cache = true;
       yield* next();
       actual = ctx.json;
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -213,7 +216,7 @@ it(tests, "malformed json", async () => {
       yield* next();
 
       actual = ctx.json;
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -254,7 +257,7 @@ it(tests, "POST", async () => {
       yield* next();
 
       ctx.loader = { meta: getTestData(ctx) };
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -302,7 +305,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
       yield* next();
 
       ctx.loader = { meta: getTestData(ctx) };
-    },
+    }
   );
 
   const fetchUsersSecond = api.post<{ id: string }>(
@@ -313,7 +316,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
       ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
       yield* next();
       ctx.loader = { meta: getTestData(ctx) };
-    },
+    }
   );
 
   store.run(api.bootup);
@@ -324,7 +327,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
   store.dispatch(action2);
 
   const results = await store.run(
-    waitForLoaders(schema.loaders, [action1, action2]),
+    waitForLoaders(schema.loaders, [action1, action2])
   );
   if (!results.ok) {
     throw results.error;
@@ -367,92 +370,84 @@ it(tests, "POST multiple endpoints with same uri", async () => {
   });
 });
 
-it(
-  tests,
-  "slug in url but payload has empty string for slug value",
-  () => {
-    const { store, schema } = testStore();
-    const api = createApi();
-    api.use(mdw.api({ schema }));
-    api.use(api.routes());
-    api.use(mdw.fetch({ baseUrl }));
-    let actual = "";
+it(tests, "slug in url but payload has empty string for slug value", () => {
+  const { store, schema } = testStore();
+  const api = createApi();
+  api.use(mdw.api({ schema }));
+  api.use(api.routes());
+  api.use(mdw.fetch({ baseUrl }));
+  let actual = "";
 
-    const fetchUsers = api.post<{ id: string }>(
-      "/users/:id",
-      { supervisor: takeEvery },
-      function* (ctx, next) {
-        ctx.cache = true;
-        ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
+  const fetchUsers = api.post<{ id: string }>(
+    "/users/:id",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.cache = true;
+      ctx.request = ctx.req({ body: JSON.stringify(mockUser) });
 
-        yield* next();
-        if (!ctx.json.ok) {
-          actual = ctx.json.error;
-        }
-      },
-    );
-
-    store.run(api.bootup);
-    const action = fetchUsers({ id: "" });
-    store.dispatch(action);
-
-    const data =
-      "found :id in endpoint name (/users/:id [POST]) but payload has falsy value ()";
-    expect(actual).toEqual(data);
-  },
-);
-
-it(
-  tests,
-  "with success - should keep retrying fetch request",
-  async () => {
-    let counter = 0;
-    mock(`GET@/users`, () => {
-      counter += 1;
-      if (counter > 4) {
-        return new Response(JSON.stringify(mockUser));
+      yield* next();
+      if (!ctx.json.ok) {
+        actual = ctx.json.error;
       }
-      return new Response(JSON.stringify({ message: "error" }), {
-        status: 400,
-      });
-    });
-
-    const { schema, store } = testStore();
-    const api = createApi();
-    api.use(mdw.api({ schema }));
-    api.use(api.routes());
-    api.use(mdw.fetch({ baseUrl }));
-
-    let actual = null;
-    const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
-      function* (ctx, next) {
-        ctx.cache = true;
-        yield* next();
-
-        if (!ctx.json.ok) {
-          return;
-        }
-
-        actual = ctx.json;
-      },
-      mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
-    ]);
-
-    store.run(api.bootup);
-
-    const action = fetchUsers();
-    store.dispatch(action);
-
-    const loader = await store.run(waitForLoader(schema.loaders, action));
-    if (!loader.ok) {
-      throw loader.error;
     }
+  );
 
-    const state = store.getState();
-    expect(state.cache[action.payload.key]).toEqual(mockUser);
-    expect(actual).toEqual({ ok: true, value: mockUser });
-  },
-);
+  store.run(api.bootup);
+  const action = fetchUsers({ id: "" });
+  store.dispatch(action);
+
+  const data =
+    "found :id in endpoint name (/users/:id [POST]) but payload has falsy value ()";
+  expect(actual).toEqual(data);
+});
+
+it(tests, "with success - should keep retrying fetch request", async () => {
+  let counter = 0;
+  mock(`GET@/users`, () => {
+    counter += 1;
+    if (counter > 4) {
+      return new Response(JSON.stringify(mockUser));
+    }
+    return new Response(JSON.stringify({ message: "error" }), {
+      status: 400,
+    });
+  });
+
+  const { schema, store } = testStore();
+  const api = createApi();
+  api.use(mdw.api({ schema }));
+  api.use(api.routes());
+  api.use(mdw.fetch({ baseUrl }));
+
+  let actual = null;
+  const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
+    function* (ctx, next) {
+      ctx.cache = true;
+      yield* next();
+
+      if (!ctx.json.ok) {
+        return;
+      }
+
+      actual = ctx.json;
+    },
+    mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
+  ]);
+
+  store.run(api.bootup);
+
+  const action = fetchUsers();
+  store.dispatch(action);
+
+  const loader = await store.run(waitForLoader(schema.loaders, action));
+  if (!loader.ok) {
+    throw loader.error;
+  }
+
+  const state = store.getState();
+  expect(state.cache[action.payload.key]).toEqual(mockUser);
+  expect(actual).toEqual({ ok: true, value: mockUser });
+});
 
 it(
   tests,
@@ -490,7 +485,7 @@ it(
     }
     const data = { message: "error" };
     expect(actual).toEqual({ ok: false, error: data });
-  },
+  }
 );
 
 it(
@@ -520,7 +515,7 @@ it(
       throw loader.error;
     }
     expect(actual).toEqual({ ok: true, value: mockUser });
-  },
+  }
 );
 
 it(tests, "should use dynamic mdw to mock response", async () => {

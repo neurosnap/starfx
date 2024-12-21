@@ -1,13 +1,13 @@
-export { assert } from "https://deno.land/std@0.187.0/testing/asserts.ts";
 export {
   afterAll,
   beforeAll,
   beforeEach,
   describe,
   it,
-} from "https://deno.land/std@0.163.0/testing/bdd.ts";
-export * as asserts from "https://deno.land/std@0.185.0/testing/asserts.ts";
-export { expect } from "https://deno.land/x/expect@v0.3.0/mod.ts";
+} from "jsr:@std/testing/bdd";
+export { assert } from "jsr:@std/assert";
+export * as asserts from "jsr:@std/assert";
+export { expect } from "jsr:@std/expect";
 export { install, mock } from "https://deno.land/x/mock_fetch@0.3.0/mod.ts";
 
 export function isLikeSelector(selector: unknown) {
@@ -24,7 +24,7 @@ export const CIRCULAR_SELECTOR = new Error("Encountered a circular selector");
 export function assertLike(
   lhs: Record<any, any>,
   selector: Record<any, any>,
-  circular = new Set(),
+  circular = new Set()
 ) {
   if (circular.has(selector)) {
     throw CIRCULAR_SELECTOR;
