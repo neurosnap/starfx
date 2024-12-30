@@ -1,4 +1,4 @@
-import { asserts, describe, it } from "../test.ts";
+import { describe, expect, it } from "../test.ts";
 import {
   createStore,
   StoreContext,
@@ -54,6 +54,7 @@ it(
   tests,
   "update store and receives update from channel `StoreUpdateContext`",
   async () => {
+    expect.assertions(1);
     const [scope] = createScope();
     const initialState: Partial<State> = {
       users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
@@ -68,7 +69,7 @@ it(
           const chan = yield* StoreUpdateContext;
           const msgList = yield* chan.subscribe();
           yield* msgList.next();
-          asserts.assertEquals(store.getState(), {
+          expect(store.getState()).toEqual({
             users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
             theme: "",
             token: null,
@@ -87,6 +88,7 @@ it(
 );
 
 it(tests, "update store and receives update from `subscribe()`", async () => {
+  expect.assertions(1);
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
     dev: false,
@@ -96,7 +98,7 @@ it(tests, "update store and receives update from `subscribe()`", async () => {
   const store = createStore({ initialState });
 
   store.subscribe(() => {
-    asserts.assertEquals(store.getState(), {
+    expect(store.getState()).toEqual({
       users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
       dev: true,
       theme: "",
@@ -110,6 +112,7 @@ it(tests, "update store and receives update from `subscribe()`", async () => {
 });
 
 it(tests, "emit Action and update store", async () => {
+  expect.assertions(1);
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
     dev: false,
@@ -131,7 +134,7 @@ it(tests, "emit Action and update store", async () => {
     yield* result;
   });
 
-  asserts.assertEquals(store.getState(), {
+  expect(store.getState()).toEqual({
     users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
     theme: "",
     token: "",
@@ -140,6 +143,7 @@ it(tests, "emit Action and update store", async () => {
 });
 
 it(tests, "resets store", async () => {
+  expect.assertions(2);
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
     dev: false,
@@ -156,7 +160,7 @@ it(tests, "resets store", async () => {
     });
   });
 
-  asserts.assertEquals(store.getState(), {
+  expect(store.getState()).toEqual({
     users: { 3: { id: "3", name: "hehe" } },
     theme: "darkness",
     token: "",
@@ -165,7 +169,7 @@ it(tests, "resets store", async () => {
 
   await store.run(store.reset(["users"]));
 
-  asserts.assertEquals(store.getState(), {
+  expect(store.getState()).toEqual({
     users: { 3: { id: "3", name: "hehe" } },
     dev: false,
     theme: "",

@@ -48,6 +48,7 @@ const jsonBlob = (data: unknown) => {
 const tests = describe("createApi()");
 
 it(tests, "POST", async () => {
+  expect.assertions(2);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
@@ -118,6 +119,7 @@ it(tests, "POST", async () => {
 });
 
 it(tests, "POST with uri", () => {
+  expect.assertions(1);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
@@ -165,6 +167,7 @@ it(tests, "POST with uri", () => {
 });
 
 it(tests, "middleware - with request fn", () => {
+  expect.assertions(2);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
@@ -185,6 +188,7 @@ it(tests, "middleware - with request fn", () => {
 });
 
 it(tests, "run() on endpoint action - should run the effect", () => {
+  expect.assertions(1);
   const api = createApi<TestCtx>();
   api.use(api.routes());
   let acc = "";
@@ -213,6 +217,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
 });
 
 it(tests, "run() from a normal saga", () => {
+  expect.assertions(5);
   const api = createApi();
   api.use(api.routes());
   let acc = "";
