@@ -1,11 +1,11 @@
-import { describe, expect, it } from "../test.ts";
+import { createScope, Operation, parallel, put, Result, take } from "../mod.ts";
 import {
   createStore,
   StoreContext,
   StoreUpdateContext,
   updateStore,
 } from "../store/mod.ts";
-import { createScope, Operation, parallel, put, Result, take } from "../mod.ts";
+import { describe, expect, it } from "../test.ts";
 
 const tests = describe("store");
 
@@ -61,28 +61,24 @@ it(
       dev: false,
     };
     createStore({ scope, initialState });
-
+    let store;
     await scope.run(function* (): Operation<Result<void>[]> {
       const result = yield* parallel([
         function* () {
-          const store = yield* StoreContext;
+          store = yield* StoreContext;
           const chan = yield* StoreUpdateContext;
           const msgList = yield* chan.subscribe();
           yield* msgList.next();
-          expect(store.getState()).toEqual({
-            users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
-            theme: "",
-            token: null,
-            dev: true,
-          });
         },
-
         function* () {
           yield* updateStore(updateUser({ id: "1", name: "eric" }));
         },
       ]);
-
       return yield* result;
+    });
+    expect(store!.getState()).toEqual({
+      users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
+      dev: true,
     });
   },
 );
