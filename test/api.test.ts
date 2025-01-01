@@ -1,12 +1,27 @@
 import {
-    AnyState, API_ACTION_PREFIX, ApiCtx, call, createApi, createKey, keepAlive, mdw, Operation,
-    safe, takeEvery, waitFor
-} from '../mod.ts';
-import { useCache } from '../react.ts';
+  AnyState,
+  API_ACTION_PREFIX,
+  ApiCtx,
+  call,
+  createApi,
+  createKey,
+  keepAlive,
+  mdw,
+  Operation,
+  safe,
+  takeEvery,
+  waitFor,
+} from "../mod.ts";
+import { useCache } from "../react.ts";
 import {
-    createSchema, createStore, select, slice, updateStore, waitForLoader
-} from '../store/mod.ts';
-import { describe, expect, it } from '../test.ts';
+  createSchema,
+  createStore,
+  select,
+  slice,
+  updateStore,
+  waitForLoader,
+} from "../store/mod.ts";
+import { describe, expect, it } from "../test.ts";
 
 interface User {
   id: string;
