@@ -37,9 +37,9 @@ export {
   useScope,
 } from "https://deno.land/x/effection@3.0.0-beta.3/mod.ts";
 
-import React from 'https://esm.sh/react@18.2.0?pin=v135';
+import React from "https://esm.sh/react@18.2.0?pin=v135";
 
-export type { JSX } from 'https://esm.sh/react@18.2.0?pin=v135';
+export type { JSX } from "https://esm.sh/react@18.2.0?pin=v135";
 
 export { React };
 export {
