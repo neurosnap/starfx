@@ -1,16 +1,9 @@
-import {
-  call,
-  createThunks,
-  put,
-  sleep as delay,
-  takeEvery,
-  waitFor,
-} from "../mod.ts";
-import { createStore, updateStore } from "../store/mod.ts";
-import { assertLike, asserts, describe, it } from "../test.ts";
+import { API_ACTION_PREFIX } from '../action.ts';
+import { call, createThunks, put, sleep as delay, takeEvery, waitFor } from '../mod.ts';
+import { createStore, updateStore } from '../store/mod.ts';
+import { assertLike, asserts, describe, expect, it } from '../test.ts';
 
 import type { Next, ThunkCtx } from "../mod.ts";
-
 // deno-lint-ignore no-explicit-any
 interface RoboCtx<D = Record<string, unknown>, P = any> extends ThunkCtx<P> {
   url: string;
@@ -300,9 +293,13 @@ it(tests, "create fn is an array", () => {
 });
 
 it(tests, "run() on endpoint action - should run the effect", () => {
+  expect.assertions(4);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
+
   let acc = "";
+  let curCtx: RoboCtx = {} as RoboCtx;
+
   const action1 = api.create(
     "/users",
     { supervisor: takeEvery },
@@ -317,69 +314,65 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     { supervisor: takeEvery },
     function* (_, next) {
       yield* next();
-      const curCtx = yield* call(() => action1.run(action1()));
+      curCtx = yield* call(() => action1.run(action1()));
       acc += "b";
-      asserts.assert(acc === "ab");
-      assertLike(curCtx, {
-        action: {
-          type: `@@starfx${action1}`,
-          payload: {
-            name: "/users",
-          },
-        },
-        name: "/users",
-        request: { method: "expect this" },
-      });
     },
   );
 
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action2());
+  expect(acc).toBe("ab");
+  expect(curCtx.action).toMatchObject({
+    type: `${API_ACTION_PREFIX}${action1}`,
+    payload: {
+      name: "/users",
+    },
+  });
+  expect(curCtx.name).toBe("/users");
+  expect(curCtx.request).toMatchObject({ method: "expect this" });
 });
 
-it(
-  tests,
-  "run() on endpoint action with payload - should run the effect",
-  () => {
-    const api = createThunks<RoboCtx>();
-    api.use(api.routes());
-    let acc = "";
-    const action1 = api.create<{ id: string }>(
-      "/users",
-      { supervisor: takeEvery },
-      function* (ctx, next) {
-        yield* next();
-        ctx.request = { method: "expect this" };
-        acc += "a";
-      },
-    );
-    const action2 = api.create(
-      "/users2",
-      { supervisor: takeEvery },
-      function* (_, next) {
-        yield* next();
-        const curCtx = yield* action1.run({ id: "1" });
-        acc += "b";
-        asserts.assert(acc === "ab");
-        assertLike(curCtx, {
-          action: {
-            type: `@@starfx${action1}`,
-            payload: {
-              name: "/users",
-            },
-          },
-          name: "/users",
-          request: { method: "expect this" },
-        });
-      },
-    );
+it(tests, "run() on endpoint action with payload - should run the effect", () => {
+  expect.assertions(4);
+  const api = createThunks<RoboCtx>();
+  api.use(api.routes());
 
-    const store = createStore({ initialState: {} });
-    store.run(api.bootup);
-    store.dispatch(action2());
-  },
-);
+  let acc = "";
+  let curCtx: RoboCtx = {} as RoboCtx;
+
+  const action1 = api.create<{ id: string }>(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      yield* next();
+      ctx.request = { method: "expect this" };
+      acc += "a";
+    },
+  );
+  const action2 = api.create(
+    "/users2",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      yield* next();
+      curCtx = yield* call(() => action1.run({ id: "1" }));
+      acc += "b";
+    },
+  );
+
+  const store = createStore({ initialState: {} });
+  store.run(api.bootup);
+  store.dispatch(action2());
+  expect(acc).toBe("ab");
+  expect(curCtx.action).toMatchObject({
+    type: `${API_ACTION_PREFIX}${action1}`,
+    payload: {
+      name: "/users",
+    },
+  });
+  expect(curCtx.name).toBe("/users");
+  expect(curCtx.request).toMatchObject({ method: "expect this" });
+});
 
 it(tests, "middleware order of execution", async () => {
   let acc = "";
