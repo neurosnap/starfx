@@ -1,27 +1,12 @@
 import {
-  AnyState,
-  API_ACTION_PREFIX,
-  ApiCtx,
-  call,
-  createApi,
-  createKey,
-  keepAlive,
-  mdw,
-  Operation,
-  safe,
-  takeEvery,
-  waitFor,
-} from "../mod.ts";
-import { useCache } from "../react.ts";
+    AnyState, API_ACTION_PREFIX, ApiCtx, call, createApi, createKey, keepAlive, mdw, Operation,
+    safe, takeEvery, waitFor
+} from '../mod.ts';
+import { useCache } from '../react.ts';
 import {
-  createSchema,
-  createStore,
-  select,
-  slice,
-  updateStore,
-  waitForLoader,
-} from "../store/mod.ts";
-import { describe, expect, it } from "../test.ts";
+    createSchema, createStore, select, slice, updateStore, waitForLoader
+} from '../store/mod.ts';
+import { describe, expect, it } from '../test.ts';
 
 interface User {
   id: string;
@@ -264,8 +249,8 @@ it(tests, "run() from a normal saga", async () => {
   const payload = { name: "/users/:id [GET]", options: { id: "1" } };
 
   expect(extractedResults.actionType).toEqual(`${API_ACTION_PREFIX}${action1}`);
-  expect(extractedResults.payload!["name"]).toEqual(payload.name);
-  expect(extractedResults.payload!["options"]).toEqual(payload.options);
+  expect(extractedResults.actionPayload!["name"]).toEqual(payload.name);
+  expect(extractedResults.actionPayload!["options"]).toEqual(payload.options);
   expect(extractedResults.name).toEqual("/users/:id [GET]");
   expect(extractedResults.payload).toEqual({ id: "1" });
   expect(acc).toEqual("ab");
