@@ -4,6 +4,7 @@ import { call, run } from "../mod.ts";
 const tests = describe("call()");
 
 it(tests, "should call the generator function", async () => {
+  expect.assertions(1);
   function* me() {
     return "valid";
   }
@@ -15,6 +16,7 @@ it(tests, "should call the generator function", async () => {
 });
 
 it(tests, "should return an Err()", async () => {
+  expect.assertions(1);
   const err = new Error("bang!");
   function* me() {
     throw err;
@@ -30,6 +32,7 @@ it(tests, "should return an Err()", async () => {
 });
 
 it(tests, "should call a promise", async () => {
+  expect.assertions(1);
   const me = () =>
     new Promise<string>((resolve) => {
       setTimeout(() => {

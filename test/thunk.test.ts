@@ -1,3 +1,4 @@
+import { API_ACTION_PREFIX } from "../action.ts";
 import {
   call,
   createThunks,
@@ -7,10 +8,9 @@ import {
   waitFor,
 } from "../mod.ts";
 import { createStore, updateStore } from "../store/mod.ts";
-import { assertLike, asserts, describe, it } from "../test.ts";
+import { describe, expect, it } from "../test.ts";
 
 import type { Next, ThunkCtx } from "../mod.ts";
-
 // deno-lint-ignore no-explicit-any
 interface RoboCtx<D = Record<string, unknown>, P = any> extends ThunkCtx<P> {
   url: string;
@@ -128,6 +128,7 @@ it(
   tests,
   "when create a query fetch pipeline - execute all middleware and save to redux",
   () => {
+    expect.assertions(1);
     const api = createThunks<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
@@ -143,7 +144,7 @@ it(
 
     store.dispatch(fetchUsers());
 
-    asserts.assertEquals(store.getState(), {
+    expect(store.getState()).toEqual({
       users: { [mockUser.id]: deserializeUser(mockUser) },
       tickets: {},
     });
@@ -154,6 +155,7 @@ it(
   tests,
   "when providing a generator the to api.create function - should call that generator before all other middleware",
   () => {
+    expect.assertions(1);
     const api = createThunks<RoboCtx>();
     api.use(api.routes());
     api.use(convertNameToUrl);
@@ -183,7 +185,7 @@ it(
     store.run(api.bootup);
 
     store.dispatch(fetchTickets());
-    asserts.assertEquals(store.getState(), {
+    expect(store.getState()).toEqual({
       users: { [mockUser.id]: deserializeUser(mockUser) },
       tickets: { [mockTicket.id]: deserializeTicket(mockTicket) },
     });
@@ -191,6 +193,7 @@ it(
 );
 
 it(tests, "error handling", () => {
+  expect.assertions(1);
   let called;
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
@@ -210,10 +213,11 @@ it(tests, "error handling", () => {
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
-  asserts.assertStrictEquals(called, true);
+  expect(called).toBe(true);
 });
 
 it(tests, "error handling inside create", () => {
+  expect.assertions(1);
   let called = false;
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
@@ -235,10 +239,11 @@ it(tests, "error handling inside create", () => {
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action());
-  asserts.assertStrictEquals(called, true);
+  expect(called).toBe(true);
 });
 
 it(tests, "error inside endpoint mdw", () => {
+  expect.assertions(1);
   let called = false;
   const query = createThunks();
   query.use(function* (_, next) {
@@ -266,14 +271,15 @@ it(tests, "error inside endpoint mdw", () => {
   });
   store.run(query.bootup);
   store.dispatch(fetchUsers());
-  asserts.assertEquals(called, true);
+  expect(called).toBe(true);
 });
 
 it(tests, "create fn is an array", () => {
+  expect.assertions(1);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
-    asserts.assertEquals(ctx.request, {
+    expect(ctx.request).toEqual({
       method: "POST",
       body: {
         test: "me",
@@ -300,9 +306,13 @@ it(tests, "create fn is an array", () => {
 });
 
 it(tests, "run() on endpoint action - should run the effect", () => {
+  expect.assertions(4);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
+
   let acc = "";
+  let curCtx: RoboCtx = {} as RoboCtx;
+
   const action1 = api.create(
     "/users",
     { supervisor: takeEvery },
@@ -317,34 +327,36 @@ it(tests, "run() on endpoint action - should run the effect", () => {
     { supervisor: takeEvery },
     function* (_, next) {
       yield* next();
-      const curCtx = yield* call(() => action1.run(action1()));
+      curCtx = yield* call(() => action1.run(action1()));
       acc += "b";
-      asserts.assert(acc === "ab");
-      assertLike(curCtx, {
-        action: {
-          type: `@@starfx${action1}`,
-          payload: {
-            name: "/users",
-          },
-        },
-        name: "/users",
-        request: { method: "expect this" },
-      });
     },
   );
 
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action2());
+  expect(acc).toBe("ab");
+  expect(curCtx.action).toMatchObject({
+    type: `${API_ACTION_PREFIX}${action1}`,
+    payload: {
+      name: "/users",
+    },
+  });
+  expect(curCtx.name).toBe("/users");
+  expect(curCtx.request).toEqual({ method: "expect this" });
 });
 
 it(
   tests,
   "run() on endpoint action with payload - should run the effect",
   () => {
+    expect.assertions(4);
     const api = createThunks<RoboCtx>();
     api.use(api.routes());
+
     let acc = "";
+    let curCtx: RoboCtx = {} as RoboCtx;
+
     const action1 = api.create<{ id: string }>(
       "/users",
       { supervisor: takeEvery },
@@ -359,29 +371,28 @@ it(
       { supervisor: takeEvery },
       function* (_, next) {
         yield* next();
-        const curCtx = yield* action1.run({ id: "1" });
+        curCtx = yield* call(() => action1.run({ id: "1" }));
         acc += "b";
-        asserts.assert(acc === "ab");
-        assertLike(curCtx, {
-          action: {
-            type: `@@starfx${action1}`,
-            payload: {
-              name: "/users",
-            },
-          },
-          name: "/users",
-          request: { method: "expect this" },
-        });
       },
     );
 
     const store = createStore({ initialState: {} });
     store.run(api.bootup);
     store.dispatch(action2());
+    expect(acc).toBe("ab");
+    expect(curCtx.action).toMatchObject({
+      type: `${API_ACTION_PREFIX}${action1}`,
+      payload: {
+        name: "/users",
+      },
+    });
+    expect(curCtx.name).toBe("/users");
+    expect(curCtx.request).toEqual({ method: "expect this" });
   },
 );
 
 it(tests, "middleware order of execution", async () => {
+  expect.assertions(1);
   let acc = "";
   const api = createThunks();
   api.use(api.routes());
@@ -418,10 +429,11 @@ it(tests, "middleware order of execution", async () => {
   store.dispatch(action());
 
   await store.run(waitFor(() => acc === "abcdefg"));
-  asserts.assert(acc === "abcdefg");
+  expect(acc).toBe("abcdefg");
 });
 
 it(tests, "retry with actionFn", async () => {
+  expect.assertions(1);
   let acc = "";
   let called = false;
 
@@ -447,10 +459,11 @@ it(tests, "retry with actionFn", async () => {
   store.dispatch(action());
 
   await store.run(waitFor(() => acc === "agag"));
-  asserts.assertEquals(acc, "agag");
+  expect(acc).toBe("agag");
 });
 
 it(tests, "retry with actionFn with payload", async () => {
+  expect.assertions(1);
   let acc = "";
   const api = createThunks();
   api.use(api.routes());
@@ -477,10 +490,11 @@ it(tests, "retry with actionFn with payload", async () => {
   store.dispatch(action({ page: 1 }));
 
   await store.run(waitFor(() => acc === "agag"));
-  asserts.assertEquals(acc, "agag");
+  expect(acc).toBe("agag");
 });
 
 it(tests, "should only call thunk once", () => {
+  expect.assertions(1);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
   let acc = "";
@@ -505,10 +519,11 @@ it(tests, "should only call thunk once", () => {
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
   store.dispatch(action2());
-  asserts.assertEquals(acc, "a");
+  expect(acc).toBe("a");
 });
 
 it(tests, "should be able to create thunk after `register()`", () => {
+  expect.assertions(1);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
   const store = createStore({ initialState: {} });
@@ -519,10 +534,11 @@ it(tests, "should be able to create thunk after `register()`", () => {
     acc += "a";
   });
   store.dispatch(action());
-  asserts.assertEquals(acc, "a");
+  expect(acc).toBe("a");
 });
 
 it(tests, "should warn when calling thunk before registered", () => {
+  expect.assertions(1);
   const err = console.warn;
   let called = false;
   console.warn = () => {
@@ -534,11 +550,12 @@ it(tests, "should warn when calling thunk before registered", () => {
 
   const action = api.create("/users");
   store.dispatch(action());
-  asserts.assertEquals(called, true);
+  expect(called).toBe(true);
   console.warn = err;
 });
 
 it(tests, "it should call the api once even if we register it twice", () => {
+  expect.assertions(1);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
   const store = createStore({ initialState: {} });
@@ -550,13 +567,14 @@ it(tests, "it should call the api once even if we register it twice", () => {
     acc += "a";
   });
   store.dispatch(action());
-  asserts.assertEquals(acc, "a");
+  expect(acc).toBe("a");
 });
 
 it(
   tests,
   "Should call the API only once, even if registered multiple times, with multiple APIs defined.",
   () => {
+    expect.assertions(2);
     const api1 = createThunks<RoboCtx>();
     api1.use(api1.routes());
 
@@ -578,11 +596,7 @@ it(
     });
     store.dispatch(action());
 
-    asserts.assertEquals(
-      acc,
-      "b",
-      "Expected 'b' after first API call, but got: " + acc,
-    );
+    expect(acc).toBe("b");
 
     let acc2 = "";
     const action2 = api2.create("/users", function* () {
@@ -590,11 +604,7 @@ it(
     });
     store.dispatch(action2());
 
-    asserts.assertEquals(
-      acc2,
-      "c",
-      "Expected 'c' after second API call, but got: " + acc2,
-    );
+    expect(acc2).toBe("c");
   },
 );
 
@@ -602,6 +612,7 @@ it(
   tests,
   "should unregister the thunk when the registration function exits",
   async () => {
+    expect.assertions(1);
     const api1 = createThunks<RoboCtx>();
     api1.use(api1.routes());
 
@@ -616,15 +627,12 @@ it(
     });
     store.dispatch(action());
 
-    asserts.assertEquals(
-      acc,
-      "b",
-      "Expected 'b' after first API call, but got: " + acc,
-    );
+    expect(acc).toBe("b");
   },
 );
 
 it(tests, "should allow multiple stores to register a thunk", () => {
+  expect.assertions(1);
   const api1 = createThunks<RoboCtx>();
   api1.use(api1.routes());
   const storeA = createStore({ initialState: {} });
@@ -638,9 +646,5 @@ it(tests, "should allow multiple stores to register a thunk", () => {
   storeA.dispatch(action());
   storeB.dispatch(action());
 
-  asserts.assertEquals(
-    acc,
-    "bb",
-    "Expected 'bb' after first API call, but got: " + acc,
-  );
+  expect(acc).toBe("bb");
 });

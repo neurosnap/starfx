@@ -1,14 +1,6 @@
-import { describe, expect, it } from "../test.ts";
-import {
-  createSchema,
-  createStore,
-  select,
-  slice,
-  updateStore,
-  waitForLoader,
-} from "../store/mod.ts";
 import {
   AnyState,
+  API_ACTION_PREFIX,
   ApiCtx,
   call,
   createApi,
@@ -21,6 +13,15 @@ import {
   waitFor,
 } from "../mod.ts";
 import { useCache } from "../react.ts";
+import {
+  createSchema,
+  createStore,
+  select,
+  slice,
+  updateStore,
+  waitForLoader,
+} from "../store/mod.ts";
+import { describe, expect, it } from "../test.ts";
 
 interface User {
   id: string;
@@ -48,6 +49,7 @@ const jsonBlob = (data: unknown) => {
 const tests = describe("createApi()");
 
 it(tests, "POST", async () => {
+  expect.assertions(2);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
@@ -118,6 +120,7 @@ it(tests, "POST", async () => {
 });
 
 it(tests, "POST with uri", () => {
+  expect.assertions(1);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
@@ -165,6 +168,7 @@ it(tests, "POST with uri", () => {
 });
 
 it(tests, "middleware - with request fn", () => {
+  expect.assertions(2);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
@@ -185,6 +189,7 @@ it(tests, "middleware - with request fn", () => {
 });
 
 it(tests, "run() on endpoint action - should run the effect", () => {
+  expect.assertions(1);
   const api = createApi<TestCtx>();
   api.use(api.routes());
   let acc = "";
@@ -212,7 +217,8 @@ it(tests, "run() on endpoint action - should run the effect", () => {
   store.dispatch(action2());
 });
 
-it(tests, "run() from a normal saga", () => {
+it(tests, "run() from a normal saga", async () => {
+  expect.assertions(6);
   const api = createApi();
   api.use(api.routes());
   let acc = "";
@@ -226,28 +232,43 @@ it(tests, "run() from a normal saga", () => {
       acc += "a";
     },
   );
+  const extractedResults = {
+    actionType: null,
+    actionPayload: null,
+    name: null,
+    payload: null,
+  };
   const action2 = () => ({ type: "ACTION" });
   function* onAction() {
     const ctx = yield* safe(() => action1.run(action1({ id: "1" })));
     if (!ctx.ok) {
       throw new Error("no ctx");
     }
-    const payload = { name: "/users/:id [GET]", options: { id: "1" } };
-    expect(ctx.value.action.type).toEqual(`@@starfx${action1}`);
-    expect(ctx.value.action.payload).toEqual(payload);
-    expect(ctx.value.name).toEqual("/users/:id [GET]");
-    expect(ctx.value.payload).toEqual({ id: "1" });
+    Object.assign(extractedResults, {
+      actionType: ctx.value.action.type,
+      actionPayload: ctx.value.action.payload,
+      name: ctx.value.name,
+      payload: ctx.value.payload,
+    });
     acc += "b";
-    expect(acc).toEqual("ab");
   }
-
   function* watchAction() {
-    yield* takeEvery(`${action2}`, onAction);
+    yield* takeEvery(action2, onAction);
   }
 
   const store = createStore({ initialState: { users: {} } });
   store.run(() => keepAlive([api.bootup, watchAction]));
   store.dispatch(action2());
+
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  const payload = { name: "/users/:id [GET]", options: { id: "1" } };
+
+  expect(extractedResults.actionType).toEqual(`${API_ACTION_PREFIX}${action1}`);
+  expect(extractedResults.actionPayload!["name"]).toEqual(payload.name);
+  expect(extractedResults.actionPayload!["options"]).toEqual(payload.options);
+  expect(extractedResults.name).toEqual("/users/:id [GET]");
+  expect(extractedResults.payload).toEqual({ id: "1" });
+  expect(acc).toEqual("ab");
 });
 
 it(tests, "with hash key on a large post", async () => {

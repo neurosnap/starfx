@@ -5,6 +5,7 @@ export {
   describe,
   it,
 } from "jsr:@std/testing/bdd";
+export * as assertType from "jsr:@std/testing/types";
 export { assert } from "jsr:@std/assert";
 export * as asserts from "jsr:@std/assert";
 export { expect } from "jsr:@std/expect";
