@@ -2,7 +2,7 @@
   "tasks": {
     "types": "deno run --allow-write ./api-type-template.ts",
     "npm": "deno run -A ./npm.ts",
-    "test": "deno test --allow-env --allow-read",
+    "test": "deno test --allow-env --allow-read --allow-import",
     "sync-build-to": "deno run -A ./scripts/sync.ts"
   },
   "lint": {

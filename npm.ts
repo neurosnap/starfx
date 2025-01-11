@@ -23,7 +23,7 @@ async function init() {
       },
     ],
     mappings: {
-      "https://deno.land/x/effection@4.0.0-alpha.3/mod.ts": {
+      "https://deno.land/x/effection@4.0.0-alpha.4/mod.ts": {
         name: "effection",
         version: "4.0.0-alpha.3",
       },

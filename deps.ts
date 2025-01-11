@@ -13,7 +13,7 @@ export type {
   Stream,
   Subscription,
   Task,
-} from "https://deno.land/x/effection@4.0.0-alpha.3/mod.ts";
+} from "https://deno.land/x/effection@4.0.0-alpha.4/mod.ts";
 export {
   action,
   call,
@@ -35,7 +35,7 @@ export {
   suspend,
   useAbortSignal,
   useScope,
-} from "https://deno.land/x/effection@4.0.0-alpha.3/mod.ts";
+} from "https://deno.land/x/effection@4.0.0-alpha.4/mod.ts";
 
 import React from "https://esm.sh/react@18.2.0?pin=v135";
 export { React };

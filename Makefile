@@ -7,5 +7,5 @@ lint:
 .PHONY: lint
 
 test:
-	deno test --allow-env --allow-read
+	deno task test
 .PHONY: test
