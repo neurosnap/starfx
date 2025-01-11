@@ -1,0 +1,41 @@
+name: static
+on:
+  push:
+    branches:
+      - main
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # need entire history
+          fetch-depth: 0
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.22"
+      - name: install pgit
+        run: |
+          go install github.com/picosh/pgit@v1
+      - name: generate site
+        run: |
+          pgit \
+            --out ./public \
+            --label starfx \
+            --desc "supercharged async flow control library." \
+            --clone-url "https://github.com/neurosnap/starfx.git" \
+            --home-url "https://git.erock.io" \
+            --revs main
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: publish to pgs
+        uses: picosh/pgs-action@main
+        with:
+          user: erock
+          key: ${{ secrets.PRIVATE_KEY }}
+          src: "./public/"
+          project: "git-starfx-${{ steps.vars.outputs.sha_short }}"
+          promote: "git-starfx"
+          retain: "git-starfx-"
+          retain_num: 1
