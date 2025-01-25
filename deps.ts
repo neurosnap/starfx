@@ -1,11 +1,8 @@
 export type {
   Callable,
   Channel,
-  Instruction,
   Operation,
-  Predicate,
   Queue,
-  Reject,
   Resolve,
   Result,
   Scope,
@@ -13,7 +10,7 @@ export type {
   Stream,
   Subscription,
   Task,
-} from "https://deno.land/x/effection@4.0.0-alpha.4/mod.ts";
+} from "npm:effection@4.0.0-alpha.5";
 export {
   action,
   call,
@@ -35,7 +32,7 @@ export {
   suspend,
   useAbortSignal,
   useScope,
-} from "https://deno.land/x/effection@4.0.0-alpha.4/mod.ts";
+} from "npm:effection@4.0.0-alpha.5";
 
 import React from "https://esm.sh/react@18.2.0?pin=v135";
 export { React };

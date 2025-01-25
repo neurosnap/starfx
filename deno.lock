@@ -1,5 +1,13 @@
 {
   "version": "4",
+  "specifiers": {
+    "npm:effection@4.0.0-alpha.5": "4.0.0-alpha.5"
+  },
+  "npm": {
+    "effection@4.0.0-alpha.5": {
+      "integrity": "sha512-7s8dwQF8oqOxtsUrFMRQBUOWXq23Khb/IYurwqEnSTUwsgkSgQww/9A9aBwdRQ1hMmELouy/YkvhC7e9oGQfbA=="
+    }
+  },
   "redirects": {
     "https://crux.land/api/get/2KNRVU": "https://crux.land/api/get/2KNRVU.ts",
     "https://crux.land/api/get/router@0.0.5": "https://crux.land/api/get/2KNRVU",
