@@ -1,7 +1,8 @@
-import type { Operation } from "./deps.ts";
+import type { Instruction, Operation } from "./deps.ts";
 
 export interface Computation<T = unknown> {
-  [Symbol.iterator](): Operation<T>;
+  // deno-lint-ignore no-explicit-any
+  [Symbol.iterator](): Iterator<Instruction, T, any>;
 }
 
 export type Next = () => Operation<void>;
