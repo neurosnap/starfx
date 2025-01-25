@@ -24,6 +24,6 @@ export function* safe<T>(operator: Callable<T>): Operation<Result<T>> {
     const value = yield* call<T>(operator as any);
     return Ok(value);
   } catch (error) {
-    return Err(error);
+    return Err(error as Error);
   }
 }
