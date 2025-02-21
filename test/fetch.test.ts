@@ -407,27 +407,7 @@ it(tests, "with success - should keep retrying fetch request", async () => {
     counter += 1;
     if (counter > 4) {
       return new Response(JSON.stringify(mockUser));
-        if (!ctx.json.ok) {
-          return;
-        }
-
-        actual = ctx.json;
-      },
-      mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
-    ]);
-
-    store.run(api.bootup);
-
-    const action = fetchUsers();
-    store.dispatch(action);
-
-    const loader = await store.run(() => waitForLoader(schema.loaders, action));
-    if (!loader.ok) {
-      throw loader.error;
     }
-    return new Response(JSON.stringify({ message: "error" }), {
-      status: 400,
-    });
   });
 
   const { schema, store } = testStore();

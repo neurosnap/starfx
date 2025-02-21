@@ -19,10 +19,6 @@ import { call, Err, Ok } from "effection";
  * }
  * ```
  */
-function isError(error: unknown): error is Error {
-  return error instanceof Error;
-}
-
 export function* safe<T>(operator: Callable<T>): Operation<Result<T>> {
   try {
     const value = yield* call<T>(operator as any);

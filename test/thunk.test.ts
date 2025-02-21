@@ -8,7 +8,7 @@ import {
   waitFor,
 } from "../mod.ts";
 import { createStore, updateStore } from "../store/mod.ts";
-import { describe, expect, it } from "../test.ts";
+import { asserts, describe, expect, it } from "../test.ts";
 
 import type { Next, ThunkCtx } from "../mod.ts";
 // deno-lint-ignore no-explicit-any

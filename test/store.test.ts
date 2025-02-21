@@ -1,7 +1,7 @@
 import { createScope, Operation, parallel, put, Result, take } from "../mod.ts";
 import {
   createStore,
-  StoreContext,
+  // StoreContext,
   StoreUpdateContext,
   updateStore,
 } from "../store/mod.ts";
@@ -65,7 +65,7 @@ it(
     await scope.run(function* (): Operation<Result<void>[]> {
       const result = yield* parallel([
         function* () {
-          const store = yield* StoreContext.expect();
+          // const store = yield* StoreContext.expect();
           const chan = yield* StoreUpdateContext.expect();
           const msgList = yield* chan;
           yield* msgList.next();

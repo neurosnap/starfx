@@ -105,13 +105,9 @@ export function* takeLeading<T>(
   }
 }
 
-<<<<<<< HEAD
-export function* waitFor(predicate: Callable<boolean>) {
-=======
 export function* waitFor(
   predicate: Callable<Operation<boolean> | Promise<boolean> | boolean>,
 ) {
->>>>>>> 30fa8e8 (chore: upgrade effection to v4)
   const init = yield* call(predicate as any);
   if (init) {
     return;
