@@ -1,5 +1,5 @@
 import type { Callable, Operation, Task } from "../deps.ts";
-import { withResolvers, call, resource, spawn } from "../deps.ts";
+import { call, resource, spawn, withResolvers } from "../deps.ts";
 
 interface OpMap<T = unknown> {
   [key: string]: Callable<T>;
@@ -19,8 +19,8 @@ export function raceMap<T>(opMap: OpMap): Operation<
 
     function* start() {
       const resolvers = withResolvers();
-      
-      yield* spawn(function*() {
+
+      yield* spawn(function* () {
         for (let i = 0; i < keys.length; i += 1) {
           const key = keys[i];
           yield* spawn(function* () {

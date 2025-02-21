@@ -32,7 +32,7 @@ export {
   suspend,
   useAbortSignal,
   useScope,
-  withResolvers
+  withResolvers,
 } from "npm:effection@4.0.0-alpha.5";
 
 import React from "https://esm.sh/react@18.2.0?pin=v135";
