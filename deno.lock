@@ -1,6 +1,7 @@
 {
   "version": "4",
 <<<<<<< HEAD
+<<<<<<< HEAD
   "specifiers": {
     "jsr:@david/code-block-writer@^13.0.2": "13.0.3",
     "jsr:@deno/cache-dir@~0.10.3": "0.10.3",
@@ -258,6 +259,16 @@
   },
 =======
 >>>>>>> da51308 (chore: update to alpha.4)
+=======
+  "specifiers": {
+    "npm:effection@4.0.0-alpha.5": "4.0.0-alpha.5"
+  },
+  "npm": {
+    "effection@4.0.0-alpha.5": {
+      "integrity": "sha512-7s8dwQF8oqOxtsUrFMRQBUOWXq23Khb/IYurwqEnSTUwsgkSgQww/9A9aBwdRQ1hMmELouy/YkvhC7e9oGQfbA=="
+    }
+  },
+>>>>>>> 7e17dc9 (Effection v4 upgrade (#56))
   "redirects": {
     "https://crux.land/api/get/2KNRVU": "https://crux.land/api/get/2KNRVU.ts",
     "https://crux.land/api/get/router@0.0.5": "https://crux.land/api/get/2KNRVU",
