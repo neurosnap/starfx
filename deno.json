@@ -28,6 +28,6 @@
     "react-redux": "npm:react-redux@^8.0.5",
     "reselect": "npm:reselect@^4.1.8",
     "immer": "npm:immer@^10.0.2",
-    "effection": "https://deno.land/x/effection@3.0.0-beta.3/mod.ts"
+    "effection": "jsr:@effection/effection@4.0.0-alpha.7"
   }
 }

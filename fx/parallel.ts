@@ -1,11 +1,11 @@
-import type { Callable, Channel, Operation, Result } from "effection";
+import type { Callable, Channel, Effect, Operation, Result } from "effection";
 import { createChannel, resource, spawn } from "effection";
-import type { Computation } from "../types.ts";
 import { safe } from "./safe.ts";
 
-export interface ParallelRet<T> extends Computation<Result<T>[]> {
-  sequence: Channel<Result<T>, void>;
-  immediate: Channel<Result<T>, void>;
+export interface ParallelRet<T> {
+  sequence: Channel<T, void>;
+  immediate: Channel<T, void>;
+  [Symbol.iterator](): Iterator<Effect<unknown>, T, unknown>;
 }
 
 /**
@@ -60,12 +60,16 @@ export interface ParallelRet<T> extends Computation<Result<T>[]> {
  * }
  * ```
  */
-export function parallel<T>(operations: Callable<T>[]) {
+export function parallel<
+  T extends Operation<unknown> | Promise<unknown> | unknown,
+>(
+  operations: Callable<T>[],
+): ParallelRet<Result<T>> {
   const sequence = createChannel<Result<T>>();
   const immediate = createChannel<Result<T>>();
   const results: Result<T>[] = [];
 
-  return resource<ParallelRet<T>>(function* (provide) {
+  return resource<ParallelRet<Result<T>>>(function* (provide) {
     const task = yield* spawn(function* () {
       const tasks = [];
       for (const op of operations) {

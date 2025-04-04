@@ -29,7 +29,6 @@ export {
 export type {
   Callable,
   Channel,
-  Instruction,
   Operation,
   Result,
   Scope,

@@ -2,7 +2,7 @@ import { type Callable, type Operation, sleep } from "effection";
 import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
 import { API_ACTION_PREFIX, put } from "../action.ts";
-import type { Result } from "effection"; // Adjust the import path as needed
+import type { Result } from "effection";
 
 export function superviseBackoff(attempt: number, max = 10): number {
   if (attempt > max) return -1;
@@ -21,7 +21,7 @@ export function supervise<T>(
   op: Callable<T>,
   backoff: (attemp: number) => number = superviseBackoff,
 ) {
-  return function* () {
+  return function* (): Operation<void> {
     let attempt = 1;
     let waitFor = backoff(attempt);
 
@@ -54,7 +54,8 @@ export function* keepAlive(
   ops: Callable<unknown>[],
   backoff?: (attempt: number) => number,
 ): Operation<Result<void>[]> {
-  const group = yield* parallel(ops.map((op) => supervise(op, backoff)));
+  const supervised = ops.map((op) => supervise(op, backoff));
+  const group = yield* parallel(supervised);
   const results = yield* group;
   return results;
 }
