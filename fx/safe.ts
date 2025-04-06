@@ -27,3 +27,4 @@ export function* safe<T>(operator: Callable<T>): Operation<Result<T>> {
     return Err(error as Error);
   }
 }
+

@@ -55,7 +55,7 @@ export function* keepAlive(
   backoff?: (attempt: number) => number,
 ): Operation<Result<void>[]> {
   const supervised = ops.map((op) => supervise(op, backoff));
-  const group = yield* parallel(supervised);
+  const group = yield* parallel<void>(supervised);
   const results = yield* group;
   return results;
 }
