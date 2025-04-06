@@ -1,11 +1,10 @@
-import type { Callable, Channel, Effect, Operation, Result } from "effection";
+import type { Callable, Channel, Operation, Result } from "effection";
 import { createChannel, resource, spawn } from "effection";
 import { safe } from "./safe.ts";
 
-export interface ParallelRet<T> {
-  sequence: Channel<T, void>;
-  immediate: Channel<T, void>;
-  [Symbol.iterator](): Iterator<Effect<unknown>, T, unknown>;
+export interface ParallelRet<T> extends Operation<Result<T>[]> {
+  sequence: Channel<Result<T>, void>;
+  immediate: Channel<Result<T>, void>;
 }
 
 /**
@@ -61,15 +60,15 @@ export interface ParallelRet<T> {
  * ```
  */
 export function parallel<
-  T extends Operation<unknown> | Promise<unknown> | unknown,
+  O extends Operation<unknown> | Promise<unknown> | unknown,
 >(
-  operations: Callable<T>[],
-): ParallelRet<Result<T>> {
-  const sequence = createChannel<Result<T>>();
-  const immediate = createChannel<Result<T>>();
-  const results: Result<T>[] = [];
+  operations: Callable<O>[],
+): Operation<ParallelRet<O>> {
+  const sequence = createChannel<Result<O>>();
+  const immediate = createChannel<Result<O>>();
+  const results: Result<O>[] = [];
 
-  return resource<ParallelRet<Result<T>>>(function* (provide) {
+  return resource<ParallelRet<O>>(function* (provide) {
     const task = yield* spawn(function* () {
       const tasks = [];
       for (const op of operations) {
@@ -92,17 +91,18 @@ export function parallel<
       yield* immediate.close();
     });
 
-    function* wait(): Operation<Result<T>[]> {
+    function* wait() {
       yield* task;
       return results;
     }
 
-    yield* provide({
+    const op = {
       sequence,
       immediate,
       *[Symbol.iterator]() {
         return yield* wait();
       },
-    });
+    };
+    yield* provide(op);
   });
 }
