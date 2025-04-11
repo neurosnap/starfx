@@ -21,9 +21,10 @@ import { call, Err, Ok } from "effection";
  */
 export function* safe<T>(operator: Callable<T>): Operation<Result<T>> {
   try {
-    const value = yield* call<T>(operator as any);
+    const value = yield* call<T>(operator);
     return Ok(value);
   } catch (error) {
     return Err(error as Error);
   }
 }
+

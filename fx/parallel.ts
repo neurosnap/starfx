@@ -60,15 +60,15 @@ export interface ParallelRet<T> extends Operation<Result<T>[]> {
  * ```
  */
 export function parallel<
-  O extends Operation<unknown> | Promise<unknown> | unknown,
+  T extends Operation<unknown> | Promise<unknown> | unknown,
 >(
-  operations: Callable<O>[],
-): Operation<ParallelRet<O>> {
-  const sequence = createChannel<Result<O>>();
-  const immediate = createChannel<Result<O>>();
-  const results: Result<O>[] = [];
+  operations: Callable<T>[],
+): Operation<ParallelRet<T>> {
+  const sequence = createChannel<Result<T>>();
+  const immediate = createChannel<Result<T>>();
+  const results: Result<T>[] = [];
 
-  return resource<ParallelRet<O>>(function* (provide) {
+  return resource<ParallelRet<T>>(function* (provide) {
     const task = yield* spawn(function* () {
       const tasks = [];
       for (const op of operations) {
