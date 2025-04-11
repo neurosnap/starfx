@@ -91,17 +91,18 @@ export function parallel<
       yield* immediate.close();
     });
 
-    function* wait(): Operation<Result<T>[]> {
+    function* wait() {
       yield* task;
       return results;
     }
 
-    yield* provide({
+    const op = {
       sequence,
       immediate,
       *[Symbol.iterator]() {
         return yield* wait();
       },
-    });
+    };
+    yield* provide(op);
   });
 }
