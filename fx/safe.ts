@@ -1,4 +1,4 @@
-import type { Callable, Operation, Result } from "effection";
+import type { Operation, Result } from "effection";
 import { call, Err, Ok } from "effection";
 
 /**
@@ -19,12 +19,13 @@ import { call, Err, Ok } from "effection";
  * }
  * ```
  */
-export function* safe<T>(operator: Callable<T>): Operation<Result<T>> {
+export function* safe<T>(
+  operatorFunction: Operation<T>,
+): Operation<Result<T>> {
   try {
-    const value = yield* call<T>(operator);
+    const value = yield* call(() => operatorFunction);
     return Ok(value);
   } catch (error) {
     return Err(error as Error);
   }
 }
-

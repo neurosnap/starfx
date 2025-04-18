@@ -257,7 +257,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* watcher(action: ActionWithPayload<Callable<unknown>>) {
-    yield* supervise(action.payload)();
+    yield* supervise(action.payload);
   }
 
   function* register() {
