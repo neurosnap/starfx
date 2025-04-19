@@ -107,11 +107,11 @@ it(tests, "POST", async () => {
 
   store.dispatch(createUser({ email: mockUser.email }));
 
-  await store.run(
+  await store.run(() =>
     waitFor(function* (): Operation<boolean> {
       const res = yield* select((state: AnyState) => state.users["1"].id);
       return res !== "";
-    }),
+    })
   );
 
   expect(store.getState().users).toEqual({
@@ -324,7 +324,7 @@ it(tests, "with hash key on a large post", async () => {
   const action = createUserDefaultKey({ email, largetext });
   store.dispatch(action);
 
-  await store.run(waitForLoader(schema.loaders, action));
+  await store.run(() => waitForLoader(schema.loaders, action));
 
   const s = store.getState();
   const expectedKey = createKey(action.payload.name, {

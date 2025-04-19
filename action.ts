@@ -22,11 +22,11 @@ export const ActionContext = createContext(
 
 export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
   return {
-    *subscribe() {
-      const actions = yield* ActionContext;
+    [Symbol.iterator]: function* () {
+      const actions = yield* ActionContext.expect();
       const match = matcher(pattern);
       yield* SignalQueueFactory.set(() => createFilterQueue(match) as any);
-      return yield* actions.subscribe();
+      return yield* actions;
     },
   };
 }
@@ -49,7 +49,7 @@ export function emit({
 }
 
 export function* put(action: AnyAction | AnyAction[]) {
-  const signal = yield* ActionContext;
+  const signal = yield* ActionContext.expect();
   return emit({
     signal,
     action,
@@ -105,7 +105,9 @@ export function* takeLeading<T>(
   }
 }
 
-export function* waitFor(predicate: Callable<boolean>) {
+export function* waitFor(
+  predicate: Callable<Operation<boolean> | Promise<boolean> | boolean>,
+) {
   const init = yield* call(predicate as any);
   if (init) {
     return;
@@ -113,7 +115,7 @@ export function* waitFor(predicate: Callable<boolean>) {
 
   while (true) {
     yield* take("*");
-    const result = yield* call(() => predicate as any);
+    const result = yield* call(predicate as any);
     if (result) {
       return;
     }
