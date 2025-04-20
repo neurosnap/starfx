@@ -60,7 +60,7 @@ it(test, "should recover with backoff pressure", async () => {
         actions.push(action);
       }
     });
-    yield* call(supervise(op, backoff));
+    yield* (supervise(call(op), backoff));
   });
 
   expect(actions.length).toEqual(3);

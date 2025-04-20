@@ -1,5 +1,5 @@
 import { createAction, take } from "./action.ts";
-import { call, Callable, Operation, race, sleep, spawn, Task } from "effection";
+import { call, Operation, race, sleep, spawn, Task } from "effection";
 import type { ActionWithPayload, AnyAction } from "./types.ts";
 import type { CreateActionPayload } from "./query/mod.ts";
 import { getIdFromAction } from "./action.ts";
@@ -47,7 +47,7 @@ export const clearTimers = createAction<
 export function timer(timer: number = 5 * MINUTES) {
   return function* onTimer(
     actionType: string,
-    op: (action: AnyAction) => Callable<unknown>,
+    op: (action: AnyAction) => Operation<unknown>,
   ) {
     const map: { [key: string]: Task<unknown> } = {};
 

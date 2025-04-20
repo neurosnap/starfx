@@ -1,4 +1,4 @@
-import { sleep } from "effection";
+import { call, sleep } from "effection";
 import { Ok, Operation, parallel, put, take } from "../mod.ts";
 import {
   createPersistor,
@@ -42,20 +42,20 @@ it(tests, "can persist to storage adapters", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
 
     const group = yield* parallel([
-      function* (): Operation<void> {
+      call(function* (): Operation<void> {
         const action = yield* take<string>("SET_TOKEN");
         yield* schema.update(schema.token.set(action.payload));
-      },
-      function* () {
+      }),
+      call(function* () {
         yield* put({ type: "SET_TOKEN", payload: "1234" });
-      },
+      }),
     ]);
     yield* group;
-  });
+  }));
 
   asserts.assertEquals(ls, '{"token":"1234"}');
 });
@@ -87,10 +87,10 @@ it(tests, "rehydrates state", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
-  });
+  }));
 
   asserts.assertEquals(store.getState().token, "123");
 });
@@ -135,20 +135,20 @@ it(tests, "persists inbound state using transform 'in' function", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
 
     const group = yield* parallel([
-      function* (): Operation<void> {
+      call(function* (): Operation<void> {
         const action = yield* take<string>("SET_TOKEN");
         yield* schema.update(schema.token.set(action.payload));
-      },
-      function* () {
+      }),
+      call(function* () {
         yield* put({ type: "SET_TOKEN", payload: "1234" });
-      },
+      }),
     ]);
     yield* group;
-  });
+  }));
   asserts.assertEquals(ls, '{"token":"4321","cache":{}}');
 });
 
@@ -196,20 +196,20 @@ it(tests, "persists inbound state using tranform in (2)", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
 
     const group = yield* parallel([
-      function* (): Operation<void> {
+      call(function* (): Operation<void> {
         const action = yield* take<string>("SET_TOKEN");
         yield* schema.update(schema.token.set(action.payload));
-      },
-      function* () {
+      }),
+      call(function* () {
         yield* put({ type: "SET_TOKEN", payload: "1234" });
-      },
+      }),
     ]);
     yield* group;
-  });
+  }));
   asserts.assertEquals(ls, '{"token":"4321","cache":{}}');
 });
 
@@ -271,10 +271,10 @@ it(tests, "persists a filtered nested part of a slice", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
     const group = yield* parallel([
-      function* () {
+      call(function* () {
         yield* schema.update(schema.token.set("1234"));
         yield* schema.update(
           schema.loaders.start({
@@ -301,10 +301,10 @@ it(tests, "persists a filtered nested part of a slice", async () => {
         yield* schema.update(schema.loaders.success({ id: "B" }));
         yield* schema.update(schema.loaders.success({ id: "C" }));
         yield* schema.update(schema.token.set("1"));
-      },
+      }),
     ]);
     yield* group;
-  });
+  }));
   asserts.assertStringIncludes(ls, '{"token":"1"');
   asserts.assertStringIncludes(ls, '"message":"loading A-second"');
   asserts.assertStringIncludes(ls, '"id":"C"');
@@ -351,9 +351,9 @@ it(tests, "handles the empty state correctly", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
-  });
+  }));
 
   asserts.assertEquals(ls, "{}");
 });
@@ -393,20 +393,20 @@ it(
       middleware: [mdw],
     });
 
-    await store.run(function* (): Operation<void> {
+    await store.run(call(function* (): Operation<void> {
       yield* persistor.rehydrate();
 
       const group = yield* parallel([
-        function* (): Operation<void> {
+        call(function* (): Operation<void> {
           const action = yield* take<string>("SET_TOKEN");
           yield* schema.update(schema.token.set(action.payload));
-        },
-        function* () {
+        }),
+        call(function* () {
           yield* put({ type: "SET_TOKEN", payload: "1234" });
-        },
+        }),
       ]);
       yield* group;
-    });
+    }));
 
     asserts.assertEquals(ls, '{"token":"1234"}');
   },
@@ -450,11 +450,11 @@ it(
       middleware: [mdw],
     });
 
-    await store.run(function* (): Operation<void> {
+    await store.run(call(function* (): Operation<void> {
       yield* persistor.rehydrate();
       yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
       yield* schema.update(schema.token.set("1234"));
-    });
+    }));
     asserts.assertEquals(store.getState().token, "1234");
   },
 );
@@ -504,12 +504,12 @@ it(
       middleware: [mdw],
     });
 
-    await store.run(function* (): Operation<void> {
+    await store.run(call(function* (): Operation<void> {
       yield* persistor.rehydrate();
       yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
       yield* schema.update(schema.token.set("1234"));
       yield* schema.update(schema.counter.set(5));
-    });
+    }));
 
     asserts.assertEquals(ls, '{"token":"54321"}');
   },
@@ -559,11 +559,11 @@ it(
       middleware: [mdw],
     });
 
-    await store.run(function* (): Operation<void> {
+    await store.run(call(function* (): Operation<void> {
       yield* persistor.rehydrate();
       yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
       yield* schema.update(schema.token.set("01234"));
-    });
+    }));
 
     asserts.assertEquals(ls, '{"token":"43210"}');
 
@@ -574,9 +574,9 @@ it(
       };
     };
 
-    await store.run(function* (): Operation<void> {
+    await store.run(call(function* (): Operation<void> {
       yield* schema.update(schema.token.set("01234"));
-    });
+    }));
 
     asserts.assertEquals(ls, '{"token":"0123456789"}');
   },
@@ -623,10 +623,10 @@ it(tests, "persists state using transform 'out' function", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
-  });
+  }));
 
   asserts.assertEquals(store.getState().token, "43210");
 });
@@ -678,10 +678,10 @@ it("persists outbound state using tranform setOutTransformer", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
-  });
+  }));
 
   asserts.assertEquals(ls, '{"token":"012345"}');
 });
@@ -734,10 +734,10 @@ it(tests, "persists outbound a filtered nested part of a slice", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
-  });
+  }));
   asserts.assertEquals(store.getState().token, "01234_FLAG_PERSISTED");
 });
 
@@ -788,25 +788,25 @@ it(tests, "the outbound transformer can be reset during runtime", async () => {
     middleware: [mdw],
   });
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
-  });
+  }));
 
   asserts.assertEquals(store.getState().token, "4321_");
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* schema.update(schema.token.set("01234"));
-  });
+  }));
 
   asserts.assertEquals(ls, '{"token":"01234"}');
 
   transform.out = postpendToken;
 
-  await store.run(function* (): Operation<void> {
+  await store.run(call(function* (): Operation<void> {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
-  });
+  }));
 
   asserts.assertEquals(store.getState().token, "0123456789");
 });

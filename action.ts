@@ -1,14 +1,13 @@
 import {
   call,
-  Callable,
   createContext,
   createSignal,
   each,
-  Operation,
-  Signal,
+  type Operation,
+  type Signal,
   SignalQueueFactory,
   spawn,
-  Stream,
+  type Stream,
 } from "effection";
 import { ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
@@ -106,16 +105,16 @@ export function* takeLeading<T>(
 }
 
 export function* waitFor(
-  predicate: Callable<Operation<boolean> | Promise<boolean> | boolean>,
+  predicate: Operation<boolean>,
 ) {
-  const init = yield* call(predicate as any);
+  const init = yield* predicate;
   if (init) {
     return;
   }
 
   while (true) {
     yield* take("*");
-    const result = yield* call(predicate as any);
+    const result = yield* predicate;
     if (result) {
       return;
     }

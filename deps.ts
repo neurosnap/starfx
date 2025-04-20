@@ -1,5 +1,4 @@
 export type {
-  Callable,
   Channel,
   Operation,
   Queue,

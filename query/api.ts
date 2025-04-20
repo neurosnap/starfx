@@ -65,10 +65,6 @@ export function createApi<Ctx extends ApiCtx = ApiCtx>(
 
   return {
     use: thunks.use,
-    /**
-     * @deprecated use `register()` instead
-     */
-    bootup: thunks.register,
     register: thunks.register,
     create: thunks.create,
     routes: thunks.routes,
