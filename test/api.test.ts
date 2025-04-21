@@ -103,7 +103,7 @@ it(tests, "POST", async () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(query.register);
+  await store.run(query.register);
 
   store.dispatch(createUser({ email: mockUser.email }));
 
@@ -257,7 +257,7 @@ it(tests, "run() from a normal saga", async () => {
   }
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(keepAlive([api.register, call(watchAction)]));
+  await store.run(keepAlive([api.register, call(watchAction)]));
   store.dispatch(action2());
 
   await new Promise((resolve) => setTimeout(resolve, 300));

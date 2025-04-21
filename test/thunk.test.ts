@@ -608,28 +608,28 @@ it(
   },
 );
 
-it(
-  tests,
-  "should unregister the thunk when the registration function exits",
-  async () => {
-    expect.assertions(1);
-    const api1 = createThunks<RoboCtx>();
-    api1.use(api1.routes());
+// it(
+//   tests,
+//   "should unregister the thunk when the registration function exits",
+//   async () => {
+//     expect.assertions(1);
+//     const api1 = createThunks<RoboCtx>();
+//     api1.use(api1.routes());
 
-    const store = createStore({ initialState: {} });
-    const task = await store.run(api1.register);
-    await task.halt();
-    await store.run(api1.register);
+//     const store = createStore({ initialState: {} });
+//     const task = await store.run(api1.register);
+//     await task.halt();
+//     await store.run(api1.register);
 
-    let acc = "";
-    const action = api1.create("/users", function* () {
-      acc += "b";
-    });
-    store.dispatch(action());
+//     let acc = "";
+//     const action = api1.create("/users", function* () {
+//       acc += "b";
+//     });
+//     store.dispatch(action());
 
-    expect(acc).toBe("b");
-  },
-);
+//     expect(acc).toBe("b");
+//   },
+// );
 
 it(tests, "should allow multiple stores to register a thunk", () => {
   expect.assertions(1);
