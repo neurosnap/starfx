@@ -1,4 +1,4 @@
-import type { Operation } from "effection";
+import type { Operation } from "./deps.ts";
 
 export type Next = () => Operation<void>;
 

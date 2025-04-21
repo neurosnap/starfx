@@ -25,7 +25,7 @@ export {
   sleep,
   spawn,
   useAbortSignal,
-} from "effection";
+} from "./deps.ts";
 export type {
   Channel,
   Operation,
@@ -34,4 +34,4 @@ export type {
   Stream,
   Subscription,
   Task,
-} from "effection";
+} from "./deps.ts";

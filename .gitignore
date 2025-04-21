@@ -7,3 +7,6 @@ npm/
 .vscode
 docs/public/*
 !docs/public/.gitkeep
+
+.lh
+.notebook

@@ -8,7 +8,7 @@ import {
   SignalQueueFactory,
   spawn,
   type Stream,
-} from "effection";
+} from "./deps.ts";
 import { ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";

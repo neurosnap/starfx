@@ -1,4 +1,4 @@
-import { createQueue } from "effection";
+import { createQueue } from "./deps.ts";
 
 export function createFilterQueue<T, TClose>(predicate: (v: T) => boolean) {
   const queue = createQueue<T, TClose>();

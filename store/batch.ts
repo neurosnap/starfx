@@ -1,4 +1,4 @@
-import { action } from "effection";
+import { action } from "../deps.ts";
 import { UpdaterCtx } from "./types.ts";
 import { AnyState, Next } from "../types.ts";
 

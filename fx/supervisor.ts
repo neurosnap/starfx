@@ -1,8 +1,8 @@
-import { call, type Operation, sleep } from "effection";
+import { call, type Operation, sleep } from "../deps.ts";
 import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
 import { API_ACTION_PREFIX, put } from "../action.ts";
-import type { Result } from "effection";
+import type { Result } from "../deps.ts";
 
 export function superviseBackoff(attempt: number, max = 10): number {
   if (attempt > max) return -1;
