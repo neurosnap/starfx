@@ -1,15 +1,18 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@effection/effection@4.0.0-alpha.7": "4.0.0-alpha.7",
-    "jsr:@std/assert@*": "1.0.10",
+    "jsr:@effection/effection@4.0.0-alpha.8": "4.0.0-alpha.8",
+    "jsr:@std/assert@*": "1.0.12",
     "jsr:@std/assert@^1.0.10": "1.0.10",
-    "jsr:@std/expect@*": "1.0.10",
+    "jsr:@std/assert@^1.0.12": "1.0.12",
+    "jsr:@std/expect@*": "1.0.15",
     "jsr:@std/internal@^1.0.5": "1.0.5",
-    "jsr:@std/testing@*": "1.0.8",
+    "jsr:@std/internal@^1.0.6": "1.0.6",
+    "jsr:@std/testing@*": "1.0.11",
     "npm:@types/node@*": "22.10.1",
     "npm:effection@4.0.0-alpha.5": "4.0.0-alpha.5",
     "npm:effection@4.0.0-alpha.7": "4.0.0-alpha.7",
+    "npm:effection@4.0.0-alpha.8": "4.0.0-alpha.8",
     "npm:immer@^10.0.2": "10.1.1",
     "npm:react-dom@^18.2.0": "18.2.0_react@18.3.1",
     "npm:react-redux@^8.0.5": "8.1.3_react@18.3.1",
@@ -17,30 +20,53 @@
     "npm:reselect@^4.1.8": "4.1.8"
   },
   "jsr": {
-    "@effection/effection@4.0.0-alpha.7": {
-      "integrity": "bb6be892e048c784a4d0ae274a5f9197eb968e3bab15a83b7763a9b1f74a382d"
+    "@effection/effection@4.0.0-alpha.8": {
+      "integrity": "d27cff0cc8b9e16c91664a545b722289eb0bb67f24df36a961395c2580d6d7fb"
     },
     "@std/assert@1.0.10": {
       "integrity": "59b5cbac5bd55459a19045d95cc7c2ff787b4f8527c0dd195078ff6f9481fbb3",
       "dependencies": [
-        "jsr:@std/internal"
+        "jsr:@std/internal@^1.0.5"
+      ]
+    },
+    "@std/assert@1.0.12": {
+      "integrity": "08009f0926dda9cbd8bef3a35d3b6a4b964b0ab5c3e140a4e0351fbf34af5b9a",
+      "dependencies": [
+        "jsr:@std/internal@^1.0.6"
       ]
     },
     "@std/expect@1.0.10": {
       "integrity": "7659b640447887cd1735f866962e10e434f12443b13595b149970c806e6f08db",
       "dependencies": [
         "jsr:@std/assert@^1.0.10",
-        "jsr:@std/internal"
+        "jsr:@std/internal@^1.0.5"
+      ]
+    },
+    "@std/expect@1.0.15": {
+      "integrity": "eca360007b5a7f13dbfa1294224baee7fb98dcd460d8461fe64eeae302902945",
+      "dependencies": [
+        "jsr:@std/assert@^1.0.12",
+        "jsr:@std/internal@^1.0.6"
       ]
     },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
     },
+    "@std/internal@1.0.6": {
+      "integrity": "9533b128f230f73bd209408bb07a4b12f8d4255ab2a4d22a1fd6d87304aca9a4"
+    },
     "@std/testing@1.0.8": {
       "integrity": "ceef535808fb7568e91b0f8263599bd29b1c5603ffb0377227f00a8ca9fe42a2",
       "dependencies": [
         "jsr:@std/assert@^1.0.10",
-        "jsr:@std/internal"
+        "jsr:@std/internal@^1.0.5"
+      ]
+    },
+    "@std/testing@1.0.11": {
+      "integrity": "12b3db12d34f0f385a26248933bde766c0f8c5ad8b6ab34d4d38f528ab852f48",
+      "dependencies": [
+        "jsr:@std/assert@^1.0.12",
+        "jsr:@std/internal@^1.0.6"
       ]
     }
   },
@@ -81,6 +107,9 @@
     },
     "effection@4.0.0-alpha.7": {
       "integrity": "sha512-4d6ox/RIMIqpmRU/FFSOJsScXsRj3KTAnsm2oy2nYqcKT/VVK/UhLka9j6EbttY5W5rt7dC6aofYdu5GPM/j7g=="
+    },
+    "effection@4.0.0-alpha.8": {
+      "integrity": "sha512-P63skS/23ajC6JzvT3uX+jmw/uJqUeyRqsFU2LX3EfTfyYM0OSz8vTlQf79YGZWLJrFhrc8zl9Hbj137N1Ao4Q=="
     },
     "hoist-non-react-statics@3.3.2": {
       "integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
@@ -158,7 +187,7 @@
     "https://crux.land/api/get/2KNRVU": "https://crux.land/api/get/2KNRVU.ts",
     "https://crux.land/api/get/router@0.0.5": "https://crux.land/api/get/2KNRVU",
     "https://crux.land/router@0.0.5": "https://crux.land/api/get/router@0.0.5",
-    "https://esm.sh/v135/@types/react@~18.2/index.d.ts": "https://esm.sh/v135/@types/react@18.2.38/index.d.ts"
+    "https://esm.sh/v135/@types/react@~18.2/index.d.ts": "https://esm.sh/v135/@types/react@18.2.79/index.d.ts"
   },
   "remote": {
     "https://crux.land/api/get/2KNRVU.ts": "6a77d55844aba78d01520c5ff0b2f0af7f24cc1716a0de8b3bb6bd918c47b5ba",
@@ -270,7 +299,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@effection/effection@4.0.0-alpha.7",
+      "jsr:@effection/effection@4.0.0-alpha.8",
       "npm:immer@^10.0.2",
       "npm:react-dom@^18.2.0",
       "npm:react-redux@^8.0.5",

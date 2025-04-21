@@ -9,7 +9,7 @@ export type {
   Stream,
   Subscription,
   Task,
-} from "npm:effection@4.0.0-alpha.7";
+} from "npm:effection@4.0.0-alpha.8";
 export {
   action,
   call,
@@ -32,7 +32,7 @@ export {
   useAbortSignal,
   useScope,
   withResolvers,
-} from "npm:effection@4.0.0-alpha.7";
+} from "npm:effection@4.0.0-alpha.8";
 
 import React from "https://esm.sh/react@18.2.0?pin=v135";
 
