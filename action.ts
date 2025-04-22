@@ -60,17 +60,13 @@ export function take<P>(
 ): Operation<ActionWithPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
   const actionStream = useActions(pattern);
-
   const subscription = yield* actionStream;
-
   const result = yield* subscription.next();
-
   if (result.done) {
     return {
       type: "Action stream closed before a matching action was received",
     };
   }
-
   return result.value;
 }
 

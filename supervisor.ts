@@ -1,5 +1,5 @@
 import { createAction, take } from "./action.ts";
-import { call, Operation, race, sleep, spawn, Task } from "effection";
+import { call, Operation, race, run, sleep, spawn, Task } from "./deps.ts";
 import type { ActionWithPayload, AnyAction } from "./types.ts";
 import type { CreateActionPayload } from "./query/mod.ts";
 import { getIdFromAction } from "./action.ts";
@@ -43,28 +43,26 @@ export const clearTimers = createAction<
  * if we don't set a timer per key then all calls to `fetchApp` will be on a timer.
  * So if we call `fetchApp({ id: 1 })` and then `fetchApp({ id: 2 })` if we use a normal
  * cache timer then the second call will not send an http request.
- */
-export function timer(timer: number = 5 * MINUTES) {
+ */ export function timer(timer: number = 5 * MINUTES) {
   return function* onTimer(
     actionType: string,
     op: (action: AnyAction) => Operation<unknown>,
   ) {
-    const map: { [key: string]: Task<unknown> } = {};
+    const map: Record<string, Task<unknown>> = {};
 
     function* activate(action: ActionWithPayload<CreateActionPayload>) {
       yield* call(() => op(action));
+
       const idA = getIdFromAction(action);
 
       const matchFn = (
         act: ActionWithPayload<ClearTimerPayload | ClearTimerPayload[]>,
       ) => {
-        if (act.type !== `${clearTimers}`) return false;
+        if (act.type !== clearTimers.toString()) return false;
         if (!act.payload) return false;
         const ids = Array.isArray(act.payload) ? act.payload : [act.payload];
         return ids.some((id) => {
-          if (id === "*") {
-            return true;
-          }
+          if (id === "*") return true;
           if (typeof id === "string") {
             return idA === id;
           } else {
@@ -72,19 +70,41 @@ export function timer(timer: number = 5 * MINUTES) {
           }
         });
       };
-      yield* race([sleep(timer), take(matchFn as any) as Operation<void>]);
 
-      delete map[action.payload.key];
+      try {
+        yield* race([sleep(timer), take(matchFn as any) as Operation<void>]);
+      } finally {
+        delete map[action.payload.key];
+      }
     }
 
-    while (true) {
-      const action = yield* take<CreateActionPayload>(`${actionType}`);
-      const key = action.payload.key;
-      if (!map[key]) {
-        const task = yield* spawn(function* () {
-          yield* activate(action);
-        });
-        map[key] = task;
+    try {
+      while (true) {
+        const action = yield* take<CreateActionPayload>(actionType);
+        const key = action.payload.key;
+        if (!map[key]) {
+          const task = yield* spawn(function* () {
+            try {
+              yield* activate(action);
+            } catch (e) {
+              // if something blows up, make sure we clean the map too
+              delete map[key];
+              throw e;
+            }
+          });
+          map[key] = task;
+        }
+      }
+    } finally {
+      // halt pendings explicitly (!)
+      for (const key in map) {
+        const task = map[key];
+        try {
+          yield* call(() => task.halt());
+        } catch {
+          // ignore “already halted” errors
+        }
+        delete map[key];
       }
     }
   };
