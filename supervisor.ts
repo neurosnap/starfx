@@ -1,5 +1,5 @@
 import { createAction, take } from "./action.ts";
-import { call, Operation, race, run, sleep, spawn, Task } from "./deps.ts";
+import { call, Operation, race, sleep, spawn, Task } from "./deps.ts";
 import type { ActionWithPayload, AnyAction } from "./types.ts";
 import type { CreateActionPayload } from "./query/mod.ts";
 import { getIdFromAction } from "./action.ts";

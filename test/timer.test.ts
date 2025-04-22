@@ -1,8 +1,6 @@
 import { describe, expect, it } from "../test.ts";
 import {
-  call,
   clearTimers,
-  keepAlive,
   put,
   run,
   sleep,
@@ -57,7 +55,7 @@ it(tests, "should let user cancel timer with action obj", async () => {
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {
-      yield* timer(10_000)("ACTION", function* (u) {
+      yield* timer(10_000)("ACTION", function* (_u) {
         called += 1;
       });
     });

@@ -2,7 +2,6 @@ import { describe, expect, it } from "../test.ts";
 import {
   Operation,
   run,
-  sleep,
   spawn,
   supervise,
   superviseBackoff,
