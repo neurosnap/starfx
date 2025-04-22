@@ -1,4 +1,4 @@
-import { call, type Operation, type Result } from "effection";
+import { type Operation, type Result } from "effection";
 import type { ActionFnWithPayload, AnyState, LoaderState } from "../types.ts";
 import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext } from "./context.ts";
