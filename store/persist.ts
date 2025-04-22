@@ -1,4 +1,4 @@
-import { Err, Ok, Operation, Result } from "../deps.ts";
+import { Err, Ok, Operation, Result } from "effection";
 import { select, updateStore } from "./fx.ts";
 import type { AnyState, Next } from "../types.ts";
 import type { UpdaterCtx } from "./types.ts";

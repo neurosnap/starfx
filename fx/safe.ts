@@ -1,5 +1,5 @@
-import type { Operation, Result } from "../deps.ts";
-import { call, Err, Ok } from "../deps.ts";
+import type { Operation, Result } from "effection";
+import { call, Err, Ok } from "effection";
 
 /**
  * The goal of `safe` is to wrap Operations to prevent them from raising

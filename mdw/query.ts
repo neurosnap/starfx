@@ -1,4 +1,4 @@
-import { call, type Operation } from "../deps.ts";
+import { call, type Operation } from "effection";
 import { safe } from "../fx/mod.ts";
 import { compose } from "../compose.ts";
 import { put } from "../action.ts";

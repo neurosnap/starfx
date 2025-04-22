@@ -1,6 +1,6 @@
 import { ActionContext, API_ACTION_PREFIX, takeEvery } from "../action.ts";
 import { compose } from "../compose.ts";
-import { call, ensure, Ok, type Operation, type Signal } from "../deps.ts";
+import { call, ensure, Ok, type Operation, type Signal } from "effection";
 import { keepAlive, supervise } from "../fx/mod.ts";
 import { IdContext } from "../store/store.ts";
 import { createKey } from "./create-key.ts";

@@ -1,4 +1,4 @@
-import { type Channel, createChannel, createContext } from "../deps.ts";
+import { type Channel, createChannel, createContext } from "effection";
 import type { AnyState } from "../types.ts";
 import type { FxStore } from "./types.ts";
 

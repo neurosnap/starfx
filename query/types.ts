@@ -1,4 +1,4 @@
-import type { Operation, Result } from "../deps.ts";
+import type { Operation, Result } from "effection";
 import type {
   Action,
   ActionWithPayload,

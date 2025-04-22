@@ -1,5 +1,5 @@
 import type { Patch } from "immer";
-import type { Operation, Scope } from "../deps.ts";
+import type { Operation, Scope } from "effection";
 import type { AnyAction, AnyState } from "../types.ts";
 import type { LoaderOutput } from "./slice/loaders.ts";
 import type { TableOutput } from "./slice/table.ts";

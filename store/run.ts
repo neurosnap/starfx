@@ -1,4 +1,4 @@
-import { Operation, Result, Scope, Task } from "../deps.ts";
+import { Operation, Result, Scope, Task } from "effection";
 import { parallel, safe } from "../fx/mod.ts";
 
 export function createRun(scope: Scope) {

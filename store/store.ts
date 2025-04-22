@@ -1,12 +1,11 @@
-import { createContext, createScope, createSignal, Ok, Scope } from "../deps.ts";
-import { enablePatches, produceWithPatches } from "../deps.ts";
+import { createContext, createScope, createSignal, Ok, Scope } from "effection";
+import { enablePatches, produceWithPatches } from "immer";
 import { ActionContext, API_ACTION_PREFIX, emit } from "../action.ts";
 import { BaseMiddleware, compose } from "../compose.ts";
 import { StoreContext, StoreUpdateContext } from "./context.ts";
 import { createRun } from "./run.ts";
 import type { AnyAction, AnyState, Next } from "../types.ts";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.ts";
-import { call } from "../deps.ts";
 const stubMsg = "This is merely a stub, not implemented";
 
 let id = 0;
@@ -126,7 +125,7 @@ export function createStore<S extends AnyState>({
       result: Ok(undefined),
     };
 
-    yield* call(()=>mdw(ctx));
+    yield* mdw(ctx);
 
     if (!ctx.result.ok) {
       dispatch({

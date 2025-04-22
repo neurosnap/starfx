@@ -12,7 +12,7 @@ import type {
   Supervisor,
 } from "./types.ts";
 import type { Next, Payload } from "../types.ts";
-import type { Operation } from "../deps.ts";
+import type { Operation } from "effection";
 
 export type ApiName = string | string[];
 
