@@ -59,12 +59,19 @@ export function take<P>(
   pattern: ActionPattern,
 ): Operation<ActionWithPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
-  const fd = useActions(pattern);
-  for (const action of yield* each(fd)) {
-    return action;
+  const actionStream = useActions(pattern);
+
+  const subscription = yield* actionStream;
+
+  const result = yield* subscription.next();
+
+  if (result.done) {
+    return {
+      type: "Action stream closed before a matching action was received",
+    };
   }
 
-  return { type: "take failed, this should not be possible" };
+  return result.value;
 }
 
 export function* takeEvery<T>(
