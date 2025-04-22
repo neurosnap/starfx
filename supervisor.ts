@@ -83,13 +83,12 @@ export const clearTimers = createAction<
         const action = yield* take<CreateActionPayload>(actionType);
         const key = action.payload.key;
         if (!map[key]) {
+          map[key] = null as any; //ensure key exists
           const task = yield* spawn(function* () {
             try {
               yield* activate(action);
-            } catch (e) {
-              // if something blows up, make sure we clean the map too
+            } finally {
               delete map[key];
-              throw e;
             }
           });
           map[key] = task;
