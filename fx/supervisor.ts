@@ -1,4 +1,4 @@
-import { type Operation, sleep } from "effection";
+import { call, type Operation, sleep } from "effection";
 import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
 import { API_ACTION_PREFIX, put } from "../action.ts";
@@ -20,22 +20,25 @@ export function superviseBackoff(attempt: number, max = 10): number {
 export function supervise<T, TArgs extends unknown[] = []>(
   op: (...args: TArgs) => Operation<T>,
   backoff: (attemp: number) => number = superviseBackoff,
-): () => Operation<void> {
+) {
   return function* () {
     let attempt = 1;
     let waitFor = backoff(attempt);
 
     while (waitFor >= 0) {
       const res = yield* safe(op);
+
       if (res.ok) {
         attempt = 0;
       } else {
+        yield* sleep(1); // next tick
         yield* put({
           type: `${API_ACTION_PREFIX}supervise`,
           payload: res.error,
           meta:
             `Exception caught, waiting ${waitFor}ms before restarting operation`,
         });
+
         yield* sleep(waitFor);
       }
 

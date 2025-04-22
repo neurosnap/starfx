@@ -1,5 +1,12 @@
 import { describe, expect, it } from "../test.ts";
-import { Operation, run, spawn, supervise, superviseBackoff } from "../mod.ts";
+import {
+  Operation,
+  run,
+  sleep,
+  spawn,
+  supervise,
+  superviseBackoff,
+} from "../mod.ts";
 import { ActionWithPayload } from "../types.ts";
 import { take } from "../action.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
@@ -50,7 +57,6 @@ it(test, "should recover with backoff pressure", async () => {
     yield* spawn(function* () {
       while (true) {
         const action = yield* take<LogAction["payload"]>("*");
-        console.log(action);
         actions.push(action);
       }
     });
@@ -58,7 +64,6 @@ it(test, "should recover with backoff pressure", async () => {
   });
 
   expect(actions.length).toEqual(3);
-  expect(actions).toEqual([]);
   expect(actions[0].type).toEqual(`${API_ACTION_PREFIX}supervise`);
   expect(actions[0].meta).toEqual(
     "Exception caught, waiting 1ms before restarting operation",
