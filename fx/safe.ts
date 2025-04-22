@@ -19,13 +19,17 @@ import { call, Err, Ok } from "effection";
  * }
  * ```
  */
-export function* safe<T>(
-  operatorFunction: Operation<T>,
+function isError(error: unknown): error is Error {
+  return error instanceof Error;
+}
+
+export function* safe<T, TArgs extends unknown[] = []>(
+  operator: (...args: TArgs) => Operation<T>,
 ): Operation<Result<T>> {
   try {
-    const value = yield* call(() => operatorFunction);
+    const value = yield* call(operator);
     return Ok(value);
   } catch (error) {
-    return Err(error as Error);
+    return Err(isError(error) ? error : new Error(String(error)));
   }
 }

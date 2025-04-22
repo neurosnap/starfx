@@ -28,7 +28,7 @@ export * from "./fetch.ts";
  * `window.fetch`.
  */
 export function* err<Ctx extends ThunkCtx = ThunkCtx>(ctx: Ctx, next: Next) {
-  ctx.result = yield* safe(call(next));
+  ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
     const message =
       `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;

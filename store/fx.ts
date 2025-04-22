@@ -57,7 +57,7 @@ export function* waitForLoaders<M extends AnyState>(
   actions: (ThunkAction | ActionFnWithPayload)[],
 ): Operation<Result<LoaderState<M>>[]> {
   const group = yield* parallel(
-    actions.map((action) => waitForLoader(loaders, action)),
+    actions.map((action) => () => waitForLoader(loaders, action)),
   );
   return yield* group;
 }
@@ -70,7 +70,7 @@ export function createTracker<T, M extends Record<string, unknown>>(
       op: () => Operation<Result<T>>,
     ): Operation<Result<Result<T>>> {
       yield* updateStore(loader.start({ id }));
-      const result = yield* safe(call(op));
+      const result = yield* safe(op);
       if (result.ok) {
         yield* updateStore(loader.success({ id }));
       } else {

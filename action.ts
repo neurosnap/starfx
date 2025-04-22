@@ -112,16 +112,16 @@ export function* takeLeading<T>(
 }
 
 export function* waitFor(
-  predicate: Operation<boolean>,
+  predicate: () => Operation<boolean>,
 ) {
-  const init = yield* predicate;
+  const init = yield* predicate();
   if (init) {
     return;
   }
 
   while (true) {
     yield* take("*");
-    const result = yield* predicate;
+    const result = yield* predicate();
     if (result) {
       return;
     }

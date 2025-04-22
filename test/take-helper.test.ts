@@ -1,4 +1,4 @@
-import { call, spawn } from "effection";
+import { spawn } from "effection";
 import { describe, expect, it } from "../test.ts";
 import { createStore } from "../store/mod.ts";
 import type { AnyAction } from "../mod.ts";
@@ -23,7 +23,7 @@ it(testLatest, "should cancel previous tasks and only use latest", async () => {
     yield* task.halt();
   }
   const store = createStore({ initialState: {} });
-  const task = await store.run(call(root));
+  const task = await store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
   store.dispatch({ type: "ACTION", payload: "2" });
@@ -50,7 +50,7 @@ it(testLeading, "should keep first action and discard the rest", async () => {
     yield* task.halt();
   }
   const store = createStore({ initialState: {} });
-  const task = await store.run(call(root));
+  const task = await store.run(root);
 
   store.dispatch({ type: "ACTION", payload: "1" });
   store.dispatch({ type: "ACTION", payload: "2" });
@@ -80,7 +80,7 @@ it(testEvery, "should receive all actions", async () => {
   }
 
   const store = createStore({ initialState: {} });
-  const task = await store.run(call(root));
+  const task = await store.run(root);
 
   for (let i = 1; i <= loop / 2; i += 1) {
     store.dispatch({

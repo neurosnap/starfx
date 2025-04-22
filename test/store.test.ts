@@ -1,12 +1,4 @@
-import {
-  call,
-  createScope,
-  Operation,
-  parallel,
-  put,
-  Result,
-  take,
-} from "../mod.ts";
+import { createScope, Operation, parallel, put, Result, take } from "../mod.ts";
 import {
   createStore,
   // StoreContext,
@@ -72,15 +64,15 @@ it(
     let store;
     await scope.run(function* (): Operation<Result<void>[]> {
       const result = yield* parallel([
-        call(function* () {
+        function* () {
           // const store = yield* StoreContext.expect();
           const chan = yield* StoreUpdateContext.expect();
           const msgList = yield* chan;
           yield* msgList.next();
-        }),
-        call(function* () {
+        },
+        function* () {
           yield* updateStore(updateUser({ id: "1", name: "eric" }));
-        }),
+        },
       ]);
       return yield* result;
     });
@@ -110,9 +102,9 @@ it(tests, "update store and receives update from `subscribe()`", async () => {
     });
   });
 
-  await store.run(call(function* () {
+  await store.run(function* () {
     yield* updateStore(updateUser({ id: "1", name: "eric" }));
-  }));
+  });
 });
 
 it(tests, "emit Action and update store", async () => {
@@ -125,18 +117,18 @@ it(tests, "emit Action and update store", async () => {
   };
   const store = createStore({ initialState });
 
-  await store.run(call(function* (): Operation<void> {
+  await store.run(function* (): Operation<void> {
     const result = yield* parallel([
-      call(function* (): Operation<void> {
+      function* (): Operation<void> {
         const action = yield* take<UpdateUserProps>("UPDATE_USER");
         yield* updateStore(updateUser(action.payload));
-      }),
-      call(function* () {
+      },
+      function* () {
         yield* put({ type: "UPDATE_USER", payload: { id: "1", name: "eric" } });
-      }),
+      },
     ]);
     yield* result;
-  }));
+  });
 
   expect(store.getState()).toEqual({
     users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
@@ -156,13 +148,13 @@ it(tests, "resets store", async () => {
   };
   const store = createStore({ initialState });
 
-  await store.run(call(function* () {
+  await store.run(function* () {
     yield* store.update((s) => {
       s.users = { 3: { id: "3", name: "hehe" } };
       s.dev = true;
       s.theme = "darkness";
     });
-  }));
+  });
 
   expect(store.getState()).toEqual({
     users: { 3: { id: "3", name: "hehe" } },
@@ -171,7 +163,7 @@ it(tests, "resets store", async () => {
     dev: true,
   });
 
-  await store.run(store.reset(["users"]));
+  await store.run(() => store.reset(["users"]));
 
   expect(store.getState()).toEqual({
     users: { 3: { id: "3", name: "hehe" } },

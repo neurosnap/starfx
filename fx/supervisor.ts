@@ -17,17 +17,16 @@ export function superviseBackoff(attempt: number, max = 10): number {
  * error simply calling the {@link Operation} then it will exponentially
  * wait longer until attempting to restart and eventually give up.
  */
-export function supervise<T>(
-  op: Operation<T>,
+export function supervise<T, TArgs extends unknown[] = []>(
+  op: (...args: TArgs) => Operation<T>,
   backoff: (attemp: number) => number = superviseBackoff,
-): Operation<void> {
-  return call(function* () {
+): () => Operation<void> {
+  return function* () {
     let attempt = 1;
     let waitFor = backoff(attempt);
 
     while (waitFor >= 0) {
       const res = yield* safe(op);
-
       if (res.ok) {
         attempt = 0;
       } else {
@@ -43,15 +42,15 @@ export function supervise<T>(
       attempt += 1;
       waitFor = backoff(attempt);
     }
-  });
+  };
 }
 
 /**
  * keepAlive accepts a list of operations and calls them all with
  * {@link supervise}
  */
-export function* keepAlive(
-  ops: Operation<void>[],
+export function* keepAlive<T, TArgs extends unknown[] = []>(
+  ops: ((...args: TArgs) => Operation<T>)[],
   backoff?: (attempt: number) => number,
 ): Operation<Result<void>[]> {
   const supervised = ops.map((op) => supervise(op, backoff));

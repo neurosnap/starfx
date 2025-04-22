@@ -78,7 +78,7 @@ it(tests, "when error is discovered, it should throw", async () => {
   ]);
   const actual = await run(function* () {
     const ctx = {};
-    const result = yield* safe(mdw(ctx));
+    const result = yield* safe(() => mdw(ctx));
     return result;
   });
 

@@ -140,7 +140,7 @@ it(
     const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
     });
-    await store.run(api.register);
+    await store.run(() => api.register);
 
     store.dispatch(fetchUsers());
 
@@ -182,7 +182,7 @@ it(
     const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
     });
-    await store.run(api.register);
+    await store.run(() => api.register);
 
     store.dispatch(fetchTickets());
     expect(store.getState()).toEqual({
@@ -211,12 +211,12 @@ it(tests, "error handling", async () => {
   const action = api.create(`/error`, { supervisor: takeEvery });
 
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action());
   expect(called).toBe(true);
 });
 
-it(tests, "error handling inside create", async() => {
+it(tests, "error handling inside create", async () => {
   expect.assertions(1);
   let called = false;
   const api = createThunks<RoboCtx>();
@@ -237,7 +237,7 @@ it(tests, "error handling inside create", async() => {
     },
   );
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action());
   expect(called).toBe(true);
 });
@@ -269,7 +269,7 @@ it(tests, "error inside endpoint mdw", async () => {
       users: {},
     },
   });
-  await store.run(query.register);
+  await store.run(() => query.register);
   store.dispatch(fetchUsers());
   expect(called).toBe(true);
 });
@@ -301,7 +301,7 @@ it(tests, "create fn is an array", async () => {
   ]);
 
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action());
 });
 
@@ -333,7 +333,7 @@ it(tests, "run() on endpoint action - should run the effect", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action2());
   expect(acc).toBe("ab");
   expect(curCtx.action).toMatchObject({
@@ -377,7 +377,7 @@ it(
     );
 
     const store = createStore({ initialState: {} });
-    await store.run(api.register);
+    await store.run(() => api.register);
     store.dispatch(action2());
     expect(acc).toBe("ab");
     expect(curCtx.action).toMatchObject({
@@ -425,10 +425,10 @@ it(tests, "middleware order of execution", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action());
 
-  await await store.run(waitFor(call(() => acc === "abcdefg")));
+  await await store.run(() => waitFor(() => call(() => acc === "abcdefg")));
   asserts.assert(acc === "abcdefg");
 });
 
@@ -455,10 +455,10 @@ it(tests, "retry with actionFn", async () => {
   });
 
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action());
 
-  await await store.run(waitFor(call(() => acc === "agag")));
+  await await store.run(() => waitFor(() => call(() => acc === "agag")));
   asserts.assertEquals(acc, "agag");
 });
 
@@ -486,10 +486,10 @@ it(tests, "retry with actionFn with payload", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action({ page: 1 }));
 
-  await await store.run(waitFor(call(() => acc === "agag")));
+  await await store.run(() => waitFor(() => call(() => acc === "agag")));
   asserts.assertEquals(acc, "agag");
 });
 
@@ -517,7 +517,7 @@ it(tests, "should only call thunk once", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
   store.dispatch(action2());
   expect(acc).toBe("a");
 });
@@ -527,7 +527,7 @@ it(tests, "should be able to create thunk after `register()`", async () => {
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
   const store = createStore({ initialState: {} });
-  await store.run(api.register);
+  await store.run(() => api.register);
 
   let acc = "";
   const action = api.create("/users", function* () {
@@ -554,21 +554,25 @@ it(tests, "should warn when calling thunk before registered", () => {
   console.warn = err;
 });
 
-it(tests, "it should call the api once even if we register it twice", async () => {
-  expect.assertions(1);
-  const api = createThunks<RoboCtx>();
-  api.use(api.routes());
-  const store = createStore({ initialState: {} });
-  await store.run(api.register);
-  await store.run(api.register);
+it(
+  tests,
+  "it should call the api once even if we register it twice",
+  async () => {
+    expect.assertions(1);
+    const api = createThunks<RoboCtx>();
+    api.use(api.routes());
+    const store = createStore({ initialState: {} });
+    await store.run(() => api.register);
+    await store.run(() => api.register);
 
-  let acc = "";
-  const action = api.create("/users", function* () {
-    acc += "a";
-  });
-  store.dispatch(action());
-  expect(acc).toBe("a");
-});
+    let acc = "";
+    const action = api.create("/users", function* () {
+      acc += "a";
+    });
+    store.dispatch(action());
+    expect(acc).toBe("a");
+  },
+);
 
 it(
   tests,
@@ -583,12 +587,12 @@ it(
 
     const store = createStore({ initialState: {} });
 
-    await store.run(api1.register);
-    await store.run(api1.register);
-    await store.run(api1.register);
+    await store.run(() => api1.register);
+    await store.run(() => api1.register);
+    await store.run(() => api1.register);
 
-    await store.run(api2.register);
-    await store.run(api2.register);
+    await store.run(() => api2.register);
+    await store.run(() => api2.register);
 
     let acc = "";
     const action = api1.create("/users", function* () {
@@ -637,8 +641,8 @@ it(tests, "should allow multiple stores to register a thunk", () => {
   api1.use(api1.routes());
   const storeA = createStore({ initialState: {} });
   const storeB = createStore({ initialState: {} });
-  storeA.run(api1.register);
-  storeB.run(api1.register);
+  storeA.run(() => api1.register);
+  storeB.run(() => api1.register);
   let acc = "";
   const action = api1.create("/users", function* () {
     acc += "b";

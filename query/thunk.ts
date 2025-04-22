@@ -127,7 +127,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   let signal: Signal<AnyAction, void> | undefined = undefined;
   let storeId: number | undefined = undefined;
   const middleware: Middleware<Ctx>[] = [];
-  const visors: { [key: string]: Operation<void> } = {};
+  const visors: { [key: string]: () => Operation<void> } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
   let dynamicMiddlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {
@@ -206,7 +206,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
       yield* tt(type, onApi);
     }
 
-    visors[name] = call(curVisor);
+    visors[name] = curVisor;
 
     // If signal is already referenced, register immediately, otherwise defer
     for (const [storeId, storeSignal] of storeMap.entries()) {
@@ -250,7 +250,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* watcher(action: ActionWithPayload<Operation<unknown>>) {
-    yield* supervise(action.payload);
+    yield* supervise(() => action.payload)();
   }
 
   function* register(): Operation<void> {

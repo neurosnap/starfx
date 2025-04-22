@@ -1,7 +1,6 @@
 import { describe, expect, it } from "../test.ts";
 import { ActionContext, each, put, sleep, spawn, take } from "../mod.ts";
 import { createStore } from "../store/mod.ts";
-import { call } from "../mod.ts";
 
 const putTests = describe("put()");
 
@@ -28,7 +27,7 @@ it(putTests, "should send actions through channel", async () => {
   }
 
   const store = createStore({ initialState: {} });
-  await store.run(genFn("arg"));
+  await store.run(() => genFn("arg"));
 
   const expected = ["arg", "2"];
   expect(actual).toEqual(expected);
@@ -58,7 +57,7 @@ it(putTests, "should handle nested puts", async () => {
   }
 
   const store = createStore({ initialState: {} });
-  await store.run(root());
+  await store.run(root);
 
   const expected = ["put b", "put a"];
   expect(actual).toEqual(expected);
@@ -76,7 +75,7 @@ it(
     }
 
     const store = createStore({ initialState: {} });
-    await store.run(root());
+    await store.run(root);
     expect(true).toBe(true);
   },
 );
@@ -104,7 +103,7 @@ it(
     }
 
     const store = createStore({ initialState: {} });
-    await store.run(call(root));
+    await store.run(root);
     const expected = ["didn't get missed"];
     expect(actual).toEqual(expected);
   },

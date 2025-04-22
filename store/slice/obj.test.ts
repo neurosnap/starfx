@@ -31,14 +31,16 @@ it(tests, "sets up an obj", async () => {
     },
   });
 
-  await store.run(updateStore(
-    slice.set({
-      username: "bob",
-      userId: 1,
-      isadmin: true,
-      roles: ["admin", "user"],
-    }),
-  ));
+  await store.run(() =>
+    updateStore(
+      slice.set({
+        username: "bob",
+        userId: 1,
+        isadmin: true,
+        roles: ["admin", "user"],
+      }),
+    )
+  );
 
   asserts.assertEquals(store.getState()["currentUser"], {
     username: "bob",
@@ -47,8 +49,8 @@ it(tests, "sets up an obj", async () => {
     roles: ["admin", "user"],
   });
 
-  await store.run(
-    updateStore(slice.update({ key: "username", value: "alice" })),
+  await store.run(() =>
+    updateStore(slice.update({ key: "username", value: "alice" }))
   );
 
   asserts.assertEquals(store.getState()["currentUser"], {
@@ -58,9 +60,11 @@ it(tests, "sets up an obj", async () => {
     roles: ["admin", "user"],
   });
 
-  await store.run(updateStore(
-    slice.update({ key: "roles", value: ["admin", "superuser"] }),
-  ));
+  await store.run(() =>
+    updateStore(
+      slice.update({ key: "roles", value: ["admin", "superuser"] }),
+    )
+  );
 
   asserts.assertEquals(store.getState()["currentUser"], {
     username: "alice",
