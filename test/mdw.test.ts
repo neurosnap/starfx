@@ -96,7 +96,7 @@ it(tests, "basic", () => {
     },
   );
 
-  store.run(() => query.register);
+  store.run(query.register);
 
   store.dispatch(fetchUsers());
   expect(store.getState().users).toEqual({ [mockUser.id]: mockUser });
@@ -136,7 +136,7 @@ it(tests, "with loader", () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   store.dispatch(fetchUsers());
   assertLike(store.getState(), {
@@ -177,7 +177,7 @@ it(tests, "with item loader", () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   const action = fetchUser({ id: mockUser.id });
   store.dispatch(action);
@@ -241,7 +241,7 @@ it(tests, "with POST", () => {
     },
   );
 
-  store.run(() => query.register);
+  store.run(query.register);
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
@@ -258,7 +258,7 @@ it(tests, "simpleCache", () => {
   });
 
   const fetchUsers = api.get("/users", { supervisor: takeEvery }, api.cache());
-  store.run(() => api.register);
+  store.run(api.register);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -305,7 +305,7 @@ it(tests, "overriding default loader behavior", () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   store.dispatch(fetchUsers());
   assertLike(store.getState(), {
@@ -341,7 +341,7 @@ it(tests, "mdw.api() - error handler", () => {
 
   const fetchUsers = query.create(`/users`, { supervisor: takeEvery });
 
-  store.run(() => query.register);
+  store.run(query.register);
   store.dispatch(fetchUsers());
 });
 
@@ -395,7 +395,7 @@ it(tests, "createApi with own key", async () => {
   );
   const newUEmail = mockUser.email + ".org";
 
-  store.run(() => query.register);
+  store.run(query.register);
 
   store.dispatch(createUserCustomKey({ email: newUEmail }));
 
@@ -465,7 +465,7 @@ it(tests, "createApi with custom key but no payload", async () => {
     },
   );
 
-  store.run(() => query.register);
+  store.run(query.register);
   store.dispatch(getUsers());
 
   await store.run(() => waitForLoader(schema.loaders, getUsers));
@@ -533,7 +533,7 @@ it(tests, "errorHandler", () => {
       users: {},
     },
   });
-  store.run(() => query.register);
+  store.run(query.register);
   store.dispatch(fetchUsers());
   expect(store.getState()).toEqual({
     users: {},
@@ -568,7 +568,7 @@ it(tests, "stub predicate", async () => {
     }),
   ]);
 
-  store.run(() => api.register);
+  store.run(api.register);
   store.dispatch(fetchUsers());
 
   await store.run(() => waitFor(() => call(() => actual.ok)));

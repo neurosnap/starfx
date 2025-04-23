@@ -19,7 +19,7 @@ import type {
 export interface ThunksApi<Ctx extends ThunkCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
-  register: Operation<void>;
+  register: () => Operation<void>;
   reset: () => void;
 
   /**
@@ -315,6 +315,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     create,
     routes,
     reset: resetMdw,
-    register: call(register),
+    register: () => call(register),
   };
 }

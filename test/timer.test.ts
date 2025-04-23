@@ -7,9 +7,10 @@ it(tests, "should call thunk at most once every timer", async () => {
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {
-      yield* timer(10)("ACTION1", function* () {
-        called += 1;
-      });
+      yield* timer(10)("ACTION1", () =>
+        function* () {
+          called += 1;
+        });
     });
     yield* put({ type: "ACTION1", payload: { key: "my-key" } });
     yield* sleep(1);
@@ -27,10 +28,11 @@ it(tests, "should let user cancel timer", async () => {
 
   await run(function* () {
     yield* spawn(function* () {
-      yield* timer(10_000)("ACTION2", function* () {
-        called += 1;
-        return called;
-      });
+      yield* timer(10_000)("ACTION2", () =>
+        function* () {
+          called += 1;
+          return called;
+        });
     });
     yield* sleep(100);
 
@@ -48,9 +50,10 @@ it(tests, "should let user cancel timer with action obj", async () => {
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {
-      yield* timer(10_000)("ACTION", function* (_u) {
-        called += 1;
-      });
+      yield* timer(10_000)("ACTION", () =>
+        function* () {
+          called += 1;
+        });
     });
     yield* sleep(100);
     const action = { type: "ACTION", payload: { key: "my-key" } };
@@ -67,15 +70,17 @@ it(tests, "should let user cancel timer with wildcard", async () => {
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {
-      yield* timer(10_000)("ACTION", function* () {
-        called += 1;
-      });
+      yield* timer(10_000)("ACTION", () =>
+        function* () {
+          called += 1;
+        });
     });
     yield* sleep(100);
     yield* spawn(function* () {
-      yield* timer(10_000)("WOW", function* () {
-        called += 1;
-      });
+      yield* timer(10_000)("WOW", () =>
+        function* () {
+          called += 1;
+        });
     });
     yield* sleep(100);
     yield* put({ type: "ACTION", payload: { key: "my-key" } });

@@ -46,7 +46,7 @@ export const clearTimers = createAction<
  */ export function timer(timer: number = 5 * MINUTES) {
   return function* onTimer(
     actionType: string,
-    op: (action: AnyAction) => Operation<unknown>,
+    op: (action: AnyAction) => () => Operation<unknown>,
   ) {
     const map: Record<string, Task<unknown>> = {};
 

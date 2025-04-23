@@ -146,7 +146,13 @@ export function predicate<Ctx extends ApiCtx = ApiCtx>(
 ) {
   return (mdw: MiddlewareApi) => {
     return function* (ctx: Ctx, next: Next) {
-      const valid = yield* call(() => predicate(ctx));
+      const predicateResult = predicate(ctx);
+
+      const valid: boolean = typeof predicateResult === "boolean"
+        ? predicateResult
+        : yield* predicateResult;
+
+      yield* call(() => predicate(ctx));
       if (!valid) {
         yield* next();
         return;

@@ -63,7 +63,7 @@ it(
       },
     );
 
-    store.run(() => api.register);
+    store.run(api.register);
 
     const action = fetchUsers();
     store.dispatch(action);
@@ -111,7 +111,7 @@ it(
       },
     );
 
-    store.run(() => api.register);
+    store.run(api.register);
 
     const action = fetchUsers();
     store.dispatch(action);
@@ -147,7 +147,7 @@ it(tests, "error handling", async () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -186,7 +186,7 @@ it(tests, "status 204", async () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -226,7 +226,7 @@ it(tests, "malformed json", async () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
   const action = fetchUsers();
   store.dispatch(action);
 
@@ -267,7 +267,7 @@ it(tests, "POST", async () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
   const action = fetchUsers();
   store.dispatch(action);
 
@@ -326,7 +326,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   const action1 = fetchUsers({ id: "1" });
   const action2 = fetchUsersSecond({ id: "1" });
@@ -399,7 +399,7 @@ it(tests, "slug in url but payload has empty string for slug value", () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
   const action = fetchUsers({ id: "" });
   store.dispatch(action);
 
@@ -439,7 +439,7 @@ it(tests, "with success - should keep retrying fetch request", async () => {
     mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
   ]);
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -480,7 +480,7 @@ it(
       mdw.fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);
 
-    store.run(() => api.register);
+    store.run(api.register);
     const action = fetchUsers();
     store.dispatch(action);
 
@@ -512,7 +512,7 @@ it(
       mdw.response(new Response(JSON.stringify(mockUser))),
     ]);
 
-    store.run(() => api.register);
+    store.run(api.register);
     store.dispatch(fetchUsers());
 
     const loader = await store.run(
@@ -541,7 +541,7 @@ it(tests, "should use dynamic mdw to mock response", async () => {
     mdw.response(new Response(JSON.stringify(mockUser))),
   ]);
 
-  store.run(() => api.register);
+  store.run(api.register);
 
   // override default response with dynamic mdw
   const dynamicUser = { id: "2", email: "dynamic@starfx.com" };

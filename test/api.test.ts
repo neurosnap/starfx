@@ -102,7 +102,7 @@ it(tests, "POST", async () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => query.register);
+  store.run(query.register);
 
   store.dispatch(createUser({ email: mockUser.email }));
 
@@ -164,7 +164,7 @@ it(tests, "POST with uri", () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => query.register);
+  store.run(query.register);
   store.dispatch(createUser({ email: mockUser.email }));
 
   expect(ctxReq1).toEqual({
@@ -194,7 +194,7 @@ it(tests, "middleware - with request fn", () => {
     query.request({ method: "POST" }),
   );
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => query.register);
+  store.run(query.register);
   store.dispatch(createUser());
 
   expect(ctxReqMethod).toEqual("POST");
@@ -225,7 +225,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => api.register);
+  store.run(api.register);
   store.dispatch(action2());
   expect(acc).toEqual("ab");
 });
@@ -274,7 +274,7 @@ it(tests, "run() from a normal saga", async () => {
   }
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => keepAlive([() => api.register, watchAction]));
+  store.run(() => keepAlive([api.register, watchAction]));
   store.dispatch(action2());
 
   await new Promise((resolve) => setTimeout(resolve, 700));
@@ -338,7 +338,7 @@ it(tests, "with hash key on a large post", async () => {
   const email = mockUser.email + "9";
   const largetext = "abc-def-ghi-jkl-mno-pqr".repeat(100);
 
-  store.run(() => query.register);
+  store.run(query.register);
   const action = createUserDefaultKey({ email, largetext });
   store.dispatch(action);
 
@@ -374,7 +374,7 @@ it(tests, "two identical endpoints", () => {
     yield* next();
   });
 
-  store.run(() => api.register);
+  store.run(api.register);
   store.dispatch(first());
   store.dispatch(second());
 
@@ -413,7 +413,7 @@ it(tests, "ensure types for get() endpoint", () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => api.register);
+  store.run(api.register);
 
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
@@ -452,7 +452,7 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => api.register);
+  store.run(api.register);
   store.dispatch(action1({ id: "1" }));
   expect(acc).toEqual(["1", "wow"]);
 });
@@ -489,7 +489,7 @@ it(
     );
 
     const store = createStore({ initialState: { users: {} } });
-    store.run(() => api.register);
+    store.run(api.register);
     store.dispatch(action1());
     expect(acc).toEqual(["wow"]);
   },
@@ -519,7 +519,7 @@ it(tests, "should bubble up error", () => {
     },
   );
 
-  store.run(() => api.register);
+  store.run(api.register);
   store.dispatch(fetchUser());
   expect(error.message).toBe(
     "Cannot read properties of undefined (reading 'thisKeyDoesNotExist')",
@@ -555,7 +555,7 @@ it(tests, "useCache - derive api success from endpoint", () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  store.run(() => api.register);
+  store.run(api.register);
 
   function _App() {
     const act = action1();
