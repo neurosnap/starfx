@@ -208,9 +208,9 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     visors[name] = curVisor;
 
-    console.log("[debug] storeMap", storeMap);
     // If signal is already referenced, register immediately, otherwise defer
     for (const [storeId, storeSignal] of storeMap.entries()) {
+      console.log("[debug] storeMap", storeMap);
       console.log(
         `[debug] ${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
       );
