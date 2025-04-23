@@ -8,7 +8,7 @@ import {
   waitFor,
 } from "../mod.ts";
 import { createStore, updateStore } from "../store/mod.ts";
-import { asserts, describe, expect, it } from "../test.ts";
+import { describe, expect, it } from "../test.ts";
 
 import type { Next, ThunkCtx } from "../mod.ts";
 // deno-lint-ignore no-explicit-any
@@ -127,7 +127,7 @@ const tests = describe("createThunks()");
 it(
   tests,
   "when create a query fetch pipeline - execute all middleware and save to redux",
-  async () => {
+  () => {
     expect.assertions(1);
     const api = createThunks<RoboCtx>();
     api.use(api.routes());
@@ -140,7 +140,7 @@ it(
     const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
     });
-    await store.run(() => api.register);
+    store.run(() => api.register);
 
     store.dispatch(fetchUsers());
 
@@ -154,7 +154,7 @@ it(
 it(
   tests,
   "when providing a generator the to api.create function - should call that generator before all other middleware",
-  async () => {
+  () => {
     expect.assertions(1);
     const api = createThunks<RoboCtx>();
     api.use(api.routes());
@@ -182,7 +182,7 @@ it(
     const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
     });
-    await store.run(() => api.register);
+    store.run(() => api.register);
 
     store.dispatch(fetchTickets());
     expect(store.getState()).toEqual({
@@ -192,7 +192,7 @@ it(
   },
 );
 
-it(tests, "error handling", async () => {
+it(tests, "error handling", () => {
   expect.assertions(1);
   let called;
   const api = createThunks<RoboCtx>();
@@ -211,12 +211,12 @@ it(tests, "error handling", async () => {
   const action = api.create(`/error`, { supervisor: takeEvery });
 
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action());
   expect(called).toBe(true);
 });
 
-it(tests, "error handling inside create", async () => {
+it(tests, "error handling inside create", () => {
   expect.assertions(1);
   let called = false;
   const api = createThunks<RoboCtx>();
@@ -237,12 +237,12 @@ it(tests, "error handling inside create", async () => {
     },
   );
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action());
   expect(called).toBe(true);
 });
 
-it(tests, "error inside endpoint mdw", async () => {
+it(tests, "error inside endpoint mdw", () => {
   expect.assertions(1);
   let called = false;
   const query = createThunks();
@@ -269,12 +269,12 @@ it(tests, "error inside endpoint mdw", async () => {
       users: {},
     },
   });
-  await store.run(() => query.register);
+  store.run(() => query.register);
   store.dispatch(fetchUsers());
   expect(called).toBe(true);
 });
 
-it(tests, "create fn is an array", async () => {
+it(tests, "create fn is an array", () => {
   expect.assertions(1);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
@@ -301,11 +301,11 @@ it(tests, "create fn is an array", async () => {
   ]);
 
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action());
 });
 
-it(tests, "run() on endpoint action - should run the effect", async () => {
+it(tests, "run() on endpoint action - should run the effect", () => {
   expect.assertions(4);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
@@ -333,8 +333,9 @@ it(tests, "run() on endpoint action - should run the effect", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action2());
+
   expect(acc).toBe("ab");
   expect(curCtx.action).toMatchObject({
     type: `${API_ACTION_PREFIX}${action1}`,
@@ -349,7 +350,7 @@ it(tests, "run() on endpoint action - should run the effect", async () => {
 it(
   tests,
   "run() on endpoint action with payload - should run the effect",
-  async () => {
+  () => {
     expect.assertions(4);
     const api = createThunks<RoboCtx>();
     api.use(api.routes());
@@ -377,7 +378,7 @@ it(
     );
 
     const store = createStore({ initialState: {} });
-    await store.run(() => api.register);
+    store.run(() => api.register);
     store.dispatch(action2());
     expect(acc).toBe("ab");
     expect(curCtx.action).toMatchObject({
@@ -425,11 +426,11 @@ it(tests, "middleware order of execution", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action());
 
-  await await store.run(() => waitFor(() => call(() => acc === "abcdefg")));
-  asserts.assert(acc === "abcdefg");
+  await store.run(() => waitFor(() => call(() => acc === "abcdefg")));
+  expect(acc).toBe("abcdefg");
 });
 
 it(tests, "retry with actionFn", async () => {
@@ -455,11 +456,11 @@ it(tests, "retry with actionFn", async () => {
   });
 
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action());
 
-  await await store.run(() => waitFor(() => call(() => acc === "agag")));
-  asserts.assertEquals(acc, "agag");
+  await store.run(() => waitFor(() => call(() => acc === "agag")));
+  expect(acc).toBe("agag");
 });
 
 it(tests, "retry with actionFn with payload", async () => {
@@ -486,14 +487,14 @@ it(tests, "retry with actionFn with payload", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action({ page: 1 }));
 
-  await await store.run(() => waitFor(() => call(() => acc === "agag")));
-  asserts.assertEquals(acc, "agag");
+  await store.run(() => waitFor(() => call(() => acc === "agag")));
+  expect(acc).toBe("agag");
 });
 
-it(tests, "should only call thunk once", async () => {
+it(tests, "should only call thunk once", () => {
   expect.assertions(1);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
@@ -517,23 +518,30 @@ it(tests, "should only call thunk once", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
   store.dispatch(action2());
   expect(acc).toBe("a");
 });
 
-it(tests, "should be able to create thunk after `register()`", async () => {
+it(tests, "should be able to create thunk after `register()`", () => {
   expect.assertions(1);
   const api = createThunks<RoboCtx>();
   api.use(api.routes());
   const store = createStore({ initialState: {} });
-  await store.run(() => api.register);
+  store.run(() => api.register);
 
   let acc = "";
-  const action = api.create("/users", function* () {
-    acc += "a";
-  });
+  const action = api.create(
+    "/users",
+    { supervisor: takeEvery },
+    function* (_, next) {
+      acc += "a";
+      yield* next();
+    },
+  );
+  console.log("action", action);
   store.dispatch(action());
+
   expect(acc).toBe("a");
 });
 

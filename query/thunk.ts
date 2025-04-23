@@ -144,8 +144,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const createType = (post: string) => `${API_ACTION_PREFIX}${post}`;
 
   function* onApi<P extends CreateActionPayload>(
-    action: ActionWithPayload<P>,
-  ): Operation<Ctx> {
+    action: ActionWithPayload<P> | AnyAction,
+  ) {
     const { name, key, options } = action.payload;
     const actionFn = actionMap[name];
     const ctx = {
@@ -172,8 +172,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     const action = (payload?: any) => {
       return { type, payload };
     };
-    let req = null;
-    let fn = null;
+    let req: { supervisor?: Supervisor } | null = null;
+    let fn: MiddlewareCo<Ctx> | null = null;
     if (args.length === 2) {
       req = args[0];
       fn = args[1];
@@ -201,15 +201,22 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     middlewareMap[name] = fn || defaultMiddleware;
 
-    const tt = req ? req.supervisor : supervisor;
+    const tt = req && req.supervisor ? req.supervisor : supervisor;
     function* curVisor(): Operation<void> {
       yield* tt(type, onApi);
     }
 
     visors[name] = curVisor;
 
+    console.log("[debug] storeMap", storeMap);
     // If signal is already referenced, register immediately, otherwise defer
     for (const [storeId, storeSignal] of storeMap.entries()) {
+      console.log(
+        `[debug] ${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
+      );
+      console.log("[debug] curVisor", curVisor);
+      console.log("[debug] here it hangs>>>>");
+      // findme[1]
       storeSignal.send({
         type: `${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
         payload: curVisor,
@@ -245,7 +252,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     actionFn._success = {};
     actionFn._error = {};
     actionMap[name] = actionFn;
-
     return actionFn;
   }
 
@@ -261,6 +267,10 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     }
 
     signal = yield* ActionContext.expect();
+    // findme[1]
+    if (!signal) {
+      throw new Error("Signal is not available");
+    }
     storeMap.set(storeId, signal);
 
     yield* ensure(function* () {
