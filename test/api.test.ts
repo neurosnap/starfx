@@ -48,6 +48,7 @@ const jsonBlob = (data: unknown) => {
 };
 
 const tests = describe("createApi()");
+let ctxReq1 = {};
 
 it(tests, "POST", async () => {
   expect.assertions(2);
@@ -55,13 +56,10 @@ it(tests, "POST", async () => {
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
   query.use(query.routes());
+
   query.use(function* fetchApi(ctx, next) {
-    expect(ctx.req()).toEqual({
-      url: "/users",
-      headers: {},
-      method: "POST",
-      body: JSON.stringify({ email: mockUser.email }),
-    });
+    ctxReq1 = ctx.req();
+
     const data = {
       users: [mockUser],
     };
@@ -104,7 +102,7 @@ it(tests, "POST", async () => {
   );
 
   const store = createStore({ initialState: { users: {} } });
-  await store.run(() => query.register);
+  store.run(() => query.register);
 
   store.dispatch(createUser({ email: mockUser.email }));
 
@@ -115,25 +113,27 @@ it(tests, "POST", async () => {
     })
   );
 
+  expect(ctxReq1).toEqual({
+    url: "/users",
+    headers: {},
+    method: "POST",
+    body: JSON.stringify({ email: mockUser.email }),
+  });
+
   expect(store.getState().users).toEqual({
     "1": { id: "1", name: "test", email: "test@test.com" },
   });
 });
 
 it(tests, "POST with uri", () => {
+  let ctxReq1 = {};
   expect.assertions(1);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
-    expect(ctx.req()).toEqual({
-      url: "/users",
-      headers: {},
-      method: "POST",
-      body: JSON.stringify({ email: mockUser.email }),
-    });
-
+    ctxReq1 = ctx.req();
     const data = {
       users: [mockUser],
     };
@@ -166,17 +166,26 @@ it(tests, "POST with uri", () => {
   const store = createStore({ initialState: { users: {} } });
   store.run(() => query.register);
   store.dispatch(createUser({ email: mockUser.email }));
+
+  expect(ctxReq1).toEqual({
+    url: "/users",
+    headers: {},
+    method: "POST",
+    body: JSON.stringify({ email: mockUser.email }),
+  });
 });
 
 it(tests, "middleware - with request fn", () => {
+  let ctxReqMethod = "";
+  let ctxReqUrl = "";
   expect.assertions(2);
   const query = createApi();
   query.use(mdw.queryCtx);
   query.use(mdw.nameParser);
   query.use(query.routes());
   query.use(function* (ctx, next) {
-    expect(ctx.req().method).toEqual("POST");
-    expect(ctx.req().url).toEqual("/users");
+    ctxReqMethod = ctx.req().method || "";
+    ctxReqUrl = ctx.req().url;
     yield* next();
   });
   const createUser = query.create(
@@ -187,6 +196,9 @@ it(tests, "middleware - with request fn", () => {
   const store = createStore({ initialState: { users: {} } });
   store.run(() => query.register);
   store.dispatch(createUser());
+
+  expect(ctxReqMethod).toEqual("POST");
+  expect(ctxReqUrl).toEqual("/users");
 });
 
 it(tests, "run() on endpoint action - should run the effect", () => {
@@ -209,13 +221,13 @@ it(tests, "run() on endpoint action - should run the effect", () => {
       yield* next();
       yield* call(() => action1.run(action1({ id: "1" })));
       acc += "b";
-      expect(acc).toEqual("ab");
     },
   );
 
   const store = createStore({ initialState: { users: {} } });
   store.run(() => api.register);
   store.dispatch(action2());
+  expect(acc).toEqual("ab");
 });
 
 it(tests, "run() from a normal saga", async () => {
@@ -223,6 +235,7 @@ it(tests, "run() from a normal saga", async () => {
   const api = createApi();
   api.use(api.routes());
   let acc = "";
+
   const action1 = api.get<{ id: string }>(
     "/users/:id",
     {
@@ -233,13 +246,16 @@ it(tests, "run() from a normal saga", async () => {
       acc += "a";
     },
   );
+
   const extractedResults = {
     actionType: null,
     actionPayload: null,
     name: null,
     payload: null,
   };
+
   const action2 = () => ({ type: "ACTION" });
+
   function* onAction() {
     const ctx = yield* safe(() => action1.run(action1({ id: "1" })));
     if (!ctx.ok) {
@@ -258,10 +274,10 @@ it(tests, "run() from a normal saga", async () => {
   }
 
   const store = createStore({ initialState: { users: {} } });
-  await store.run(() => keepAlive([() => api.register, watchAction]));
+  store.run(() => keepAlive([() => api.register, watchAction]));
   store.dispatch(action2());
 
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, 700));
   const payload = { name: "/users/:id [GET]", options: { id: "1" } };
 
   expect(extractedResults.actionType).toEqual(`${API_ACTION_PREFIX}${action1}`);
@@ -273,6 +289,7 @@ it(tests, "run() from a normal saga", async () => {
 });
 
 it(tests, "with hash key on a large post", async () => {
+  expect.assertions(2);
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.api({ schema }));
@@ -340,6 +357,7 @@ it(tests, "with hash key on a large post", async () => {
 });
 
 it(tests, "two identical endpoints", () => {
+  expect.assertions(1);
   const actual: string[] = [];
   const { store, schema } = testStore();
   const api = createApi();
@@ -369,6 +387,7 @@ interface TestCtx<P = any, S = any> extends ApiCtx<P, S, { message: string }> {
 
 // this is strictly for testing types
 it(tests, "ensure types for get() endpoint", () => {
+  expect.assertions(1);
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -407,6 +426,7 @@ type FetchUserCtx = TestCtx<FetchUserProps>;
 
 // this is strictly for testing types
 it(tests, "ensure ability to cast `ctx` in function definition", () => {
+  expect.assertions(1);
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -444,6 +464,7 @@ it(
   tests,
   "ensure ability to cast `ctx` in function definition with no props",
   () => {
+    expect.assertions(1);
     const api = createApi<TestCtx>();
     api.use(api.routes());
     api.use(function* (ctx, next) {
@@ -475,6 +496,7 @@ it(
 );
 
 it(tests, "should bubble up error", () => {
+  expect.assertions(1);
   let error: any = null;
   const { store } = testStore();
   const api = createApi();
