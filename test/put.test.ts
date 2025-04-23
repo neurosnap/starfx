@@ -1,5 +1,13 @@
 import { describe, expect, it } from "../test.ts";
-import { ActionContext, each, put, sleep, spawn, take } from "../mod.ts";
+import {
+  ActionContext,
+  AnyAction,
+  each,
+  put,
+  sleep,
+  spawn,
+  take,
+} from "../mod.ts";
 import { createStore } from "../store/mod.ts";
 
 const putTests = describe("put()");
@@ -11,7 +19,7 @@ it(putTests, "should send actions through channel", async () => {
     const actions = yield* ActionContext.expect();
     const task = yield* spawn(function* () {
       for (const action of yield* each(actions)) {
-        actual.push(action.type);
+        actual.push((action as AnyAction).type);
         yield* each.next();
       }
     });
