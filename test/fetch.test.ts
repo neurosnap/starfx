@@ -92,6 +92,8 @@ it(
   tests,
   "should be able to fetch a resource and parse as text instead of json",
   async () => {
+    expect.assertions(1);
+
     mock(`GET@/users`, () => {
       return new Response("this is some text");
     });
@@ -123,10 +125,14 @@ it(
 
     const data = "this is some text";
     expect(actual).toEqual({ ok: true, value: data });
+
+    await new Promise((resolve) => setTimeout(resolve, t));
   },
 );
 
 it(tests, "error handling", async () => {
+  expect.assertions(2);
+
   const errMsg = { message: "something happened" };
   mock(`GET@/users`, () => {
     return new Response(JSON.stringify(errMsg), { status: 500 });
@@ -160,9 +166,13 @@ it(tests, "error handling", async () => {
   const state = store.getState();
   expect(state.cache[action.payload.key]).toEqual(errMsg);
   expect(actual).toEqual({ ok: false, error: errMsg });
+
+  await new Promise((resolve) => setTimeout(resolve, t));
 });
 
 it(tests, "status 204", async () => {
+  expect.assertions(2);
+
   mock(`GET@/users`, () => {
     return new Response(null, { status: 204 });
   });
@@ -202,6 +212,8 @@ it(tests, "status 204", async () => {
 });
 
 it(tests, "malformed json", async () => {
+  expect.assertions(1);
+
   mock(`GET@/users`, () => {
     return new Response("not json", { status: 200 });
   });
@@ -245,6 +257,8 @@ it(tests, "malformed json", async () => {
 });
 
 it(tests, "POST", async () => {
+  expect.assertions(2);
+
   mock(`POST@/users`, () => {
     return new Response(JSON.stringify(mockUser));
   });
@@ -295,6 +309,8 @@ it(tests, "POST", async () => {
 });
 
 it(tests, "POST multiple endpoints with same uri", async () => {
+  expect.assertions(4);
+
   mock(`POST@/users/1/something`, () => {
     return new Response(JSON.stringify(mockUser));
   });
@@ -381,6 +397,8 @@ it(tests, "POST multiple endpoints with same uri", async () => {
 });
 
 it(tests, "slug in url but payload has empty string for slug value", () => {
+  expect.assertions(1);
+
   const { store, schema } = testStore();
   const api = createApi();
   api.use(mdw.api({ schema }));
@@ -415,6 +433,8 @@ it(
   tests,
   "with success - should keep retrying fetch request",
   async () => {
+    expect.assertions(2);
+
     let counter = 0;
 
     const handler = (() => {
@@ -469,6 +489,8 @@ it(
   tests,
   "fetch retry - with failure - should keep retrying and then quit",
   async () => {
+    expect.assertions(1);
+
     mock(`GET@/users`, () => {
       return new Response(JSON.stringify({ message: "error" }), {
         status: 400,
@@ -508,6 +530,8 @@ it(
   tests,
   "should *not* make http request and instead simply mock response",
   async () => {
+    expect.assertions(1);
+
     const { schema, store } = testStore();
     let actual: null | Result<unknown> = null;
     const api = createApi();
@@ -537,6 +561,8 @@ it(
 );
 
 it(tests, "should use dynamic mdw to mock response", async () => {
+  expect.assertions(2);
+
   const { schema, store } = testStore();
   let actual: null | Result<unknown> = null;
   const api = createApi();

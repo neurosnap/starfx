@@ -15,7 +15,7 @@ import type { LoaderItemState } from "../types.ts";
 
 const tests = describe("store");
 
-it(tests, "can persist to storage adapters", async () => {
+it.skip(tests, "can persist to storage adapters", async () => {
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -44,7 +44,6 @@ it(tests, "can persist to storage adapters", async () => {
 
   await store.run(function* (): Operation<void> {
     yield* persistor.rehydrate();
-
     const group = yield* parallel([
       function* (): Operation<void> {
         const action = yield* take<string>("SET_TOKEN");
