@@ -43,10 +43,11 @@ export const clearTimers = createAction<
  * if we don't set a timer per key then all calls to `fetchApp` will be on a timer.
  * So if we call `fetchApp({ id: 1 })` and then `fetchApp({ id: 2 })` if we use a normal
  * cache timer then the second call will not send an http request.
- */ export function timer(timer: number = 5 * MINUTES) {
+ */
+export function timer__0(timer: number = 5 * MINUTES) {
   return function* onTimer(
     actionType: string,
-    op: (action: AnyAction) => () => Operation<unknown>,
+    op: (action: AnyAction) => Operation<unknown> | (() => Operation<unknown>),
   ) {
     const map: Record<string, Task<unknown>> = {};
 
@@ -104,6 +105,55 @@ export const clearTimers = createAction<
           // ignore “already halted” errors
         }
         delete map[key];
+      }
+    }
+  };
+}
+
+export function timer(timer: number = 5 * MINUTES) {
+  return function* onTimer(
+    actionType: string,
+    op: (action: AnyAction) => Operation<unknown> | (() => Operation<unknown>),
+  ) {
+    const map: { [key: string]: Task<unknown> } = {};
+
+    function* activate(action: ActionWithPayload<CreateActionPayload>) {
+      yield* call(() => op(action));
+      const idA = getIdFromAction(action);
+
+      const matchFn = (
+        act: ActionWithPayload<ClearTimerPayload | ClearTimerPayload[]>,
+      ) => {
+        if (act.type !== `${clearTimers}`) return false;
+        if (!act.payload) return false;
+        const ids = Array.isArray(act.payload) ? act.payload : [act.payload];
+        return ids.some((id) => {
+          if (id === "*") {
+            return true;
+          }
+          if (typeof id === "string") {
+            return idA === id;
+          } else {
+            return idA === getIdFromAction(id);
+          }
+        });
+      };
+      yield* race([
+        sleep(timer),
+        take(matchFn as any) as Operation<void>,
+      ]);
+
+      delete map[action.payload.key];
+    }
+
+    while (true) {
+      const action = yield* take<CreateActionPayload>(`${actionType}`);
+      const key = action.payload.key;
+      if (!map[key]) {
+        const task = yield* spawn(function* () {
+          yield* activate(action);
+        });
+        map[key] = task;
       }
     }
   };

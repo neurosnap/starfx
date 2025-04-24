@@ -539,7 +539,6 @@ it(tests, "should be able to create thunk after `register()`", () => {
       yield* next();
     },
   );
-  console.log("action", action);
   store.dispatch(action());
 
   expect(acc).toBe("a");
@@ -565,13 +564,13 @@ it(tests, "should warn when calling thunk before registered", () => {
 it(
   tests,
   "it should call the api once even if we register it twice",
-  async () => {
+  () => {
     expect.assertions(1);
     const api = createThunks<RoboCtx>();
     api.use(api.routes());
     const store = createStore({ initialState: {} });
-    await store.run(api.register);
-    await store.run(api.register);
+    store.run(api.register);
+    store.run(api.register);
 
     let acc = "";
     const action = api.create("/users", function* () {
@@ -585,7 +584,7 @@ it(
 it(
   tests,
   "Should call the API only once, even if registered multiple times, with multiple APIs defined.",
-  async () => {
+  () => {
     expect.assertions(2);
     const api1 = createThunks<RoboCtx>();
     api1.use(api1.routes());
@@ -595,12 +594,12 @@ it(
 
     const store = createStore({ initialState: {} });
 
-    await store.run(api1.register);
-    await store.run(api1.register);
-    await store.run(api1.register);
+    store.run(api1.register);
+    store.run(api1.register);
+    store.run(api1.register);
 
-    await store.run(api2.register);
-    await store.run(api2.register);
+    store.run(api2.register);
+    store.run(api2.register);
 
     let acc = "";
     const action = api1.create("/users", function* () {

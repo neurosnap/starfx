@@ -210,13 +210,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     // If signal is already referenced, register immediately, otherwise defer
     for (const [storeId, storeSignal] of storeMap.entries()) {
-      console.log("[debug] storeMap", storeMap);
-      console.log(
-        `[debug] ${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
-      );
-      console.log("[debug] curVisor", curVisor);
-      console.log("[debug] here it hangs>>>>");
-      // findme[1]
       storeSignal.send({
         type: `${API_ACTION_PREFIX}REGISTER_THUNK_${storeId}_${thunkId}`,
         payload: curVisor,
@@ -255,8 +248,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     return actionFn;
   }
 
-  function* watcher(action: ActionWithPayload<Operation<unknown>>) {
-    yield* supervise(() => action.payload)();
+  function* watcher(action: ActionWithPayload<() => Operation<unknown>>) {
+    yield* supervise(action.payload)();
   }
 
   function* register(): Operation<void> {
