@@ -13,12 +13,13 @@ import {
   waitForLoader,
   waitForLoaders,
 } from "../store/mod.ts";
-import { ApiCtx, createApi, mdw, takeEvery } from "../mod.ts";
+import { ApiCtx, createApi, mdw, Result, takeEvery } from "../mod.ts";
 
 install();
 
 const baseUrl = "https://starfx.com";
 const mockUser = { id: "1", email: "test@starfx.com" };
+const t = 10;
 
 const testStore = () => {
   const [schema, initialState] = createSchema({
@@ -39,6 +40,8 @@ it(
   tests,
   "should be able to fetch a resource and save automatically",
   async () => {
+    expect.assertions(2);
+
     mock(`GET@/users`, () => {
       return new Response(JSON.stringify(mockUser));
     });
@@ -99,7 +102,7 @@ it(
     api.use(api.routes());
     api.use(mdw.fetch({ baseUrl }));
 
-    let actual = null;
+    let actual: null | Result<unknown> = null;
     const fetchUsers = api.get(
       "/users",
       { supervisor: takeEvery },
@@ -135,7 +138,7 @@ it(tests, "error handling", async () => {
   api.use(api.routes());
   api.use(mdw.fetch({ baseUrl }));
 
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -175,7 +178,7 @@ it(tests, "status 204", async () => {
   });
   api.use(mdw.fetch());
 
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -214,7 +217,7 @@ it(tests, "malformed json", async () => {
   });
   api.use(mdw.fetch());
 
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -408,51 +411,59 @@ it(tests, "slug in url but payload has empty string for slug value", () => {
   expect(actual).toEqual(data);
 });
 
-it(tests, "with success - should keep retrying fetch request", async () => {
-  let counter = 0;
-  const handler = (() => {
-    counter += 1;
-    if (counter > 4) {
-      return new Response(JSON.stringify(mockUser));
-    }
-  }) as MatchHandler;
-  mock(`GET@/users`, handler);
+it(
+  tests,
+  "with success - should keep retrying fetch request",
+  async () => {
+    let counter = 0;
 
-  const { schema, store } = testStore();
-  const api = createApi();
-  api.use(mdw.api({ schema }));
-  api.use(api.routes());
-  api.use(mdw.fetch({ baseUrl }));
-
-  let actual = null;
-  const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
-    function* (ctx, next) {
-      ctx.cache = true;
-      yield* next();
-
-      if (!ctx.json.ok) {
-        return;
+    const handler = (() => {
+      counter += 1;
+      if (counter > 4) {
+        return new Response(JSON.stringify(mockUser));
       }
+      return new Response(JSON.stringify({ message: "error" }), {
+        status: 400,
+      });
+    }) as MatchHandler;
 
-      actual = ctx.json;
-    },
-    mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
-  ]);
+    mock(`GET@/users`, handler);
+    const { schema, store } = testStore();
+    const api = createApi();
+    api.use(mdw.api({ schema }));
+    api.use(api.routes());
+    api.use(mdw.fetch({ baseUrl }));
 
-  store.run(api.register);
+    let actual = null as any;
+    const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
+      function* (ctx, next) {
+        ctx.cache = true;
+        yield* next();
 
-  const action = fetchUsers();
-  store.dispatch(action);
+        if (!ctx.json.ok) {
+          return;
+        }
 
-  const loader = await store.run(() => waitForLoader(schema.loaders, action));
-  if (!loader.ok) {
-    throw loader.error;
-  }
+        actual = ctx.json as any;
+      },
+      mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
+    ]);
 
-  const state = store.getState();
-  expect(state.cache[action.payload.key]).toEqual(mockUser);
-  expect(actual).toEqual({ ok: true, value: mockUser });
-});
+    store.run(api.register);
+
+    const action = fetchUsers();
+    store.dispatch(action);
+
+    const loader = await store.run(() => waitForLoader(schema.loaders, action));
+    if (!loader.ok) {
+      throw loader.error;
+    }
+
+    const state = store.getState();
+    expect(state.cache[action.payload.key]).toEqual(mockUser);
+    expect(actual).toEqual({ ok: true, value: mockUser });
+  },
+);
 
 it(
   tests,
@@ -465,7 +476,7 @@ it(
     });
 
     const { schema, store } = testStore();
-    let actual = null;
+    let actual: null | Result<unknown> = null;
     const api = createApi();
     api.use(mdw.api({ schema }));
     api.use(api.routes());
@@ -498,7 +509,7 @@ it(
   "should *not* make http request and instead simply mock response",
   async () => {
     const { schema, store } = testStore();
-    let actual = null;
+    let actual: null | Result<unknown> = null;
     const api = createApi();
     api.use(mdw.api({ schema }));
     api.use(api.routes());
@@ -527,7 +538,7 @@ it(
 
 it(tests, "should use dynamic mdw to mock response", async () => {
   const { schema, store } = testStore();
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const api = createApi();
   api.use(mdw.api({ schema }));
   api.use(api.routes());

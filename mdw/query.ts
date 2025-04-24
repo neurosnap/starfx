@@ -142,17 +142,11 @@ export function fetch<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
  * This middleware will only be activated if predicate is true.
  */
 export function predicate<Ctx extends ApiCtx = ApiCtx>(
-  predicate: ((ctx: Ctx) => boolean) | ((ctx: Ctx) => Operation<boolean>),
+  predicate: ((ctx: Ctx) => boolean) | ((ctx: Ctx) => () => Operation<boolean>),
 ) {
   return (mdw: MiddlewareApi) => {
     return function* (ctx: Ctx, next: Next) {
-      const predicateResult = predicate(ctx);
-
-      const valid: boolean = typeof predicateResult === "boolean"
-        ? predicateResult
-        : yield* predicateResult;
-
-      yield* call(() => predicate(ctx));
+      const valid = yield* call(() => predicate(ctx));
       if (!valid) {
         yield* next();
         return;

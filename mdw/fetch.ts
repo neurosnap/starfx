@@ -281,7 +281,6 @@ export function fetchRetry<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 ) {
   return function* (ctx: CurCtx, next: Next) {
     yield* next();
-
     if (!ctx.response) {
       return;
     }
