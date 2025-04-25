@@ -7,6 +7,7 @@ import {
   sleep,
   spawn,
   take,
+  //suspend
 } from "../mod.ts";
 import { createStore } from "../store/mod.ts";
 
@@ -66,13 +67,19 @@ it(putTests, "should handle nested puts", async () => {
 
   function* root() {
     yield* spawn(genB);
-    yield* spawn(genA);
+    // TODO upgrade to future version, see issue https://github.com/thefrontside/effection/issues/998
+    // we currently process functions in sibiling spawn()
+    // as last in, first out for this case but if there is async work,
+    //  such as sleep, it breaks that queue into two which makes this work as expected
+    yield* sleep(0);
+    const task = yield* spawn(genA);
+    yield* task;
   }
 
   const store = createStore({ initialState: {} });
   await store.run(root);
 
-  const expected = ["put b", "put a"];
+  const expected = ["put a", "put b"]; // with the TODO, it will be ["put b", "put a"];
   expect(actual).toEqual(expected);
 });
 
