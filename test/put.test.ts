@@ -13,16 +13,20 @@ import { createStore } from "../store/mod.ts";
 const putTests = describe("put()");
 
 it(putTests, "should send actions through channel", async () => {
+  expect.assertions(1);
   const actual: string[] = [];
 
   function* genFn(arg: string) {
     const actions = yield* ActionContext.expect();
+
     const task = yield* spawn(function* () {
       for (const action of yield* each(actions)) {
         actual.push((action as AnyAction).type);
         yield* each.next();
       }
     });
+
+    yield* sleep(1); // without this sleep,the test hangs forever;
 
     yield* put({
       type: arg,
@@ -42,6 +46,7 @@ it(putTests, "should send actions through channel", async () => {
 });
 
 it(putTests, "should handle nested puts", async () => {
+  expect.assertions(1);
   const actual: string[] = [];
 
   function* genA() {
@@ -75,6 +80,7 @@ it(
   putTests,
   "should not cause stack overflow when puts are emitted while dispatching saga",
   async () => {
+    expect.assertions(1);
     function* root() {
       for (let i = 0; i < 10_000; i += 1) {
         yield* put({ type: "test" });
@@ -92,12 +98,14 @@ it(
   putTests,
   "should not miss `put` that was emitted directly after creating a task (caused by another `put`)",
   async () => {
+    expect.assertions(1);
     const actual: string[] = [];
 
     function* root() {
       yield* spawn(function* firstspawn() {
-        yield* sleep(10);
+        yield* sleep(10); // Adding this just not to hang the whole test << DELETE WHEN FIXED | it fails;
         yield* put({ type: "c" });
+        yield* sleep(10);
         yield* put({ type: "do not miss" });
       });
 
