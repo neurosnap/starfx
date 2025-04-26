@@ -1,5 +1,6 @@
 import { asserts, describe, it } from "../../test.ts";
-import { configureStore, updateStore } from "../mod.ts";
+import { createStore } from "../store.ts";
+import { updateStore } from "../fx.ts";
 
 import { createObj } from "./obj.ts";
 const tests = describe("createObj()");
@@ -25,7 +26,7 @@ const slice = createObj<ICurrentUser>({
 });
 
 it(tests, "sets up an obj", async () => {
-  const store = configureStore({
+  const store = createStore({
     initialState: {
       [NAME]: crtInitialState,
     },

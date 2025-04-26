@@ -25,9 +25,9 @@
   "imports": {
     "react": "npm:react@^18.2.0",
     "react-dom": "npm:react-dom@^18.2.0",
-    "react-redux": "npm:react-redux@^8.0.5",
-    "reselect": "npm:reselect@^4.1.8",
-    "immer": "npm:immer@^10.0.2",
-    "effection": "jsr:@effection/effection@4.0.0-alpha.8"
+    "react-redux": "npm:react-redux@8.1.3",
+    "reselect": "npm:reselect@4.1.8",
+    "immer": "npm:immer@10.1.1",
+    "effection": "npm:effection@4.0.0-alpha.8"
   }
 }

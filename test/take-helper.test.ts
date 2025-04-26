@@ -3,7 +3,7 @@ import { describe, expect, it } from "../test.ts";
 import { createStore } from "../store/mod.ts";
 import type { AnyAction } from "../mod.ts";
 import { sleep, take, takeEvery, takeLatest, takeLeading } from "../mod.ts";
-import { call } from "../deps.ts";
+import { call } from "effection";
 
 const testEvery = describe("takeEvery()");
 const testLatest = describe("takeLatest()");
