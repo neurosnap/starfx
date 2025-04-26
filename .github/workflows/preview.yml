@@ -16,7 +16,7 @@ jobs:
         uses: denoland/setup-deno@v2
       - name: get version
         id: vars
-        run: echo ::set-output name=version::$(echo ${{github.ref_name}} | sed 's/^v//')
+        run: echo ::set-output name=version::$(git describe --abbrev=0 --tags | sed 's/^v//')-pr+$(git rev-parse HEAD)
       - name: setup node
         uses: actions/setup-node@v2
         with:
