@@ -1,5 +1,5 @@
 import type { Channel, Operation, Result, Task } from "effection";
-import { createChannel, resource, sleep, spawn } from "effection";
+import { createChannel, resource, spawn } from "effection";
 import { safe } from "./safe.ts";
 
 export interface ParallelRet<T> extends Operation<Result<T>[]> {

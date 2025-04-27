@@ -1,13 +1,4 @@
-import {
-  createScope,
-  Operation,
-  parallel,
-  put,
-  Result,
-  safe,
-  sleep,
-  take,
-} from "../mod.ts";
+import { createScope, Operation, parallel, put, Result, take } from "../mod.ts";
 import {
   createStore,
   // StoreContext,
