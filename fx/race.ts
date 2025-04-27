@@ -1,8 +1,8 @@
-import type { Callable, Operation, Task } from "../deps.ts";
-import { call, resource, spawn, withResolvers } from "../deps.ts";
+import type { Operation, Task } from "effection";
+import { resource, spawn, withResolvers } from "effection";
 
-interface OpMap<T = unknown> {
-  [key: string]: Callable<T>;
+interface OpMap<T = unknown, TArgs extends unknown[] = []> {
+  [key: string]: (...args: TArgs) => Operation<T>;
 }
 
 export function raceMap<T>(opMap: OpMap): Operation<
@@ -15,24 +15,21 @@ export function raceMap<T>(opMap: OpMap): Operation<
   return resource(function* Race(provide) {
     const keys = Object.keys(opMap);
     const taskMap: { [key: string]: Task<unknown> } = {};
-    const resultMap: { [key: keyof OpMap]: OpMap[keyof OpMap] } = {};
+    const resultMap: { [key: keyof OpMap]: ReturnType<OpMap[keyof OpMap]> } =
+      {};
 
     function* start() {
       const resolvers = withResolvers();
 
-      yield* spawn(function* () {
-        for (let i = 0; i < keys.length; i += 1) {
-          const key = keys[i];
-          yield* spawn(function* () {
-            const task = yield* spawn(function* () {
-              yield* call(opMap[key] as any);
-            });
-            taskMap[key] = task;
-            (resultMap as any)[key] = yield* task;
-            resolvers.resolve(task);
-          });
-        }
-      });
+      for (let i = 0; i < keys.length; i += 1) {
+        const key = keys[i];
+        yield* spawn(function* () {
+          const task = yield* spawn(opMap[key]);
+          taskMap[key] = task;
+          (resultMap[key] as any) = yield* task;
+          resolvers.resolve(task);
+        });
+      }
 
       return yield* resolvers.operation;
     }

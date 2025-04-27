@@ -3,12 +3,14 @@ import { describe, expect, it } from "../test.ts";
 import { createStore } from "../store/mod.ts";
 import type { AnyAction } from "../mod.ts";
 import { sleep, take, takeEvery, takeLatest, takeLeading } from "../mod.ts";
+import { call } from "effection";
 
 const testEvery = describe("takeEvery()");
 const testLatest = describe("takeLatest()");
 const testLeading = describe("takeLeading()");
 
 it(testLatest, "should cancel previous tasks and only use latest", async () => {
+  expect.assertions(1);
   const actual: string[] = [];
   function* worker(action: AnyAction) {
     if (action.payload !== "3") {
@@ -23,19 +25,18 @@ it(testLatest, "should cancel previous tasks and only use latest", async () => {
     yield* task.halt();
   }
   const store = createStore({ initialState: {} });
-  const task = store.run(root);
-
+  const task = store.run(() => call(root));
   store.dispatch({ type: "ACTION", payload: "1" });
   store.dispatch({ type: "ACTION", payload: "2" });
   store.dispatch({ type: "ACTION", payload: "3" });
   store.dispatch({ type: "CANCEL_WATCHER" });
-
   await task;
 
   expect(actual).toEqual(["3"]);
 });
 
 it(testLeading, "should keep first action and discard the rest", async () => {
+  expect.assertions(2);
   let called = 0;
   const actual: string[] = [];
   function* worker(action: AnyAction) {
@@ -50,7 +51,8 @@ it(testLeading, "should keep first action and discard the rest", async () => {
     yield* task.halt();
   }
   const store = createStore({ initialState: {} });
-  const task = store.run(root);
+  // const task = await store.run(root); // That used to work
+  const task = store.run(root); // The await makes the test to hang;
 
   store.dispatch({ type: "ACTION", payload: "1" });
   store.dispatch({ type: "ACTION", payload: "2" });
@@ -63,6 +65,7 @@ it(testLeading, "should keep first action and discard the rest", async () => {
 });
 
 it(testEvery, "should receive all actions", async () => {
+  expect.assertions(1);
   const loop = 10;
   const actual: string[][] = [];
 
@@ -80,6 +83,7 @@ it(testEvery, "should receive all actions", async () => {
   }
 
   const store = createStore({ initialState: {} });
+  // const task = await store.run(root);
   const task = store.run(root);
 
   for (let i = 1; i <= loop / 2; i += 1) {

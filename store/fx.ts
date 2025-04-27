@@ -1,5 +1,5 @@
-import { Operation, Result } from "effection";
-import type { ActionFnWithPayload, AnyState } from "../types.ts";
+import { type Operation, type Result } from "effection";
+import type { ActionFnWithPayload, AnyState, LoaderState } from "../types.ts";
 import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext } from "./context.ts";
 import { LoaderOutput } from "./slice/loaders.ts";
@@ -33,7 +33,7 @@ export function* select<S, R, P>(
 export function* waitForLoader<M extends AnyState>(
   loaders: LoaderOutput<M, AnyState>,
   action: ThunkAction | ActionFnWithPayload,
-) {
+): Operation<LoaderState<M>> {
   const id = getIdFromAction(action);
   const selector = (s: AnyState) => loaders.selectById(s, { id });
 
@@ -55,7 +55,7 @@ export function* waitForLoader<M extends AnyState>(
 export function* waitForLoaders<M extends AnyState>(
   loaders: LoaderOutput<M, AnyState>,
   actions: (ThunkAction | ActionFnWithPayload)[],
-) {
+): Operation<Result<LoaderState<M>>[]> {
   const group = yield* parallel(
     actions.map((action) => () => waitForLoader(loaders, action)),
   );
@@ -66,7 +66,9 @@ export function createTracker<T, M extends Record<string, unknown>>(
   loader: LoaderOutput<M, AnyState>,
 ) {
   return (id: string) => {
-    return function* (op: () => Operation<Result<T>>) {
+    return function* (
+      op: () => Operation<Result<T>>,
+    ): Operation<Result<Result<T>>> {
       yield* updateStore(loader.start({ id }));
       const result = yield* safe(op);
       if (result.ok) {

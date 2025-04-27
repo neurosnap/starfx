@@ -1,4 +1,11 @@
-import { describe, expect, install, it, mock } from "../test.ts";
+import {
+  describe,
+  expect,
+  install,
+  it,
+  type MatchHandler,
+  mock,
+} from "../test.ts";
 import {
   createSchema,
   createStore,
@@ -6,12 +13,13 @@ import {
   waitForLoader,
   waitForLoaders,
 } from "../store/mod.ts";
-import { ApiCtx, createApi, mdw, takeEvery } from "../mod.ts";
+import { ApiCtx, createApi, mdw, Result, takeEvery } from "../mod.ts";
 
 install();
 
 const baseUrl = "https://starfx.com";
 const mockUser = { id: "1", email: "test@starfx.com" };
+const t = 10;
 
 const testStore = () => {
   const [schema, initialState] = createSchema({
@@ -32,6 +40,8 @@ it(
   tests,
   "should be able to fetch a resource and save automatically",
   async () => {
+    expect.assertions(2);
+
     mock(`GET@/users`, () => {
       return new Response(JSON.stringify(mockUser));
     });
@@ -56,7 +66,7 @@ it(
       },
     );
 
-    store.run(api.bootup);
+    store.run(api.register);
 
     const action = fetchUsers();
     store.dispatch(action);
@@ -82,6 +92,8 @@ it(
   tests,
   "should be able to fetch a resource and parse as text instead of json",
   async () => {
+    expect.assertions(1);
+
     mock(`GET@/users`, () => {
       return new Response("this is some text");
     });
@@ -92,7 +104,7 @@ it(
     api.use(api.routes());
     api.use(mdw.fetch({ baseUrl }));
 
-    let actual = null;
+    let actual: null | Result<unknown> = null;
     const fetchUsers = api.get(
       "/users",
       { supervisor: takeEvery },
@@ -104,7 +116,7 @@ it(
       },
     );
 
-    store.run(api.bootup);
+    store.run(api.register);
 
     const action = fetchUsers();
     store.dispatch(action);
@@ -113,10 +125,14 @@ it(
 
     const data = "this is some text";
     expect(actual).toEqual({ ok: true, value: data });
+
+    await new Promise((resolve) => setTimeout(resolve, t));
   },
 );
 
 it(tests, "error handling", async () => {
+  expect.assertions(2);
+
   const errMsg = { message: "something happened" };
   mock(`GET@/users`, () => {
     return new Response(JSON.stringify(errMsg), { status: 500 });
@@ -128,7 +144,7 @@ it(tests, "error handling", async () => {
   api.use(api.routes());
   api.use(mdw.fetch({ baseUrl }));
 
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -140,7 +156,7 @@ it(tests, "error handling", async () => {
     },
   );
 
-  store.run(api.bootup);
+  store.run(api.register);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -150,9 +166,13 @@ it(tests, "error handling", async () => {
   const state = store.getState();
   expect(state.cache[action.payload.key]).toEqual(errMsg);
   expect(actual).toEqual({ ok: false, error: errMsg });
+
+  await new Promise((resolve) => setTimeout(resolve, t));
 });
 
 it(tests, "status 204", async () => {
+  expect.assertions(2);
+
   mock(`GET@/users`, () => {
     return new Response(null, { status: 204 });
   });
@@ -168,7 +188,7 @@ it(tests, "status 204", async () => {
   });
   api.use(mdw.fetch());
 
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -179,7 +199,7 @@ it(tests, "status 204", async () => {
     },
   );
 
-  store.run(api.bootup);
+  store.run(api.register);
 
   const action = fetchUsers();
   store.dispatch(action);
@@ -192,6 +212,8 @@ it(tests, "status 204", async () => {
 });
 
 it(tests, "malformed json", async () => {
+  expect.assertions(1);
+
   mock(`GET@/users`, () => {
     return new Response("not json", { status: 200 });
   });
@@ -207,7 +229,7 @@ it(tests, "malformed json", async () => {
   });
   api.use(mdw.fetch());
 
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const fetchUsers = api.get(
     "/users",
     { supervisor: takeEvery },
@@ -219,7 +241,7 @@ it(tests, "malformed json", async () => {
     },
   );
 
-  store.run(api.bootup);
+  store.run(api.register);
   const action = fetchUsers();
   store.dispatch(action);
 
@@ -235,6 +257,8 @@ it(tests, "malformed json", async () => {
 });
 
 it(tests, "POST", async () => {
+  expect.assertions(2);
+
   mock(`POST@/users`, () => {
     return new Response(JSON.stringify(mockUser));
   });
@@ -260,7 +284,7 @@ it(tests, "POST", async () => {
     },
   );
 
-  store.run(api.bootup);
+  store.run(api.register);
   const action = fetchUsers();
   store.dispatch(action);
 
@@ -285,6 +309,8 @@ it(tests, "POST", async () => {
 });
 
 it(tests, "POST multiple endpoints with same uri", async () => {
+  expect.assertions(4);
+
   mock(`POST@/users/1/something`, () => {
     return new Response(JSON.stringify(mockUser));
   });
@@ -319,7 +345,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
     },
   );
 
-  store.run(api.bootup);
+  store.run(api.register);
 
   const action1 = fetchUsers({ id: "1" });
   const action2 = fetchUsersSecond({ id: "1" });
@@ -371,6 +397,8 @@ it(tests, "POST multiple endpoints with same uri", async () => {
 });
 
 it(tests, "slug in url but payload has empty string for slug value", () => {
+  expect.assertions(1);
+
   const { store, schema } = testStore();
   const api = createApi();
   api.use(mdw.api({ schema }));
@@ -392,7 +420,7 @@ it(tests, "slug in url but payload has empty string for slug value", () => {
     },
   );
 
-  store.run(api.bootup);
+  store.run(api.register);
   const action = fetchUsers({ id: "" });
   store.dispatch(action);
 
@@ -401,55 +429,68 @@ it(tests, "slug in url but payload has empty string for slug value", () => {
   expect(actual).toEqual(data);
 });
 
-it(tests, "with success - should keep retrying fetch request", async () => {
-  let counter = 0;
-  mock(`GET@/users`, () => {
-    counter += 1;
-    if (counter > 4) {
-      return new Response(JSON.stringify(mockUser));
-    }
-  });
+it(
+  tests,
+  "with success - should keep retrying fetch request",
+  async () => {
+    expect.assertions(2);
 
-  const { schema, store } = testStore();
-  const api = createApi();
-  api.use(mdw.api({ schema }));
-  api.use(api.routes());
-  api.use(mdw.fetch({ baseUrl }));
+    let counter = 0;
 
-  let actual = null;
-  const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
-    function* (ctx, next) {
-      ctx.cache = true;
-      yield* next();
-
-      if (!ctx.json.ok) {
-        return;
+    const handler = (() => {
+      counter += 1;
+      if (counter > 4) {
+        return new Response(JSON.stringify(mockUser));
       }
+      return new Response(JSON.stringify({ message: "error" }), {
+        status: 400,
+      });
+    }) as MatchHandler;
 
-      actual = ctx.json;
-    },
-    mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
-  ]);
+    mock(`GET@/users`, handler);
+    const { schema, store } = testStore();
+    const api = createApi();
+    api.use(mdw.api({ schema }));
+    api.use(api.routes());
+    api.use(mdw.fetch({ baseUrl }));
 
-  store.run(api.bootup);
+    let actual = null as any;
+    const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
+      function* (ctx, next) {
+        ctx.cache = true;
+        yield* next();
 
-  const action = fetchUsers();
-  store.dispatch(action);
+        if (!ctx.json.ok) {
+          return;
+        }
 
-  const loader = await store.run(waitForLoader(schema.loaders, action));
-  if (!loader.ok) {
-    throw loader.error;
-  }
+        actual = ctx.json as any;
+      },
+      mdw.fetchRetry((n) => (n > 4 ? -1 : 10)),
+    ]);
 
-  const state = store.getState();
-  expect(state.cache[action.payload.key]).toEqual(mockUser);
-  expect(actual).toEqual({ ok: true, value: mockUser });
-});
+    store.run(api.register);
+
+    const action = fetchUsers();
+    store.dispatch(action);
+
+    const loader = await store.run(() => waitForLoader(schema.loaders, action));
+    if (!loader.ok) {
+      throw loader.error;
+    }
+
+    const state = store.getState();
+    expect(state.cache[action.payload.key]).toEqual(mockUser);
+    expect(actual).toEqual({ ok: true, value: mockUser });
+  },
+);
 
 it(
   tests,
   "fetch retry - with failure - should keep retrying and then quit",
   async () => {
+    expect.assertions(1);
+
     mock(`GET@/users`, () => {
       return new Response(JSON.stringify({ message: "error" }), {
         status: 400,
@@ -457,7 +498,7 @@ it(
     });
 
     const { schema, store } = testStore();
-    let actual = null;
+    let actual: null | Result<unknown> = null;
     const api = createApi();
     api.use(mdw.api({ schema }));
     api.use(api.routes());
@@ -472,7 +513,7 @@ it(
       mdw.fetchRetry((n) => (n > 2 ? -1 : 10)),
     ]);
 
-    store.run(api.bootup);
+    store.run(api.register);
     const action = fetchUsers();
     store.dispatch(action);
 
@@ -489,8 +530,10 @@ it(
   tests,
   "should *not* make http request and instead simply mock response",
   async () => {
+    expect.assertions(1);
+
     const { schema, store } = testStore();
-    let actual = null;
+    let actual: null | Result<unknown> = null;
     const api = createApi();
     api.use(mdw.api({ schema }));
     api.use(api.routes());
@@ -504,11 +547,11 @@ it(
       mdw.response(new Response(JSON.stringify(mockUser))),
     ]);
 
-    store.run(api.bootup);
+    store.run(api.register);
     store.dispatch(fetchUsers());
 
-    const loader = await store.run(() =>
-      waitForLoader(schema.loaders, fetchUsers)
+    const loader = await store.run(
+      () => waitForLoader(schema.loaders, fetchUsers),
     );
     if (!loader.ok) {
       throw loader.error;
@@ -518,8 +561,10 @@ it(
 );
 
 it(tests, "should use dynamic mdw to mock response", async () => {
+  expect.assertions(2);
+
   const { schema, store } = testStore();
-  let actual = null;
+  let actual: null | Result<unknown> = null;
   const api = createApi();
   api.use(mdw.api({ schema }));
   api.use(api.routes());
@@ -533,7 +578,7 @@ it(tests, "should use dynamic mdw to mock response", async () => {
     mdw.response(new Response(JSON.stringify(mockUser))),
   ]);
 
-  store.run(api.bootup);
+  store.run(api.register);
 
   // override default response with dynamic mdw
   const dynamicUser = { id: "2", email: "dynamic@starfx.com" };

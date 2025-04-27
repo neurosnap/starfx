@@ -1,5 +1,5 @@
 import { createAction, take } from "./action.ts";
-import { call, Callable, Operation, race, sleep, spawn, Task } from "effection";
+import { call, Operation, race, sleep, spawn, Task } from "effection";
 import type { ActionWithPayload, AnyAction } from "./types.ts";
 import type { CreateActionPayload } from "./query/mod.ts";
 import { getIdFromAction } from "./action.ts";
@@ -44,10 +44,76 @@ export const clearTimers = createAction<
  * So if we call `fetchApp({ id: 1 })` and then `fetchApp({ id: 2 })` if we use a normal
  * cache timer then the second call will not send an http request.
  */
+export function timer__0(timer: number = 5 * MINUTES) {
+  return function* onTimer(
+    actionType: string,
+    op: (action: AnyAction) => Operation<unknown> | (() => Operation<unknown>),
+  ) {
+    const map: Record<string, Task<unknown>> = {};
+
+    function* activate(action: ActionWithPayload<CreateActionPayload>) {
+      yield* call(() => op(action));
+
+      const idA = getIdFromAction(action);
+
+      const matchFn = (
+        act: ActionWithPayload<ClearTimerPayload | ClearTimerPayload[]>,
+      ) => {
+        if (act.type !== clearTimers.toString()) return false;
+        if (!act.payload) return false;
+        const ids = Array.isArray(act.payload) ? act.payload : [act.payload];
+        return ids.some((id) => {
+          if (id === "*") return true;
+          if (typeof id === "string") {
+            return idA === id;
+          } else {
+            return idA === getIdFromAction(id);
+          }
+        });
+      };
+
+      try {
+        yield* race([sleep(timer), take(matchFn as any) as Operation<void>]);
+      } finally {
+        delete map[action.payload.key];
+      }
+    }
+
+    try {
+      while (true) {
+        const action = yield* take<CreateActionPayload>(actionType);
+        const key = action.payload.key;
+        if (!map[key]) {
+          map[key] = null as any; //ensure key exists
+          const task = yield* spawn(function* () {
+            try {
+              yield* activate(action);
+            } finally {
+              delete map[key];
+            }
+          });
+          map[key] = task;
+        }
+      }
+    } finally {
+      // halt pendings explicitly (!)
+      for (const key in map) {
+        const task = map[key];
+        try {
+          yield* call(() => task.halt());
+        } catch {
+          // ignore “already halted” errors
+        }
+        delete map[key];
+      }
+    }
+  };
+}
+
 export function timer(timer: number = 5 * MINUTES) {
   return function* onTimer(
     actionType: string,
-    op: (action: AnyAction) => Callable<unknown>,
+    op: (action: AnyAction) => Operation<unknown> | (() => Operation<unknown>),
   ) {
     const map: { [key: string]: Task<unknown> } = {};
 
@@ -72,7 +138,10 @@ export function timer(timer: number = 5 * MINUTES) {
           }
         });
       };
-      yield* race([sleep(timer), take(matchFn as any) as Operation<void>]);
+      yield* race([
+        sleep(timer),
+        take(matchFn as any) as Operation<void>,
+      ]);
 
       delete map[action.payload.key];
     }

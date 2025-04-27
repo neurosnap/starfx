@@ -1,8 +1,8 @@
-import { type Callable, type Operation, sleep } from "effection";
+import { type Operation, sleep } from "effection";
 import { safe } from "./safe.ts";
 import { parallel } from "./parallel.ts";
 import { API_ACTION_PREFIX, put } from "../action.ts";
-import type { Result } from "effection"; // Adjust the import path as needed
+import type { Result } from "effection";
 
 export function superviseBackoff(attempt: number, max = 10): number {
   if (attempt > max) return -1;
@@ -17,8 +17,8 @@ export function superviseBackoff(attempt: number, max = 10): number {
  * error simply calling the {@link Operation} then it will exponentially
  * wait longer until attempting to restart and eventually give up.
  */
-export function supervise<T>(
-  op: Callable<T>,
+export function supervise<T, TArgs extends unknown[] = []>(
+  op: (...args: TArgs) => Operation<T>,
   backoff: (attemp: number) => number = superviseBackoff,
 ) {
   return function* () {
@@ -31,12 +31,14 @@ export function supervise<T>(
       if (res.ok) {
         attempt = 0;
       } else {
+        yield* sleep(1); // next tick
         yield* put({
           type: `${API_ACTION_PREFIX}supervise`,
           payload: res.error,
           meta:
             `Exception caught, waiting ${waitFor}ms before restarting operation`,
         });
+
         yield* sleep(waitFor);
       }
 
@@ -50,11 +52,12 @@ export function supervise<T>(
  * keepAlive accepts a list of operations and calls them all with
  * {@link supervise}
  */
-export function* keepAlive(
-  ops: Callable<unknown>[],
+export function* keepAlive<T, TArgs extends unknown[] = []>(
+  ops: ((...args: TArgs) => Operation<T>)[],
   backoff?: (attempt: number) => number,
 ): Operation<Result<void>[]> {
-  const group = yield* parallel(ops.map((op) => supervise(op, backoff)));
+  const supervised = ops.map((op) => supervise(op, backoff));
+  const group = yield* parallel(supervised);
   const results = yield* group;
   return results;
 }

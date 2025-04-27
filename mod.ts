@@ -27,9 +27,7 @@ export {
   useAbortSignal,
 } from "effection";
 export type {
-  Callable,
   Channel,
-  Instruction,
   Operation,
   Result,
   Scope,

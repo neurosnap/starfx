@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import { createAction } from "../mod.ts";
+import { createAction } from "../action.ts";
 
 const tests = describe("createAction()");
 

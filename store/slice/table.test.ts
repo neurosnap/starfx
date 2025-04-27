@@ -30,9 +30,7 @@ it(tests, "sets up a table", async () => {
     initialState,
   });
 
-  await store.run(function* () {
-    yield* updateStore(slice.set({ [first.id]: first }));
-  });
+  await store.run(() => updateStore(slice.set({ [first.id]: first })));
   asserts.assertEquals(store.getState()[NAME], { [first.id]: first });
 });
 
@@ -41,9 +39,7 @@ it(tests, "adds a row", async () => {
     initialState,
   });
 
-  await store.run(function* () {
-    yield* updateStore(slice.set({ [second.id]: second }));
-  });
+  await store.run(() => updateStore(slice.set({ [second.id]: second })));
   asserts.assertEquals(store.getState()[NAME], { 2: second });
 });
 
@@ -58,9 +54,7 @@ it(tests, "removes a row", async () => {
     },
   });
 
-  await store.run(function* () {
-    yield* updateStore(slice.remove(["1"]));
-  });
+  await store.run(() => updateStore(slice.remove(["1"])));
   asserts.assertEquals(store.getState()[NAME], { [second.id]: second });
 });
 
@@ -81,11 +75,11 @@ it(tests, "gets a row", async () => {
   const store = configureStore({
     initialState,
   });
-  await store.run(function* () {
-    yield* updateStore(
+  await store.run(() =>
+    updateStore(
       slice.add({ [first.id]: first, [second.id]: second, [third.id]: third }),
-    );
-  });
+    )
+  );
 
   const row = slice.selectById(store.getState(), { id: "2" });
   asserts.assertEquals(row, second);
@@ -105,9 +99,7 @@ it(tests, "gets all rows", async () => {
     initialState,
   });
   const data = { [first.id]: first, [second.id]: second, [third.id]: third };
-  await store.run(function* () {
-    yield* updateStore(slice.add(data));
-  });
+  await store.run(() => updateStore(slice.add(data)));
   asserts.assertEquals(store.getState()[NAME], data);
 });
 
@@ -119,9 +111,7 @@ it(tests, "with empty", async () => {
   });
 
   asserts.assertEquals(tbl.empty, first);
-  await store.run(function* () {
-    yield* updateStore(tbl.set({ [first.id]: first }));
-  });
+  await store.run(() => updateStore(tbl.set({ [first.id]: first })));
   asserts.assertEquals(tbl.selectTable(store.getState()), {
     [first.id]: first,
   });
@@ -137,9 +127,7 @@ it(tests, "with no empty", async () => {
   });
 
   asserts.assertEquals(tbl.empty, undefined);
-  await store.run(function* () {
-    yield* updateStore(tbl.set({ [first.id]: first }));
-  });
+  await store.run(() => updateStore(tbl.set({ [first.id]: first })));
   asserts.assertEquals(tbl.selectTable(store.getState()), {
     [first.id]: first,
   });

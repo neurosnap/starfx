@@ -1,4 +1,4 @@
-import { Instruction, Operation } from "effection";
+import { Operation } from "effection";
 import type { Next } from "./types.ts";
 
 export interface BaseCtx {
@@ -28,7 +28,7 @@ export function compose<Ctx extends BaseCtx = BaseCtx, T = unknown>(
     // last called middleware #
     let index = -1;
 
-    function* dispatch(i: number): Generator<Instruction, void, unknown> {
+    function* dispatch(i: number): Operation<void> {
       if (i <= index) {
         throw new Error("next() called multiple times");
       }

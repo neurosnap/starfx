@@ -1,14 +1,13 @@
 import {
   call,
-  Callable,
   createContext,
   createSignal,
   each,
-  Operation,
-  Signal,
+  type Operation,
+  type Signal,
   SignalQueueFactory,
   spawn,
-  Stream,
+  type Stream,
 } from "effection";
 import { ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
@@ -60,12 +59,15 @@ export function take<P>(
   pattern: ActionPattern,
 ): Operation<ActionWithPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
-  const fd = useActions(pattern);
-  for (const action of yield* each(fd)) {
-    return action;
+  const actionStream = useActions(pattern);
+  const subscription = yield* actionStream;
+  const result = yield* subscription.next();
+  if (result.done) {
+    return {
+      type: "Action stream closed before a matching action was received",
+    };
   }
-
-  return { type: "take failed, this should not be possible" };
+  return result.value;
 }
 
 export function* takeEvery<T>(
@@ -106,16 +108,16 @@ export function* takeLeading<T>(
 }
 
 export function* waitFor(
-  predicate: Callable<Operation<boolean> | Promise<boolean> | boolean>,
+  predicate: () => Operation<boolean>,
 ) {
-  const init = yield* call(predicate as any);
+  const init = yield* predicate();
   if (init) {
     return;
   }
 
   while (true) {
     yield* take("*");
-    const result = yield* call(predicate as any);
+    const result = yield* predicate();
     if (result) {
       return;
     }

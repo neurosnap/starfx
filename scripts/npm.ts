@@ -22,13 +22,6 @@ async function init() {
         path: "react.ts",
       },
     ],
-    mappings: {
-      // use the deno module in this repo, but use the npm module when publishing
-      "https://deno.land/x/effection@4.0.0-alpha.7/mod.ts": {
-        name: "effection",
-        version: "4.0.0-alpha.7",
-      },
-    },
     importMap: "deno.json",
     outDir: "./npm",
     shims: {

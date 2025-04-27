@@ -3,7 +3,7 @@ import type { Operation, Scope } from "effection";
 import type { AnyAction, AnyState } from "../types.ts";
 import type { LoaderOutput } from "./slice/loaders.ts";
 import type { TableOutput } from "./slice/table.ts";
-import { BaseCtx } from "../mod.ts";
+import { BaseCtx } from "../compose.ts";
 import { createRun } from "./run.ts";
 
 export type StoreUpdater<S extends AnyState> = (s: S) => S | void;

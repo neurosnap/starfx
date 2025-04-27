@@ -1,0 +1,39 @@
+name: preview
+
+on: [pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: setup deno
+        uses: denoland/setup-deno@v2
+      - name: get version
+        id: vars
+        run: echo ::set-output name=version::$(git describe --abbrev=0 --tags | sed 's/^v//')-pr+$(git rev-parse HEAD)
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          registry-url: https://registry.npmjs.com
+      - name: build
+        run: deno task npm $NPM_VERSION
+        env:
+          NPM_VERSION: ${{steps.vars.outputs.version}}
+
+      - name: checkout neurosnap/starfx-examples
+        uses: actions/checkout@v4
+        with:
+          repository: neurosnap/starfx-examples
+          path: examples
+
+      - name: Publish Preview Versions
+        run: npx pkg-pr-new publish './npm' --template './examples/*'

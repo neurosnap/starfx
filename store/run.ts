@@ -1,11 +1,11 @@
-import { Callable, Operation, Result, Scope, Task } from "effection";
+import { Operation, Result, Scope, Task } from "effection";
 import { parallel, safe } from "../fx/mod.ts";
 
 export function createRun(scope: Scope) {
-  function run<T>(op: Callable<T>[]): Task<Result<T>[]>;
-  function run<T>(op: Callable<T>): Task<Result<T>>;
+  function run<T>(op: (() => Operation<T>)[]): Task<Result<T>[]>;
+  function run<T>(op: () => Operation<T>): Task<Result<T>>;
   function run<T>(
-    op: Callable<T> | Callable<T>[],
+    op: (() => Operation<T>) | (() => Operation<T>)[],
   ): Task<Result<T> | Result<T>[]> {
     if (Array.isArray(op)) {
       return scope.run(function* (): Operation<Result<T>[]> {

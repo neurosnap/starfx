@@ -1,12 +1,6 @@
 import { ActionContext, API_ACTION_PREFIX, takeEvery } from "../action.ts";
 import { compose } from "../compose.ts";
-import {
-  type Callable,
-  ensure,
-  Ok,
-  type Operation,
-  type Signal,
-} from "effection";
+import { call, ensure, Ok, type Operation, type Signal } from "effection";
 import { keepAlive, supervise } from "../fx/mod.ts";
 import { IdContext } from "../store/store.ts";
 import { createKey } from "./create-key.ts";
@@ -25,8 +19,7 @@ import type {
 export interface ThunksApi<Ctx extends ThunkCtx> {
   use: (fn: Middleware<Ctx>) => void;
   routes: () => Middleware<Ctx>;
-  bootup: Callable<void>;
-  register: Callable<void>;
+  register: () => Operation<void>;
   reset: () => void;
 
   /**
@@ -134,7 +127,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   let signal: Signal<AnyAction, void> | undefined = undefined;
   let storeId: number | undefined = undefined;
   const middleware: Middleware<Ctx>[] = [];
-  const visors: { [key: string]: Callable<unknown> } = {};
+  const visors: { [key: string]: () => Operation<void> } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
   let dynamicMiddlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {
@@ -151,8 +144,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   const createType = (post: string) => `${API_ACTION_PREFIX}${post}`;
 
   function* onApi<P extends CreateActionPayload>(
-    action: ActionWithPayload<P>,
-  ): Operation<Ctx> {
+    action: ActionWithPayload<P> | AnyAction,
+  ) {
     const { name, key, options } = action.payload;
     const actionFn = actionMap[name];
     const ctx = {
@@ -179,8 +172,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     const action = (payload?: any) => {
       return { type, payload };
     };
-    let req = null;
-    let fn = null;
+    let req: { supervisor?: Supervisor } | null = null;
+    let fn: MiddlewareCo<Ctx> | null = null;
     if (args.length === 2) {
       req = args[0];
       fn = args[1];
@@ -208,8 +201,8 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
     middlewareMap[name] = fn || defaultMiddleware;
 
-    const tt = req ? (req as any).supervisor : supervisor;
-    function* curVisor() {
+    const tt = req && req.supervisor ? req.supervisor : supervisor;
+    function* curVisor(): Operation<void> {
       yield* tt(type, onApi);
     }
 
@@ -252,15 +245,14 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     actionFn._success = {};
     actionFn._error = {};
     actionMap[name] = actionFn;
-
     return actionFn;
   }
 
-  function* watcher(action: ActionWithPayload<Callable<unknown>>) {
+  function* watcher(action: ActionWithPayload<() => Operation<unknown>>) {
     yield* supervise(action.payload)();
   }
 
-  function* register() {
+  function* register(): Operation<void> {
     storeId = yield* IdContext.expect();
     if (storeId && storeMap.has(storeId)) {
       console.warn("This thunk instance is already registered.");
@@ -268,6 +260,10 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     }
 
     signal = yield* ActionContext.expect();
+    // findme[1]
+    if (!signal) {
+      throw new Error("Signal is not available");
+    }
     storeMap.set(storeId, signal);
 
     yield* ensure(function* () {
@@ -311,11 +307,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     },
     create,
     routes,
-    /**
-     * @deprecated use `register()` instead
-     */
-    bootup: register,
     reset: resetMdw,
-    register,
+    register: () => call(register),
   };
 }

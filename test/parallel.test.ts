@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import type { Operation, Result } from "../mod.ts";
+import { type Operation, type Result, until } from "effection";
 import { each, Err, Ok, parallel, run, sleep, spawn } from "../mod.ts";
 
 const test = describe("parallel()");
@@ -116,7 +116,7 @@ it(test, "should return empty array", async () => {
 it(test, "should resolve all async items", async () => {
   const two = defer();
 
-  function* one() {
+  function* one(): Operation<number> {
     yield* sleep(5);
     return 1;
   }
@@ -126,7 +126,7 @@ it(test, "should resolve all async items", async () => {
       yield* sleep(15);
       two.resolve(2);
     });
-    const results = yield* parallel([one, () => two.promise]);
+    const results = yield* parallel([one, () => until(two.promise)]);
     return yield* results;
   });
 
@@ -140,7 +140,10 @@ it(test, "should stop all operations when there is an error", async () => {
 
   function* genFn() {
     try {
-      const results = yield* parallel([() => one.promise, () => two.promise]);
+      const results = yield* parallel<number>([
+        () => until(one.promise),
+        () => until(two.promise),
+      ]);
       actual = yield* results;
     } catch (_) {
       actual = [Err(new Error("should not get hit"))];

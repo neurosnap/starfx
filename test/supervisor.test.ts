@@ -1,12 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import {
-  call,
-  Operation,
-  run,
-  spawn,
-  supervise,
-  superviseBackoff,
-} from "../mod.ts";
+import { Operation, run, spawn, supervise, superviseBackoff } from "../mod.ts";
 import { ActionWithPayload } from "../types.ts";
 import { take } from "../action.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
@@ -60,7 +53,7 @@ it(test, "should recover with backoff pressure", async () => {
         actions.push(action);
       }
     });
-    yield* call(supervise(op, backoff));
+    yield* supervise(op, backoff)();
   });
 
   expect(actions.length).toEqual(3);

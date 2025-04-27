@@ -1,5 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import type { AnyAction } from "../mod.ts";
+import type { AnyAction, Operation } from "../mod.ts";
 import { put, sleep, spawn, take } from "../mod.ts";
 import { createStore } from "../store/mod.ts";
 
@@ -17,7 +17,7 @@ it(
       yield* put({ type: "action-1", payload: 2 });
     }
 
-    function* root() {
+    function* root(): Operation<void> {
       yield* spawn(channelFn);
 
       actual.push(yield* take("action-1"));

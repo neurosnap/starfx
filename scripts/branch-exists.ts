@@ -6,7 +6,7 @@ await main(function* (): Operation<void> {
   const [branch, ownerRepo] = Deno.args;
   console.dir({ branch, ownerRepo });
 
-  const response = yield* call(
+  const response = yield* call(() =>
     fetch(`https://api.github.com/repos/${ownerRepo}/branches`, {
       headers: {
         Accept: "application/vnd.github+json",
@@ -14,11 +14,11 @@ await main(function* (): Operation<void> {
         // the token isn't required but helps with rate limiting
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-    }),
+    })
   );
 
   if (response.ok) {
-    const branches = yield* call(response.json());
+    const branches = yield* call(() => response.json());
     const branchList = branches.map((branch: { name: string }) => branch.name);
     // for CI debug purposes
     console.dir({ branchList });
@@ -30,10 +30,10 @@ await main(function* (): Operation<void> {
       const encoder = new TextEncoder();
       if (branchList.includes(branch)) {
         const data = encoder.encode(`branch=${branch}`);
-        yield* call(Deno.writeFile(output, data, { append: true }));
+        yield* call(() => Deno.writeFile(output, data, { append: true }));
       } else {
         const data = encoder.encode("branch=main");
-        yield* call(Deno.writeFile(output, data, { append: true }));
+        yield* call(() => Deno.writeFile(output, data, { append: true }));
       }
     }
     // always log out the branch for both CI and local running
@@ -46,7 +46,7 @@ await main(function* (): Operation<void> {
     console.error(
       `Error trying to fetch https://api.github.com/repos/${ownerRepo}/branches and check for ${branch}`,
     );
-    const text = yield* call(response.text());
+    const text = yield* call(() => response.text());
     throw new Error(text);
   }
 });
