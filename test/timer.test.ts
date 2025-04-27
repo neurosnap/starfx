@@ -1,13 +1,5 @@
 import { describe, expect, it } from "../test.ts";
-import {
-  clearTimers,
-  put,
-  run,
-  sleep,
-  spawn,
-  timer,
-  timer__0,
-} from "../mod.ts";
+import { clearTimers, put, run, sleep, spawn, timer__0 } from "../mod.ts";
 
 const tests = describe("timer()");
 

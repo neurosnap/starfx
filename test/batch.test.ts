@@ -6,6 +6,7 @@ import {
   slice,
 } from "../store/mod.ts";
 import { parallel } from "../mod.ts";
+import { sleep } from "effection";
 
 const batch = describe("batch mdw");
 
@@ -23,7 +24,7 @@ it(batch, "should batch notify subscribers based on mdw", async () => {
     counter += 1;
   });
   await store.run(function* () {
-    const group: any = yield* parallel([
+    const group = yield* parallel([
       () => schema.update(schema.cache.add({ "1": "one" })),
       () => schema.update(schema.cache.add({ "2": "two" })),
       () => schema.update(schema.cache.add({ "3": "three" })),
@@ -34,6 +35,7 @@ it(batch, "should batch notify subscribers based on mdw", async () => {
     yield* group;
     // make sure it will still notify subscribers after batched round
     yield* schema.update(schema.cache.add({ "7": "seven" }));
+    yield* sleep(0);
   });
   expect(counter).toBe(2);
 });
