@@ -77,11 +77,6 @@ export function parallel<T, TArgs extends unknown[] = []>(
             return result;
           }),
         );
-        // TODO upgrade to future version, see issue https://github.com/thefrontside/effection/issues/998
-        // we currently process functions in sibiling spawn()
-        // as last in, first out for this case but if there is async work,
-        //  such as sleep, it breaks that queue into two which makes this work as expected
-        yield* sleep(0);
       }
 
       for (const tsk of tasks) {
