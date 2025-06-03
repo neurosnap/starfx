@@ -6,7 +6,7 @@ import {
   waitForLoader,
   waitForLoaders,
 } from "../store/mod.ts";
-import { ApiCtx, createApi, mdw, takeEvery } from "../mod.ts";
+import { type ApiCtx, createApi, mdw, takeEvery } from "../mod.ts";
 
 install();
 
@@ -32,7 +32,7 @@ it(
   tests,
   "should be able to fetch a resource and save automatically",
   async () => {
-    mock(`GET@/users`, () => {
+    mock("GET@/users", () => {
       return new Response(JSON.stringify(mockUser));
     });
 
@@ -82,7 +82,7 @@ it(
   tests,
   "should be able to fetch a resource and parse as text instead of json",
   async () => {
-    mock(`GET@/users`, () => {
+    mock("GET@/users", () => {
       return new Response("this is some text");
     });
 
@@ -118,7 +118,7 @@ it(
 
 it(tests, "error handling", async () => {
   const errMsg = { message: "something happened" };
-  mock(`GET@/users`, () => {
+  mock("GET@/users", () => {
     return new Response(JSON.stringify(errMsg), { status: 500 });
   });
 
@@ -153,7 +153,7 @@ it(tests, "error handling", async () => {
 });
 
 it(tests, "status 204", async () => {
-  mock(`GET@/users`, () => {
+  mock("GET@/users", () => {
     return new Response(null, { status: 204 });
   });
 
@@ -192,7 +192,7 @@ it(tests, "status 204", async () => {
 });
 
 it(tests, "malformed json", async () => {
-  mock(`GET@/users`, () => {
+  mock("GET@/users", () => {
     return new Response("not json", { status: 200 });
   });
 
@@ -235,7 +235,7 @@ it(tests, "malformed json", async () => {
 });
 
 it(tests, "POST", async () => {
-  mock(`POST@/users`, () => {
+  mock("POST@/users", () => {
     return new Response(JSON.stringify(mockUser));
   });
 
@@ -285,7 +285,7 @@ it(tests, "POST", async () => {
 });
 
 it(tests, "POST multiple endpoints with same uri", async () => {
-  mock(`POST@/users/1/something`, () => {
+  mock("POST@/users/1/something", () => {
     return new Response(JSON.stringify(mockUser));
   });
 
@@ -403,7 +403,7 @@ it(tests, "slug in url but payload has empty string for slug value", () => {
 
 it(tests, "with success - should keep retrying fetch request", async () => {
   let counter = 0;
-  mock(`GET@/users`, () => {
+  mock("GET@/users", () => {
     counter += 1;
     if (counter > 4) {
       return new Response(JSON.stringify(mockUser));
@@ -453,7 +453,7 @@ it(
   tests,
   "fetch retry - with failure - should keep retrying and then quit",
   async () => {
-    mock(`GET@/users`, () => {
+    mock("GET@/users", () => {
       return new Response(JSON.stringify({ message: "error" }), {
         status: 400,
       });

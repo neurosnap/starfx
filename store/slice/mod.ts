@@ -1,12 +1,12 @@
-import { str, StrOutput } from "./str.ts";
-import { num, NumOutput } from "./num.ts";
-import { table, TableOutput } from "./table.ts";
-import { any, AnyOutput } from "./any.ts";
-import { obj, ObjOutput } from "./obj.ts";
+import { str, type StrOutput } from "./str.ts";
+import { num, type NumOutput } from "./num.ts";
+import { table, type TableOutput } from "./table.ts";
+import { any, type AnyOutput } from "./any.ts";
+import { obj, type ObjOutput } from "./obj.ts";
 import {
   defaultLoader,
   defaultLoaderItem,
-  LoaderOutput,
+  type LoaderOutput,
   loaders,
 } from "./loaders.ts";
 

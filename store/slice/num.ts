@@ -26,14 +26,18 @@ export function createNum<S extends AnyState = AnyState>({
       // deno-lint-ignore no-explicit-any
       (state as any)[name] = value;
     },
-    increment: (by = 1) => (state) => {
-      // deno-lint-ignore no-explicit-any
-      (state as any)[name] += by;
-    },
-    decrement: (by = 1) => (state) => {
-      // deno-lint-ignore no-explicit-any
-      (state as any)[name] -= by;
-    },
+    increment:
+      (by = 1) =>
+      (state) => {
+        // deno-lint-ignore no-explicit-any
+        (state as any)[name] += by;
+      },
+    decrement:
+      (by = 1) =>
+      (state) => {
+        // deno-lint-ignore no-explicit-any
+        (state as any)[name] -= by;
+      },
     reset: () => (state) => {
       // deno-lint-ignore no-explicit-any
       (state as any)[name] = initialState;

@@ -29,9 +29,8 @@ export interface LoaderState<M extends AnyState = AnyState>
   isInitialLoading: boolean;
 }
 
-export type LoaderPayload<M extends AnyState> =
-  & Pick<LoaderItemState<M>, "id">
-  & Partial<Pick<LoaderItemState<M>, "message" | "meta">>;
+export type LoaderPayload<M extends AnyState> = Pick<LoaderItemState<M>, "id"> &
+  Partial<Pick<LoaderItemState<M>, "message" | "meta">>;
 
 // deno-lint-ignore no-explicit-any
 export type AnyState = Record<string, any>;

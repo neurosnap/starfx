@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 import type { AnyState, IdProp } from "../../types.ts";
-import { BaseSchema } from "../types.ts";
+import type { BaseSchema } from "../types.ts";
 
 interface PropId {
   id: IdProp;
@@ -65,9 +65,8 @@ function tableSelectors<
     findByIds,
     tableAsList,
     selectTable,
-    selectTableAsList: createSelector(
-      selectTable,
-      (data): Entity[] => tableAsList(data),
+    selectTableAsList: createSelector(selectTable, (data): Entity[] =>
+      tableAsList(data),
     ),
     selectById: sbi,
     selectByIds: createSelector(

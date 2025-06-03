@@ -1,10 +1,10 @@
-import { Operation, Result } from "effection";
+import type { Operation, Result } from "effection";
 import type { ActionFnWithPayload, AnyState } from "../types.ts";
 import type { FxStore, StoreUpdater, UpdaterCtx } from "./types.ts";
 import { StoreContext } from "./context.ts";
-import { LoaderOutput } from "./slice/loaders.ts";
+import type { LoaderOutput } from "./slice/loaders.ts";
 import { parallel, safe } from "../fx/mod.ts";
-import { ThunkAction } from "../query/mod.ts";
+import type { ThunkAction } from "../query/mod.ts";
 import { getIdFromAction, take } from "../action.ts";
 
 export function* updateStore<S extends AnyState>(

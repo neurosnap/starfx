@@ -2,9 +2,9 @@ import type { ApiCtx, ThunkCtxWLoader } from "../query/mod.ts";
 import { compose } from "../compose.ts";
 import type { AnyState, Next } from "../types.ts";
 import {
-  LoaderOutput,
+  type LoaderOutput,
   select,
-  TableOutput,
+  type TableOutput,
   updateStore,
 } from "../store/mod.ts";
 import { actions, customKey, err, queryCtx } from "./query.ts";
@@ -128,7 +128,7 @@ export function loader<M extends AnyState = AnyState>(schema: {
       ]);
     } finally {
       const loaders = yield* select((s: any) =>
-        schema.loaders.selectByIds(s, { ids: [ctx.name, ctx.key] })
+        schema.loaders.selectByIds(s, { ids: [ctx.name, ctx.key] }),
       );
       const ids = loaders
         .filter((loader) => loader.status === "loading")
@@ -209,7 +209,7 @@ export function loaderApi<
       ]);
     } finally {
       const loaders = yield* select((s: any) =>
-        schema.loaders.selectByIds(s, { ids: [ctx.name, ctx.key] })
+        schema.loaders.selectByIds(s, { ids: [ctx.name, ctx.key] }),
       );
       const ids = loaders
         .filter((loader) => loader.status === "loading")

@@ -1,5 +1,13 @@
 import { createAction, take } from "./action.ts";
-import { call, Callable, Operation, race, sleep, spawn, Task } from "effection";
+import {
+  call,
+  type Callable,
+  type Operation,
+  race,
+  sleep,
+  spawn,
+  type Task,
+} from "effection";
 import type { ActionWithPayload, AnyAction } from "./types.ts";
 import type { CreateActionPayload } from "./query/mod.ts";
 import { getIdFromAction } from "./action.ts";
@@ -67,9 +75,8 @@ export function timer(timer: number = 5 * MINUTES) {
           }
           if (typeof id === "string") {
             return idA === id;
-          } else {
-            return idA === getIdFromAction(id);
           }
+          return idA === getIdFromAction(id);
         });
       };
       yield* race([sleep(timer), take(matchFn as any) as Operation<void>]);

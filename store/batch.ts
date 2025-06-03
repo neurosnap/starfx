@@ -1,6 +1,6 @@
 import { action } from "effection";
-import { UpdaterCtx } from "./types.ts";
-import { AnyState, Next } from "../types.ts";
+import type { UpdaterCtx } from "./types.ts";
+import type { AnyState, Next } from "../types.ts";
 
 export function createBatchMdw<S extends AnyState>(
   queue: (send: () => void) => void,

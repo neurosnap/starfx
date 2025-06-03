@@ -1,19 +1,19 @@
 import {
   call,
-  Callable,
+  type Callable,
   createContext,
   createSignal,
   each,
-  Operation,
-  Signal,
+  type Operation,
+  type Signal,
   SignalQueueFactory,
   spawn,
-  Stream,
+  type Stream,
 } from "effection";
-import { ActionPattern, matcher } from "./matcher.ts";
+import { type ActionPattern, matcher } from "./matcher.ts";
 import type { Action, ActionWithPayload, AnyAction } from "./types.ts";
 import { createFilterQueue } from "./queue.ts";
-import { ActionFnWithPayload } from "./types.ts";
+import type { ActionFnWithPayload } from "./types.ts";
 
 export const ActionContext = createContext(
   "starfx:action",

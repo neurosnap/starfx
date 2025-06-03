@@ -1,12 +1,12 @@
 import { sleep } from "effection";
-import { Ok, Operation, parallel, put, take } from "../mod.ts";
+import { Ok, type Operation, parallel, put, take } from "../mod.ts";
 import {
   createPersistor,
   createSchema,
   createStore,
   createTransform,
   PERSIST_LOADER_ID,
-  PersistAdapter,
+  type PersistAdapter,
   persistStoreMdw,
   slice,
 } from "../store/mod.ts";
@@ -119,9 +119,10 @@ it(tests, "persists inbound state using transform 'in' function", async () => {
 
   const transform = createTransform<State>();
 
-  transform.in = function (state) {
-    return { ...state, token: state?.token?.split("").reverse().join("") };
-  };
+  transform.in = (state) => ({
+    ...state,
+    token: state?.token?.split("").reverse().join(""),
+  });
 
   const persistor = createPersistor<State>({
     adapter,
@@ -336,9 +337,7 @@ it(tests, "handles the empty state correctly", async () => {
   };
 
   const transform = createTransform<State>();
-  transform.in = function (_: Partial<State>) {
-    return {};
-  };
+  transform.in = (_: Partial<State>) => ({});
 
   const persistor = createPersistor<State>({
     adapter,
@@ -437,7 +436,7 @@ it(
     };
 
     const transform = createTransform<State>();
-    transform.in = function (_: Partial<State>) {
+    transform.in = (_: Partial<State>) => {
       throw new Error("testing the transform error");
     };
     const persistor = createPersistor<State>({
@@ -485,12 +484,10 @@ it(
     };
 
     const transform = createTransform<State>();
-    transform.in = function (state) {
-      return {
-        ...state,
-        token: `${state.counter}${state?.token?.split("").reverse().join("")}`,
-      };
-    };
+    transform.in = (state) => ({
+      ...state,
+      token: `${state.counter}${state?.token?.split("").reverse().join("")}`,
+    });
 
     const persistor = createPersistor<State>({
       adapter,
@@ -540,12 +537,10 @@ it(
     };
 
     const transform = createTransform<State>();
-    transform.in = function (state) {
-      return {
-        ...state,
-        token: `${state?.token?.split("").reverse().join("")}`,
-      };
-    };
+    transform.in = (state) => ({
+      ...state,
+      token: `${state?.token?.split("").reverse().join("")}`,
+    });
 
     const persistor = createPersistor<State>({
       adapter,
@@ -567,12 +562,10 @@ it(
 
     asserts.assertEquals(ls, '{"token":"43210"}');
 
-    transform.in = function (state) {
-      return {
-        ...state,
-        token: `${state?.token}56789`,
-      };
-    };
+    transform.in = (state) => ({
+      ...state,
+      token: `${state?.token}56789`,
+    });
 
     await store.run(function* (): Operation<void> {
       yield* schema.update(schema.token.set("01234"));
@@ -712,7 +705,7 @@ it(tests, "persists outbound a filtered nested part of a slice", async () => {
   function extractMetaAndSetToken(state: Partial<State>): Partial<State> {
     const nextState = { ...state };
     if (state.loaders) {
-      const savedLoader = state.loaders["A"];
+      const savedLoader = state.loaders.A;
       if (savedLoader?.meta?.flag) {
         nextState.token = savedLoader.meta.flag;
       }

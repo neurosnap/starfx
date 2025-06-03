@@ -34,8 +34,7 @@ export function supervise<T>(
         yield* put({
           type: `${API_ACTION_PREFIX}supervise`,
           payload: res.error,
-          meta:
-            `Exception caught, waiting ${waitFor}ms before restarting operation`,
+          meta: `Exception caught, waiting ${waitFor}ms before restarting operation`,
         });
         yield* sleep(waitFor);
       }

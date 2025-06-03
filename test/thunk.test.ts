@@ -135,7 +135,7 @@ it(
     api.use(onFetchApi);
     api.use(processUsers);
     api.use(processTickets);
-    const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
+    const fetchUsers = api.create("/users", { supervisor: takeEvery });
 
     const store = createStore<TestState>({
       initialState: { users: {}, tickets: {} },
@@ -162,9 +162,9 @@ it(
     api.use(onFetchApi);
     api.use(processUsers);
     api.use(processTickets);
-    const fetchUsers = api.create(`/users`, { supervisor: takeEvery });
+    const fetchUsers = api.create("/users", { supervisor: takeEvery });
     const fetchTickets = api.create(
-      `/ticket-wrong-url`,
+      "/ticket-wrong-url",
       {
         supervisor: takeEvery,
       },
@@ -208,7 +208,7 @@ it(tests, "error handling", () => {
     throw new Error("some error");
   });
 
-  const action = api.create(`/error`, { supervisor: takeEvery });
+  const action = api.create("/error", { supervisor: takeEvery });
 
   const store = createStore({ initialState: {} });
   store.run(api.bootup);
@@ -226,7 +226,7 @@ it(tests, "error handling inside create", () => {
   });
 
   const action = api.create(
-    `/error`,
+    "/error",
     { supervisor: takeEvery },
     function* (_, next) {
       try {
@@ -257,7 +257,7 @@ it(tests, "error inside endpoint mdw", () => {
   query.use(query.routes());
 
   const fetchUsers = query.create(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers() {
       throw new Error("some error");
@@ -470,7 +470,7 @@ it(tests, "retry with actionFn with payload", async () => {
 
   api.use(function* (ctx: ThunkCtx<{ page: number }>, next) {
     yield* next();
-    if (ctx.payload.page == 1) {
+    if (ctx.payload.page === 1) {
       yield* put(ctx.actionFn({ page: 2 }));
     }
   });

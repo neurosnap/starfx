@@ -1,4 +1,4 @@
-import { Callable, Operation, Result, Scope, Task } from "effection";
+import type { Callable, Operation, Result, Scope, Task } from "effection";
 import { parallel, safe } from "../fx/mod.ts";
 
 export function createRun(scope: Scope) {

@@ -68,7 +68,7 @@ it(testEvery, "should receive all actions", async () => {
 
   function* root() {
     const task = yield* spawn(() =>
-      takeEvery("ACTION", (action) => worker("a1", "a2", action))
+      takeEvery("ACTION", (action) => worker("a1", "a2", action)),
     );
     yield* take("CANCEL_WATCHER");
     yield* task.halt();

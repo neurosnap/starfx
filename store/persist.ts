@@ -1,4 +1,4 @@
-import { Err, Ok, Operation, Result } from "effection";
+import { Err, Ok, type Operation, type Result } from "effection";
 import { select, updateStore } from "./fx.ts";
 import type { AnyState, Next } from "../types.ts";
 import type { UpdaterCtx } from "./types.ts";
@@ -26,21 +26,15 @@ interface TransformFunctions<S extends AnyState> {
 
 export function createTransform<S extends AnyState>() {
   const transformers: TransformFunctions<S> = {
-    in: function (currentState: Partial<S>): Partial<S> {
-      return currentState;
-    },
-    out: function (currentState: Partial<S>): Partial<S> {
-      return currentState;
-    },
+    in: (currentState: Partial<S>): Partial<S> => currentState,
+    out: (currentState: Partial<S>): Partial<S> => currentState,
   };
 
-  const inTransformer = function (state: Partial<S>): Partial<S> {
-    return transformers.in(state);
-  };
+  const inTransformer = (state: Partial<S>): Partial<S> =>
+    transformers.in(state);
 
-  const outTransformer = function (state: Partial<S>): Partial<S> {
-    return transformers.out(state);
-  };
+  const outTransformer = (state: Partial<S>): Partial<S> =>
+    transformers.out(state);
 
   return {
     in: inTransformer,
@@ -85,9 +79,8 @@ export function createPersistor<S extends AnyState>({
   reconciler = shallowReconciler,
   allowlist = [],
   transform,
-}:
-  & Pick<PersistProps<S>, "adapter">
-  & Partial<PersistProps<S>>): PersistProps<S> {
+}: Pick<PersistProps<S>, "adapter"> &
+  Partial<PersistProps<S>>): PersistProps<S> {
   function* rehydrate(): Operation<Result<undefined>> {
     const persistedState = yield* adapter.getItem(key);
     if (!persistedState.ok) {
@@ -105,7 +98,7 @@ export function createPersistor<S extends AnyState>({
 
     const state = yield* select((s) => s);
     const nextState = reconciler(state as S, stateFromStorage);
-    yield* updateStore<S>(function (state) {
+    yield* updateStore<S>((state) => {
       Object.keys(nextState).forEach((key: keyof S) => {
         state[key] = nextState[key];
       });

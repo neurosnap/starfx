@@ -5,7 +5,7 @@ import type {
   LoaderPayload,
   LoaderState,
 } from "../../types.ts";
-import { BaseSchema } from "../types.ts";
+import type { BaseSchema } from "../types.ts";
 
 interface PropId {
   id: string;
@@ -109,9 +109,8 @@ function loaderSelectors<
 export interface LoaderOutput<
   M extends Record<string, unknown>,
   S extends AnyState,
-> extends
-  LoaderSelectors<M, S>,
-  BaseSchema<Record<string, LoaderItemState<M>>> {
+> extends LoaderSelectors<M, S>,
+    BaseSchema<Record<string, LoaderItemState<M>>> {
   schema: "loader";
   initialState: Record<string, LoaderItemState<M>>;
   start: (e: LoaderPayload<M>) => (s: S) => void;

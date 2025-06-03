@@ -64,7 +64,7 @@ it(tests, "basic", () => {
   });
 
   const fetchUsers = query.create(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
@@ -80,7 +80,7 @@ it(tests, "basic", () => {
   );
 
   const fetchUser = query.create<{ id: string }>(
-    `/users/:id`,
+    "/users/:id",
     {
       supervisor: takeLatest,
     },
@@ -119,7 +119,7 @@ it(tests, "with loader", () => {
   });
 
   const fetchUsers = api.create(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
@@ -161,7 +161,7 @@ it(tests, "with item loader", () => {
   });
 
   const fetchUser = api.create<{ id: string }>(
-    `/users/:id`,
+    "/users/:id",
     { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
@@ -216,7 +216,7 @@ it(tests, "with POST", () => {
   });
 
   const createUser = query.create<{ email: string }>(
-    `/users [POST]`,
+    "/users [POST]",
     { supervisor: takeEvery },
     function* processUsers(
       ctx: ApiCtx<{ email: string }, { users: User[] }>,
@@ -286,7 +286,7 @@ it(tests, "overriding default loader behavior", () => {
   });
 
   const fetchUsers = api.create(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* (ctx: ApiCtx<unknown, { users: User[] }>, next) {
       yield* next();
@@ -338,7 +338,7 @@ it(tests, "mdw.api() - error handler", () => {
     throw new Error("something happened");
   });
 
-  const fetchUsers = query.create(`/users`, { supervisor: takeEvery });
+  const fetchUsers = query.create("/users", { supervisor: takeEvery });
 
   store.run(query.bootup);
   store.dispatch(fetchUsers());
@@ -361,7 +361,7 @@ it(tests, "createApi with own key", async () => {
   const theTestKey = `some-custom-key-${Math.ceil(Math.random() * 1000)}`;
 
   const createUserCustomKey = query.post<{ email: string }>(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx, next) {
       ctx.cache = true;
@@ -392,7 +392,7 @@ it(tests, "createApi with own key", async () => {
       };
     },
   );
-  const newUEmail = mockUser.email + ".org";
+  const newUEmail = `${mockUser.email}.org`;
 
   store.run(query.bootup);
 
@@ -432,7 +432,7 @@ it(tests, "createApi with custom key but no payload", async () => {
   const theTestKey = `some-custom-key-${Math.ceil(Math.random() * 1000)}`;
 
   const getUsers = query.get(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers(ctx: ApiCtx, next) {
       ctx.cache = true;
@@ -519,7 +519,7 @@ it(tests, "errorHandler", () => {
   });
 
   const fetchUsers = query.create(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers(_: ApiCtx<unknown, { users: User[] }>, next) {
       // throw new Error("some error");

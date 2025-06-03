@@ -304,7 +304,7 @@ it(
     const falsy2 = action5("");
     const falsy3 = action5(undefined);
     const falsy4 = action5(null);
-    const primNo0 = action5(NaN);
+    const primNo0 = action5(Number.NaN);
     const primNo1 = action5(1);
     const primNo1bis = action5(1);
     const primNo2 = action5(2);

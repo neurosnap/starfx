@@ -170,8 +170,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
   function create(name: string, ...args: any[]) {
     if (Object.hasOwn(visors, name)) {
-      const msg =
-        `[${name}] already exists, do you have two thunks with the same name?`;
+      const msg = `[${name}] already exists, do you have two thunks with the same name?`;
       console.warn(msg);
     }
 
@@ -223,9 +222,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
       });
     }
 
-    const errMsg =
-      `[${name}] is being called before its thunk has been registered. ` +
-      "Run `store.run(thunks.register)` where `thunks` is the name of your `createThunks` or `createApi` variable.";
+    const errMsg = `[${name}] is being called before its thunk has been registered. Run \`store.run(thunks.register)\` where \`thunks\` is the name of your \`createThunks\` or \`createApi\` variable.`;
 
     const actionFn = (options?: Ctx["payload"]) => {
       if (!signal) {

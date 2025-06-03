@@ -1,13 +1,13 @@
 import { describe, expect, it } from "../test.ts";
 import {
   call,
-  Operation,
+  type Operation,
   run,
   spawn,
   supervise,
   superviseBackoff,
 } from "../mod.ts";
-import { ActionWithPayload } from "../types.ts";
+import type { ActionWithPayload } from "../types.ts";
 import { take } from "../action.ts";
 import { API_ACTION_PREFIX } from "../action.ts";
 
@@ -20,20 +20,7 @@ describe("superviseBackoff", () => {
       actual.push(superviseBackoff(i));
     }
     expect(actual).toEqual([
-      20,
-      40,
-      80,
-      160,
-      320,
-      640,
-      1280,
-      2560,
-      5120,
-      10240,
-      -1,
-      -1,
-      -1,
-      -1,
+      20, 40, 80, 160, 320, 640, 1280, 2560, 5120, 10240, -1, -1, -1, -1,
     ]);
   });
 });

@@ -30,8 +30,7 @@ export * from "./fetch.ts";
 export function* err<Ctx extends ThunkCtx = ThunkCtx>(ctx: Ctx, next: Next) {
   ctx.result = yield* safe(next);
   if (!ctx.result.ok) {
-    const message =
-      `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;
+    const message = `Error: ${ctx.result.error.message}.  Check the endpoint [${ctx.name}]`;
     console.error(message, ctx);
     yield* put({
       type: "error:query",
@@ -68,7 +67,7 @@ export function* customKey<Ctx extends ThunkCtx = ThunkCtx>(
     ctx?.action?.payload?.key &&
     ctx.key !== ctx.action.payload.key
   ) {
-    const newKey = ctx.name.split("|")[0] + "|" + ctx.key;
+    const newKey = `${ctx.name.split("|")[0]}|${ctx.key}`;
     ctx.key = newKey;
     ctx.action.payload.key = newKey;
   }

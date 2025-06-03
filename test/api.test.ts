@@ -1,13 +1,13 @@
 import {
-  AnyState,
+  type AnyState,
   API_ACTION_PREFIX,
-  ApiCtx,
+  type ApiCtx,
   call,
   createApi,
   createKey,
   keepAlive,
   mdw,
-  Operation,
+  type Operation,
   safe,
   takeEvery,
   waitFor,
@@ -71,7 +71,7 @@ it(tests, "POST", async () => {
   });
 
   const createUser = query.post<{ email: string }, { users: User[] }>(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers(ctx, next) {
       ctx.request = ctx.req({
@@ -264,8 +264,8 @@ it(tests, "run() from a normal saga", async () => {
   const payload = { name: "/users/:id [GET]", options: { id: "1" } };
 
   expect(extractedResults.actionType).toEqual(`${API_ACTION_PREFIX}${action1}`);
-  expect(extractedResults.actionPayload!["name"]).toEqual(payload.name);
-  expect(extractedResults.actionPayload!["options"]).toEqual(payload.options);
+  expect(extractedResults.actionPayload?.name).toEqual(payload.name);
+  expect(extractedResults.actionPayload?.options).toEqual(payload.options);
   expect(extractedResults.name).toEqual("/users/:id [GET]");
   expect(extractedResults.payload).toEqual({ id: "1" });
   expect(acc).toEqual("ab");
@@ -284,7 +284,7 @@ it(tests, "with hash key on a large post", async () => {
     yield* next();
   });
   const createUserDefaultKey = query.post<{ email: string; largetext: string }>(
-    `/users`,
+    "/users",
     { supervisor: takeEvery },
     function* processUsers(ctx, next) {
       ctx.cache = true;
@@ -317,7 +317,7 @@ it(tests, "with hash key on a large post", async () => {
     },
   );
 
-  const email = mockUser.email + "9";
+  const email = `${mockUser.email}9`;
   const largetext = "abc-def-ghi-jkl-mno-pqr".repeat(100);
 
   store.run(query.bootup);

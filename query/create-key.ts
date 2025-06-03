@@ -15,16 +15,17 @@ const deepSortObject = (opts?: any) => {
 };
 
 function padStart(hash: string, len: number) {
-  while (hash.length < len) {
-    hash = "0" + hash;
+  let hsh = hash;
+  while (hsh.length < len) {
+    hsh = `0${hsh}`;
   }
-  return hash;
+  return hsh;
 }
 
 // https://gist.github.com/iperelivskiy/4110988
 const tinySimpleHash = (s: string) => {
   let h = 9;
-  for (let i = 0; i < s.length;) {
+  for (let i = 0; i < s.length; ) {
     h = Math.imul(h ^ s.charCodeAt(i++), 9 ** 9);
   }
   return h ^ (h >>> 9);
@@ -35,9 +36,10 @@ const tinySimpleHash = (s: string) => {
  */
 // deno-lint-ignore no-explicit-any
 export const createKey = (name: string, payload?: any) => {
-  const normJsonString = typeof payload !== "undefined"
-    ? JSON.stringify(deepSortObject(payload))
-    : "";
+  const normJsonString =
+    typeof payload !== "undefined"
+      ? JSON.stringify(deepSortObject(payload))
+      : "";
   const hash = normJsonString
     ? padStart(tinySimpleHash(normJsonString).toString(16), 8)
     : "";

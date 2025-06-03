@@ -36,7 +36,7 @@ export function* nameParser<Ctx extends FetchJsonCtx = FetchJsonCtx>(
 
   let method = "";
   httpMethods.forEach((curMethod) => {
-    const pattern = new RegExp(`\\s*\\[` + curMethod + `\\]\\s*\\w*`, "i");
+    const pattern = new RegExp(`\\s*\\[${curMethod}\\]\\s*\\w*`, "i");
     const tmpUrl = url.replace(pattern, "");
     if (tmpUrl.length !== url.length) {
       method = curMethod.toLocaleUpperCase();
@@ -182,8 +182,7 @@ export function* payload<CurCtx extends FetchJsonCtx = FetchJsonCtx>(
 
     const val = payload[key];
     if (!val) {
-      const data =
-        `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`;
+      const data = `found :${key} in endpoint name (${ctx.name}) but payload has falsy value (${val})`;
       ctx.json = {
         ok: false,
         error: data,

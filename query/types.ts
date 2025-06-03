@@ -32,13 +32,13 @@ export interface LoaderCtx<P = unknown> extends ThunkCtx<P> {
 
 export type ApiFetchResult<ApiSuccess = any, ApiError = any> =
   | {
-    ok: true;
-    value: ApiSuccess;
-  }
+      ok: true;
+      value: ApiSuccess;
+    }
   | {
-    ok: false;
-    error: ApiError;
-  };
+      ok: false;
+      error: ApiError;
+    };
 
 export type ApiRequest = Partial<{ url: string } & RequestInit>;
 export type RequiredApiRequest = {
@@ -58,7 +58,8 @@ export interface FetchJson<ApiSuccess = any, ApiError = any> {
 }
 
 export interface FetchJsonCtx<P = any, ApiSuccess = any, ApiError = any>
-  extends FetchCtx<P>, FetchJson<ApiSuccess, ApiError> {}
+  extends FetchCtx<P>,
+    FetchJson<ApiSuccess, ApiError> {}
 
 export interface ApiCtx<Payload = any, ApiSuccess = any, ApiError = any>
   extends FetchJsonCtx<Payload, ApiSuccess, ApiError> {

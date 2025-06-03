@@ -25,33 +25,23 @@ export type ActionPattern<Guard extends AnyAction = AnyAction> =
 
 export function matcher(pattern: ActionPattern): Predicate {
   if (pattern === "*") {
-    return function (input) {
-      return !!input;
-    };
+    return (input) => !!input;
   }
 
   if (typeof pattern === "string") {
-    return function (input) {
-      return pattern === input.type;
-    };
+    return (input) => pattern === input.type;
   }
 
   if (Array.isArray(pattern)) {
-    return function (input) {
-      return pattern.some((p) => matcher(p)(input));
-    };
+    return (input) => pattern.some((p) => matcher(p)(input));
   }
 
   if (typeof pattern === "function" && Object.hasOwn(pattern, "toString")) {
-    return function (input) {
-      return pattern.toString() === input.type;
-    };
+    return (input) => pattern.toString() === input.type;
   }
 
   if (typeof pattern === "function") {
-    return function (input) {
-      return pattern(input) as boolean;
-    };
+    return (input) => pattern(input) as boolean;
   }
 
   throw new Error("invalid pattern");

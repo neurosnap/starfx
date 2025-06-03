@@ -42,7 +42,7 @@ it(tests, "sets up an obj", async () => {
     );
   });
 
-  asserts.assertEquals(store.getState()["currentUser"], {
+  asserts.assertEquals(store.getState().currentUser, {
     username: "bob",
     userId: 1,
     isadmin: true,
@@ -53,7 +53,7 @@ it(tests, "sets up an obj", async () => {
     yield* updateStore(slice.update({ key: "username", value: "alice" }));
   });
 
-  asserts.assertEquals(store.getState()["currentUser"], {
+  asserts.assertEquals(store.getState().currentUser, {
     username: "alice",
     userId: 1,
     isadmin: true,
@@ -66,7 +66,7 @@ it(tests, "sets up an obj", async () => {
     );
   });
 
-  asserts.assertEquals(store.getState()["currentUser"], {
+  asserts.assertEquals(store.getState().currentUser, {
     username: "alice",
     userId: 1,
     isadmin: true,

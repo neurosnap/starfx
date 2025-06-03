@@ -3,10 +3,10 @@ import type { Operation, Scope } from "effection";
 import type { AnyAction, AnyState } from "../types.ts";
 import type { LoaderOutput } from "./slice/loaders.ts";
 import type { TableOutput } from "./slice/table.ts";
-import { BaseCtx } from "../mod.ts";
-import { createRun } from "./run.ts";
+import type { BaseCtx } from "../mod.ts";
+import type { createRun } from "./run.ts";
 
-export type StoreUpdater<S extends AnyState> = (s: S) => S | void;
+export type StoreUpdater<S extends AnyState> = (s: S) => S | undefined;
 
 export type Listener = () => void;
 
@@ -37,11 +37,9 @@ export interface FxMap {
   [key: string]: (name: string) => BaseSchema<unknown>;
 }
 
-export type FxSchema<S extends AnyState, O extends FxMap = FxMap> =
-  & {
-    [key in keyof O]: ReturnType<O[key]>;
-  }
-  & { update: FxStore<S>["update"] };
+export type FxSchema<S extends AnyState, O extends FxMap = FxMap> = {
+  [key in keyof O]: ReturnType<O[key]>;
+} & { update: FxStore<S>["update"] };
 
 export interface FxStore<S extends AnyState> {
   getScope: () => Scope;
