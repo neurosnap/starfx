@@ -1,0 +1,28 @@
+{
+  "name": "starfx",
+  "version": "0.14.0",
+  "description": " A micro-mvc framework for react apps",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neurosnap/starfx.git"
+  },
+  "author": "Eric Bower",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/neurosnap/starfx/issues"
+  },
+  "homepage": "https://github.com/neurosnap/starfx#readme",
+  "dependencies": {
+    "effection": "^3.5.0",
+    "immer": "^10.1.1",
+    "reselect": "^5.1.1"
+  }
+}
