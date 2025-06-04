@@ -1,10 +1,10 @@
-import { parallel } from "../mod.js";
+import { parallel } from "../index.js";
 import {
   createBatchMdw,
   createSchema,
   createStore,
   slice,
-} from "../store/mod.js";
+} from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 const batch = describe("batch mdw");

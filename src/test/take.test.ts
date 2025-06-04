@@ -1,6 +1,6 @@
-import type { AnyAction } from "../mod.js";
-import { put, sleep, spawn, take } from "../mod.js";
-import { createStore } from "../store/mod.js";
+import type { AnyAction } from "../index.js";
+import { put, sleep, spawn, take } from "../index.js";
+import { createStore } from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 const takeTests = describe("take()");

@@ -6,11 +6,11 @@ import {
   put,
   takeEvery,
   waitFor,
-} from "../mod.js";
-import { createStore, updateStore } from "../store/mod.js";
+} from "../index.js";
+import { createStore, updateStore } from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
-import type { Next, ThunkCtx } from "../mod.js";
+import type { Next, ThunkCtx } from "../index.js";
 // deno-lint-ignore no-explicit-any
 interface RoboCtx<D = Record<string, unknown>, P = any> extends ThunkCtx<P> {
   url: string;

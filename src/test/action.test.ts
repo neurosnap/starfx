@@ -1,4 +1,4 @@
-import { createAction } from "../mod.js";
+import { createAction } from "../index.js";
 import { describe, expect, it } from "../test.js";
 
 const tests = describe("createAction()");

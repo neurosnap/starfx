@@ -1,5 +1,5 @@
 import { updateStore } from "./fx.js";
-import { slice } from "./slice/mod.js";
+import { slice } from "./slice/index.js";
 import type { FxMap, FxSchema, StoreUpdater } from "./types.js";
 
 const defaultSchema = <O>(): O =>

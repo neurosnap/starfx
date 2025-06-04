@@ -7,7 +7,7 @@ import {
   spawn,
   supervise,
   superviseBackoff,
-} from "../mod.js";
+} from "../index.js";
 import { describe, expect, it } from "../test.js";
 import type { ActionWithPayload } from "../types.js";
 

@@ -1,7 +1,7 @@
 import { spawn } from "effection";
-import type { AnyAction } from "../mod.js";
-import { sleep, take, takeEvery, takeLatest, takeLeading } from "../mod.js";
-import { createStore } from "../store/mod.js";
+import type { AnyAction } from "../index.js";
+import { sleep, take, takeEvery, takeLatest, takeLeading } from "../index.js";
+import { createStore } from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 const testEvery = describe("takeEvery()");

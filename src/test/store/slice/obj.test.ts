@@ -1,4 +1,4 @@
-import { configureStore, updateStore } from "../../../store/mod.js";
+import { configureStore, updateStore } from "../../../store/index.js";
 import { asserts, describe, it } from "../../../test.js";
 
 import { createObj } from "../../../store/slice/obj.js";

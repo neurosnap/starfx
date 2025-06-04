@@ -1,7 +1,7 @@
 import { type Callable, call } from "effection";
 import { put } from "../action.js";
 import { compose } from "../compose.js";
-import { safe } from "../fx/mod.js";
+import { safe } from "../fx/index.js";
 import type {
   ApiCtx,
   ApiRequest,

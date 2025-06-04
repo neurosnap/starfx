@@ -1,11 +1,11 @@
 import { compose } from "../compose.js";
-import type { ApiCtx, ThunkCtxWLoader } from "../query/mod.js";
+import type { ApiCtx, ThunkCtxWLoader } from "../query/index.js";
 import {
   type LoaderOutput,
   type TableOutput,
   select,
   updateStore,
-} from "../store/mod.js";
+} from "../store/index.js";
 import type { AnyState, Next } from "../types.js";
 import { nameParser } from "./fetch.js";
 import { actions, customKey, err, queryCtx } from "./query.js";

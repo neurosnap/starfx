@@ -9,7 +9,7 @@ import {
 } from "effection";
 import { createAction, take } from "./action.js";
 import { getIdFromAction } from "./action.js";
-import type { CreateActionPayload } from "./query/mod.js";
+import type { CreateActionPayload } from "./query/index.js";
 import type { ActionWithPayload, AnyAction } from "./types.js";
 
 const MS = 1000;

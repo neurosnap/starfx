@@ -5,13 +5,13 @@ import {
   parallel,
   put,
   take,
-} from "../mod.js";
+} from "../index.js";
 import {
   StoreContext,
   StoreUpdateContext,
   createStore,
   updateStore,
-} from "../store/mod.js";
+} from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 const tests = describe("store");

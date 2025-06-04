@@ -1,7 +1,7 @@
 import type { Operation, Result } from "effection";
 import { getIdFromAction, take } from "../action.js";
-import { parallel, safe } from "../fx/mod.js";
-import type { ThunkAction } from "../query/mod.js";
+import { parallel, safe } from "../fx/index.js";
+import type { ThunkAction } from "../query/index.js";
 import type { ActionFnWithPayload, AnyState } from "../types.js";
 import { StoreContext } from "./context.js";
 import type { LoaderOutput } from "./slice/loaders.js";

@@ -1,11 +1,11 @@
-import { type ApiCtx, createApi, mdw, takeEvery } from "../mod.js";
+import { type ApiCtx, createApi, mdw, takeEvery } from "../index.js";
 import {
   createSchema,
   createStore,
   slice,
   waitForLoader,
   waitForLoaders,
-} from "../store/mod.js";
+} from "../store/index.js";
 import { describe, expect, install, it, mock } from "../test.js";
 
 install();

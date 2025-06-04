@@ -1,6 +1,6 @@
 import type { Operation, Scope } from "effection";
 import type { Patch } from "immer";
-import type { BaseCtx } from "../mod.js";
+import type { BaseCtx } from "../index.js";
 import type { AnyAction, AnyState } from "../types.js";
 import type { createRun } from "./run.js";
 import type { LoaderOutput } from "./slice/loaders.js";

@@ -7,15 +7,15 @@ import {
   takeEvery,
   takeLatest,
   waitFor,
-} from "../mod.js";
-import type { ApiCtx, Next, ThunkCtx } from "../mod.js";
+} from "../index.js";
+import type { ApiCtx, Next, ThunkCtx } from "../index.js";
 import {
   createSchema,
   createStore,
   slice,
   updateStore,
   waitForLoader,
-} from "../store/mod.js";
+} from "../store/index.js";
 import { assertLike, asserts, describe, expect, it } from "../test.js";
 
 interface User {

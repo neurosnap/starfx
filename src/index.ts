@@ -1,7 +1,7 @@
-export * from "./fx/mod.js";
-export * from "./query/mod.js";
-export * from "./store/mod.js";
-export * from "./mdw/mod.js";
+export * from "./fx/index.js";
+export * from "./query/index.js";
+export * from "./store/index.js";
+export * from "./mdw/index.js";
 
 export * from "./types.js";
 export * from "./compose.js";

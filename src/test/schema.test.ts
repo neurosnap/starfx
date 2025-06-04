@@ -1,4 +1,4 @@
-import { createSchema, createStore, select, slice } from "../store/mod.js";
+import { createSchema, createStore, select, slice } from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 const tests = describe("createSchema()");

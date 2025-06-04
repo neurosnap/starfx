@@ -11,7 +11,7 @@ import {
   safe,
   takeEvery,
   waitFor,
-} from "../mod.js";
+} from "../index.js";
 import { useCache } from "../react.js";
 import {
   createSchema,
@@ -20,7 +20,7 @@ import {
   slice,
   updateStore,
   waitForLoader,
-} from "../store/mod.js";
+} from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 interface User {

@@ -1,6 +1,6 @@
 import { sleep } from "effection";
-import { safe } from "../fx/mod.js";
-import type { FetchCtx, FetchJsonCtx } from "../query/mod.js";
+import { safe } from "../fx/index.js";
+import type { FetchCtx, FetchJsonCtx } from "../query/index.js";
 import { isObject, noop } from "../query/util.js";
 import type { Next } from "../types.js";
 

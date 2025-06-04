@@ -1,5 +1,5 @@
-import type { Operation, Result } from "../mod.js";
-import { Err, Ok, each, parallel, run, sleep, spawn } from "../mod.js";
+import type { Operation, Result } from "../index.js";
+import { Err, Ok, each, parallel, run, sleep, spawn } from "../index.js";
 import { describe, expect, it } from "../test.js";
 
 const test = describe("parallel()");

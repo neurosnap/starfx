@@ -1,5 +1,5 @@
 import { sleep } from "effection";
-import { Ok, type Operation, parallel, put, take } from "../mod.js";
+import { Ok, type Operation, parallel, put, take } from "../index.js";
 import {
   PERSIST_LOADER_ID,
   type PersistAdapter,
@@ -9,7 +9,7 @@ import {
   createTransform,
   persistStoreMdw,
   slice,
-} from "../store/mod.js";
+} from "../store/index.js";
 import { asserts, describe, it } from "../test.js";
 import type { LoaderItemState } from "../types.js";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Provider } from "../react.js";
-import { createSchema, createStore, slice } from "../store/mod.js";
+import { createSchema, createStore, slice } from "../store/index.js";
 import { asserts, describe, it } from "../test.js";
 
 const tests = describe("react");

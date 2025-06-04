@@ -46,5 +46,28 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
+  },
+    "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "react": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/react.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/react.js"
+      }
+    },
+    "./package.json": "./package.json"
   }
 }

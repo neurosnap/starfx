@@ -7,7 +7,7 @@ import {
 } from "effection";
 import { API_ACTION_PREFIX, ActionContext, takeEvery } from "../action.js";
 import { compose } from "../compose.js";
-import { keepAlive, supervise } from "../fx/mod.js";
+import { keepAlive, supervise } from "../fx/index.js";
 import { IdContext } from "../store/store.js";
 import { createKey } from "./create-key.js";
 import { isFn, isObject } from "./util.js";

@@ -1,4 +1,4 @@
-import { call, run } from "../mod.js";
+import { call, run } from "../index.js";
 import { describe, expect, it } from "../test.js";
 
 const tests = describe("call()");

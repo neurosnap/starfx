@@ -1,5 +1,5 @@
-import { ActionContext, each, put, sleep, spawn, take } from "../mod.js";
-import { createStore } from "../store/mod.js";
+import { ActionContext, each, put, sleep, spawn, take } from "../index.js";
+import { createStore } from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 const putTests = describe("put()");

@@ -1,4 +1,4 @@
-import { clearTimers, put, run, sleep, spawn, timer } from "../mod.js";
+import { clearTimers, put, run, sleep, spawn, timer } from "../index.js";
 import { describe, expect, it } from "../test.js";
 
 const tests = describe("timer()");

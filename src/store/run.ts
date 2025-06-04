@@ -1,5 +1,5 @@
 import type { Callable, Operation, Result, Scope, Task } from "effection";
-import { parallel, safe } from "../fx/mod.js";
+import { parallel, safe } from "../fx/index.js";
 
 export function createRun(scope: Scope) {
   function run<T>(op: Callable<T>[]): Task<Result<T>[]>;

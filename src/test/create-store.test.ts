@@ -1,5 +1,5 @@
-import { call } from "../mod.js";
-import { createStore, select } from "../store/mod.js";
+import { call } from "../index.js";
+import { createStore, select } from "../store/index.js";
 import { describe, expect, it } from "../test.js";
 
 const tests = describe("createStore()");

@@ -1,4 +1,4 @@
-import { Err, Ok, type Result, compose, run, safe, sleep } from "../mod.js";
+import { Err, Ok, type Result, compose, run, safe, sleep } from "../index.js";
 import { asserts, describe, expect, it } from "../test.js";
 
 const tests = describe("compose()");

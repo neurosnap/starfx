@@ -1,4 +1,4 @@
-import { type ActionWithPayload, createApi } from "../mod.js";
+import { type ActionWithPayload, createApi } from "../index.js";
 import { afterAll, beforeAll, describe, expect, it } from "../test.js";
 
 const getKeyOf = (action: ActionWithPayload<{ key: string }>): string =>
