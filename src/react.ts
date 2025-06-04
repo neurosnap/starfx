@@ -7,7 +7,11 @@ import {
 } from "react-redux";
 import { getIdFromAction } from "./action.js";
 import type { ThunkAction } from "./query/index.js";
-import { type FxSchema, type FxStore, PERSIST_LOADER_ID } from "./store/index.js";
+import {
+  type FxSchema,
+  type FxStore,
+  PERSIST_LOADER_ID,
+} from "./store/index.js";
 import type { AnyState, LoaderState } from "./types.js";
 import type { ActionFn, ActionFnWithPayload } from "./types.js";
 

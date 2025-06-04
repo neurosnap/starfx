@@ -14,7 +14,8 @@
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "off",
-        "noImplicitAnyLet": "off"
+        "noImplicitAnyLet": "off",
+        "noConfusingVoidType": "off"
       },
       "correctness": {
         "useYield": "off",

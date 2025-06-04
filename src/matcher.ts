@@ -36,7 +36,7 @@ export function matcher(pattern: ActionPattern): Predicate {
     return (input) => pattern.some((p) => matcher(p)(input));
   }
 
-  if (typeof pattern === "function" && pattern["toString"]) {
+  if (typeof pattern === "function" && pattern.toString) {
     return (input) => pattern.toString() === input.type;
   }
 
