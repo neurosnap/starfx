@@ -16,17 +16,11 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: setup deno
-        uses: denoland/setup-deno@v2
-
-      - name: format
-        run: deno fmt --check
+      - name: setup node
+        uses: actions/setup-node@v4
 
       - name: lint
-        run: deno lint
+        run: npm run ci
 
       - name: test
-        run: deno task test
-
-      - name: npm
-        run: deno task npm 0.0.0
+        run: npm test
