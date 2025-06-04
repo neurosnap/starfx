@@ -1,5 +1,9 @@
 import { writeFileSync } from "node:fs";
 
+console.log("writing api template file");
+createTemplateFile(createQueryApi());
+console.log("DONE!");
+
 function createQueryApi() {
   const methods = [
     "get",
@@ -165,7 +169,7 @@ ${method}<P, ApiSuccess, ApiError = unknown>(
   fn: MiddlewareApiCo<
     Omit<Ctx, 'payload' | 'json'> &
       Payload<P> &
-      FetchJson<ApiSuccess, ApiError extends unknown ? Ctx["_error"] : ApiError>,
+      FetchJson<ApiSuccess, ApiError extends unknown ? Ctx["_error"] : ApiError>
   >,
 ): CreateActionWithPayload<
   Omit<Ctx, 'payload' | 'json'> &
@@ -254,12 +258,6 @@ ${regMethods}
   return tmpl;
 }
 
-async function createTemplateFile(tmpl: string) {
-  try {
-    writeFileSync("./query/api-types.js", tmpl);
-  } catch (err) {
-    console.error(err);
-  }
+function createTemplateFile(tmpl: string) {
+  writeFileSync("./src/query/api-types.ts", tmpl);
 }
-
-createTemplateFile(createQueryApi()).then(console.log).catch(console.error);

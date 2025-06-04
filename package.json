@@ -13,6 +13,7 @@
     "lint": "npx @biomejs/biome check --write",
     "fmt": "npx @biomejs/biome check --write --linter-enabled=false",
     "ci": "npx @biomejs/biome ci .",
+    "template": "tsx ./api-type-template.mts",
     "build": "tsx ./build.mts"
   },
   "repository": {

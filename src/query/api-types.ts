@@ -1,9 +1,9 @@
+import type { Operation } from "effection";
+import type { Next, Payload } from "../types.js";
 /**
  * This is an auto-generated file, do not edit directly!
  * Run "yarn template" to generate this file.
  */
-import type { Operation } from "effection";
-import type { Next, Payload } from "../types.js";
 import type { ThunksApi } from "./thunk.js";
 import type {
   ApiCtx,
@@ -27,9 +27,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     get(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    get<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    get<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     get<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -147,9 +148,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     post(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    post<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    post<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     post<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -267,9 +269,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     put(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    put<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    put<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     put<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -387,9 +390,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     patch(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    patch<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    patch<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     patch<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -507,9 +511,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     delete(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    delete<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    delete<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     delete<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -627,9 +632,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     options(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    options<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    options<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     options<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -747,9 +753,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     head(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    head<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    head<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     head<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -867,9 +874,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     connect(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    connect<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    connect<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     connect<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
@@ -987,9 +995,10 @@ export interface QueryApi<Ctx extends ApiCtx = ApiCtx> extends ThunksApi<Ctx> {
      * Options only
      */
     trace(req: { supervisor?: Supervisor }): CreateAction<Ctx>;
-    trace<P>(req: {
-      supervisor?: Supervisor;
-    }): CreateActionWithPayload<Omit<Ctx, "payload"> & Payload<P>, P>;
+    trace<P>(req: { supervisor?: Supervisor }): CreateActionWithPayload<
+      Omit<Ctx, "payload"> & Payload<P>,
+      P
+    >;
     trace<P extends never, ApiSuccess, ApiError = unknown>(req: {
       supervisor?: Supervisor;
     }): CreateAction<
