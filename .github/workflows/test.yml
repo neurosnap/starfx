@@ -19,6 +19,9 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
 
+      - name: install
+        run: npm install
+
       - name: lint
         run: npm run ci
 
