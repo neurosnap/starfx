@@ -1,9 +1,7 @@
 import { call, run } from "../index.js";
-import { describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
-const tests = describe("call()");
-
-it(tests, "should call the generator function", async () => {
+test("should call the generator function", async () => {
   expect.assertions(1);
   function* me() {
     return "valid";
@@ -15,7 +13,7 @@ it(tests, "should call the generator function", async () => {
   });
 });
 
-it(tests, "should return an Err()", async () => {
+test("should return an Err()", async () => {
   expect.assertions(1);
   const err = new Error("bang!");
   function* me() {
@@ -31,7 +29,7 @@ it(tests, "should return an Err()", async () => {
   });
 });
 
-it(tests, "should call a promise", async () => {
+test("should call a promise", async () => {
   expect.assertions(1);
   const me = () =>
     new Promise<string>((resolve) => {

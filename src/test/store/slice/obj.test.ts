@@ -1,8 +1,7 @@
 import { configureStore, updateStore } from "../../../store/index.js";
-import { asserts, describe, it } from "../../../test.js";
+import { expect, test } from "../../../test.js";
 
 import { createObj } from "../../../store/slice/obj.js";
-const tests = describe("createObj()");
 
 export interface ICurrentUser {
   username: string;
@@ -24,7 +23,7 @@ const slice = createObj<ICurrentUser>({
   initialState: crtInitialState,
 });
 
-it(tests, "sets up an obj", async () => {
+test("sets up an obj", async () => {
   const store = configureStore({
     initialState: {
       [NAME]: crtInitialState,
@@ -42,7 +41,7 @@ it(tests, "sets up an obj", async () => {
     );
   });
 
-  asserts.assertEquals(store.getState().currentUser, {
+  expect(store.getState().currentUser).toEqual({
     username: "bob",
     userId: 1,
     isadmin: true,
@@ -53,7 +52,7 @@ it(tests, "sets up an obj", async () => {
     yield* updateStore(slice.update({ key: "username", value: "alice" }));
   });
 
-  asserts.assertEquals(store.getState().currentUser, {
+  expect(store.getState().currentUser).toEqual({
     username: "alice",
     userId: 1,
     isadmin: true,
@@ -66,7 +65,7 @@ it(tests, "sets up an obj", async () => {
     );
   });
 
-  asserts.assertEquals(store.getState().currentUser, {
+  expect(store.getState().currentUser).toEqual({
     username: "alice",
     userId: 1,
     isadmin: true,

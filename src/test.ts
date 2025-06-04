@@ -1,11 +1,10 @@
 export {
   afterAll,
-  assert,
   beforeAll,
   beforeEach,
   describe,
   expect,
-  it,
+  test,
 } from "vitest";
 
 export function isLikeSelector(selector: unknown) {

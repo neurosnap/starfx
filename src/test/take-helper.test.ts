@@ -2,13 +2,9 @@ import { spawn } from "effection";
 import type { AnyAction } from "../index.js";
 import { sleep, take, takeEvery, takeLatest, takeLeading } from "../index.js";
 import { createStore } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
-const testEvery = describe("takeEvery()");
-const testLatest = describe("takeLatest()");
-const testLeading = describe("takeLeading()");
-
-it(testLatest, "should cancel previous tasks and only use latest", async () => {
+test("should cancel previous tasks and only use latest", async () => {
   const actual: string[] = [];
   function* worker(action: AnyAction) {
     if (action.payload !== "3") {
@@ -35,7 +31,7 @@ it(testLatest, "should cancel previous tasks and only use latest", async () => {
   expect(actual).toEqual(["3"]);
 });
 
-it(testLeading, "should keep first action and discard the rest", async () => {
+test("should keep first action and discard the rest", async () => {
   let called = 0;
   const actual: string[] = [];
   function* worker(action: AnyAction) {
@@ -62,7 +58,7 @@ it(testLeading, "should keep first action and discard the rest", async () => {
   expect(called).toEqual(1);
 });
 
-it(testEvery, "should receive all actions", async () => {
+test("should receive all actions", async () => {
   const loop = 10;
   const actual: string[][] = [];
 

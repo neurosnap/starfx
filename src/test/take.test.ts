@@ -1,40 +1,35 @@
 import type { AnyAction } from "../index.js";
 import { put, sleep, spawn, take } from "../index.js";
 import { createStore } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
-const takeTests = describe("take()");
+test("a put should complete before more `take` are added and then consumed automatically", async () => {
+  const actual: AnyAction[] = [];
 
-it(
-  takeTests,
-  "a put should complete before more `take` are added and then consumed automatically",
-  async () => {
-    const actual: AnyAction[] = [];
+  function* channelFn() {
+    yield* sleep(10);
+    yield* put({ type: "action-1", payload: 1 });
+    yield* put({ type: "action-1", payload: 2 });
+  }
 
-    function* channelFn() {
-      yield* sleep(10);
-      yield* put({ type: "action-1", payload: 1 });
-      yield* put({ type: "action-1", payload: 2 });
-    }
+  function* root() {
+    yield* spawn(channelFn);
 
-    function* root() {
-      yield* spawn(channelFn);
+    actual.push(yield* take("action-1"));
+    actual.push(yield* take("action-1"));
+  }
 
-      actual.push(yield* take("action-1"));
-      actual.push(yield* take("action-1"));
-    }
+  const store = createStore({ initialState: {} });
+  await store.run(root);
 
-    const store = createStore({ initialState: {} });
-    await store.run(root);
+  expect(actual).toEqual([
+    { type: "action-1", payload: 1 },
+    { type: "action-1", payload: 2 },
+  ]);
+});
 
-    expect(actual).toEqual([
-      { type: "action-1", payload: 1 },
-      { type: "action-1", payload: 2 },
-    ]);
-  },
-);
-
-it(takeTests, "take from default channel", async () => {
+test("take from default channel", async () => {
+  expect.assertions(1);
   function* channelFn() {
     yield* sleep(10);
     yield* put({ type: "action-*" });

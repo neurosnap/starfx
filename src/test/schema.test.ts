@@ -1,7 +1,5 @@
 import { createSchema, createStore, select, slice } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
-
-const tests = describe("createSchema()");
+import { expect, test } from "../test.js";
 
 interface User {
   id: string;
@@ -13,7 +11,7 @@ interface UserWithRoles extends User {
 
 const emptyUser = { id: "", name: "" };
 
-it(tests, "default schema", async () => {
+test("default schema", async () => {
   const [schema, initialState] = createSchema();
   const store = createStore({ initialState });
   expect(store.getState()).toEqual({
@@ -35,7 +33,7 @@ it(tests, "default schema", async () => {
   );
 });
 
-it(tests, "general types and functionality", async () => {
+test("general types and functionality", async () => {
   expect.assertions(8);
   const [db, initialState] = createSchema({
     users: slice.table<User>({
@@ -93,7 +91,7 @@ it(tests, "general types and functionality", async () => {
   });
 });
 
-it(tests, "can work with a nested object", async () => {
+test("can work with a nested object", async () => {
   expect.assertions(3);
   const [db, initialState] = createSchema({
     currentUser: slice.obj<UserWithRoles>({ id: "", name: "", roles: [] }),

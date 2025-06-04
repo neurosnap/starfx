@@ -1,9 +1,7 @@
 import { updateStore } from "../../../store/fx.js";
 import { createTable, table } from "../../../store/slice/table.js";
 import { configureStore } from "../../../store/store.js";
-import { asserts, describe, it } from "../../../test.js";
-
-const tests = describe("createTable()");
+import { expect, test } from "../../../test.js";
 
 type TUser = {
   id: number;
@@ -25,7 +23,7 @@ const first = { id: 1, user: "A" };
 const second = { id: 2, user: "B" };
 const third = { id: 3, user: "C" };
 
-it(tests, "sets up a table", async () => {
+test("sets up a table", async () => {
   const store = configureStore({
     initialState,
   });
@@ -33,10 +31,10 @@ it(tests, "sets up a table", async () => {
   await store.run(function* () {
     yield* updateStore(slice.set({ [first.id]: first }));
   });
-  asserts.assertEquals(store.getState()[NAME], { [first.id]: first });
+  expect(store.getState()[NAME]).toEqual({ [first.id]: first });
 });
 
-it(tests, "adds a row", async () => {
+test("adds a row", async () => {
   const store = configureStore({
     initialState,
   });
@@ -44,10 +42,10 @@ it(tests, "adds a row", async () => {
   await store.run(function* () {
     yield* updateStore(slice.set({ [second.id]: second }));
   });
-  asserts.assertEquals(store.getState()[NAME], { 2: second });
+  expect(store.getState()[NAME]).toEqual({ 2: second });
 });
 
-it(tests, "removes a row", async () => {
+test("removes a row", async () => {
   const store = configureStore({
     initialState: {
       ...initialState,
@@ -61,10 +59,10 @@ it(tests, "removes a row", async () => {
   await store.run(function* () {
     yield* updateStore(slice.remove(["1"]));
   });
-  asserts.assertEquals(store.getState()[NAME], { [second.id]: second });
+  expect(store.getState()[NAME]).toEqual({ [second.id]: second });
 });
 
-it(tests, "updates a row", async () => {
+test("updates a row", async () => {
   const store = configureStore({
     initialState,
   });
@@ -72,12 +70,12 @@ it(tests, "updates a row", async () => {
     const updated = { id: second.id, user: "BB" };
     yield* updateStore(slice.patch({ [updated.id]: updated }));
   });
-  asserts.assertEquals(store.getState()[NAME], {
+  expect(store.getState()[NAME]).toEqual({
     [second.id]: { ...second, user: "BB" },
   });
 });
 
-it(tests, "gets a row", async () => {
+test("gets a row", async () => {
   const store = configureStore({
     initialState,
   });
@@ -88,19 +86,19 @@ it(tests, "gets a row", async () => {
   });
 
   const row = slice.selectById(store.getState(), { id: "2" });
-  asserts.assertEquals(row, second);
+  expect(row).toEqual(second);
 });
 
-it(tests, "when the record doesnt exist, it returns empty record", () => {
+test("when the record doesnt exist, it returns empty record", () => {
   const store = configureStore({
     initialState,
   });
 
   const row = slice.selectById(store.getState(), { id: "2" });
-  asserts.assertEquals(row, empty);
+  expect(row).toEqual(empty);
 });
 
-it(tests, "gets all rows", async () => {
+test("gets all rows", async () => {
   const store = configureStore({
     initialState,
   });
@@ -108,41 +106,41 @@ it(tests, "gets all rows", async () => {
   await store.run(function* () {
     yield* updateStore(slice.add(data));
   });
-  asserts.assertEquals(store.getState()[NAME], data);
+  expect(store.getState()[NAME]).toEqual(data);
 });
 
 // checking types of `result` here
-it(tests, "with empty", async () => {
+test("with empty", async () => {
   const tbl = table<TUser>({ empty: first })("users");
   const store = configureStore({
     initialState,
   });
 
-  asserts.assertEquals(tbl.empty, first);
+  expect(tbl.empty).toEqual(first);
   await store.run(function* () {
     yield* updateStore(tbl.set({ [first.id]: first }));
   });
-  asserts.assertEquals(tbl.selectTable(store.getState()), {
+  expect(tbl.selectTable(store.getState())).toEqual({
     [first.id]: first,
   });
   const result = tbl.selectById(store.getState(), { id: 1 });
-  asserts.assertEquals(result, first);
+  expect(result).toEqual(first);
 });
 
 // checking types of `result` here
-it(tests, "with no empty", async () => {
+test("with no empty", async () => {
   const tbl = table<TUser>()("users");
   const store = configureStore({
     initialState,
   });
 
-  asserts.assertEquals(tbl.empty, undefined);
+  expect(tbl.empty).toEqual(undefined);
   await store.run(function* () {
     yield* updateStore(tbl.set({ [first.id]: first }));
   });
-  asserts.assertEquals(tbl.selectTable(store.getState()), {
+  expect(tbl.selectTable(store.getState())).toEqual({
     [first.id]: first,
   });
   const result = tbl.selectById(store.getState(), { id: 1 });
-  asserts.assertEquals(result, first);
+  expect(result).toEqual(first);
 });

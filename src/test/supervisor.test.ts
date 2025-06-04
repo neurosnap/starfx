@@ -8,13 +8,11 @@ import {
   supervise,
   superviseBackoff,
 } from "../index.js";
-import { describe, expect, it } from "../test.js";
+import { describe, expect, test } from "../test.js";
 import type { ActionWithPayload } from "../types.js";
 
-const test = describe("supervise()");
-
 describe("superviseBackoff", () => {
-  it("should increase number exponentially", () => {
+  test("should increase number exponentially", () => {
     const actual: number[] = [];
     for (let i = 1; i < 15; i += 1) {
       actual.push(superviseBackoff(i));
@@ -27,7 +25,7 @@ describe("superviseBackoff", () => {
 
 type LogAction = ActionWithPayload<{ message: string }>;
 
-it(test, "should recover with backoff pressure", async () => {
+test("should recover with backoff pressure", async () => {
   const err = console.error;
   console.error = () => {};
 

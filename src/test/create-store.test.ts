@@ -1,14 +1,12 @@
 import { call } from "../index.js";
 import { createStore, select } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
-
-const tests = describe("createStore()");
+import { expect, test } from "../test.js";
 
 interface TestState {
   user: { id: string };
 }
 
-it(tests, "should be able to grab values from store", async () => {
+test("should be able to grab values from store", async () => {
   let actual;
   const store = createStore({ initialState: { user: { id: "1" } } });
   await store.run(function* () {
@@ -17,7 +15,7 @@ it(tests, "should be able to grab values from store", async () => {
   expect(actual).toEqual({ id: "1" });
 });
 
-it(tests, "should be able to grab store from a nested call", async () => {
+test("should be able to grab store from a nested call", async () => {
   let actual;
   const store = createStore({ initialState: { user: { id: "2" } } });
   await store.run(function* () {

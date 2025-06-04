@@ -1,10 +1,8 @@
 import { ActionContext, each, put, sleep, spawn, take } from "../index.js";
 import { createStore } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
-const putTests = describe("put()");
-
-it(putTests, "should send actions through channel", async () => {
+test("should send actions through channel", async () => {
   const actual: string[] = [];
 
   function* genFn(arg: string) {
@@ -33,7 +31,7 @@ it(putTests, "should send actions through channel", async () => {
   expect(actual).toEqual(expected);
 });
 
-it(putTests, "should handle nested puts", async () => {
+test("should handle nested puts", async () => {
   const actual: string[] = [];
 
   function* genA() {
@@ -63,48 +61,40 @@ it(putTests, "should handle nested puts", async () => {
   expect(actual).toEqual(expected);
 });
 
-it(
-  putTests,
-  "should not cause stack overflow when puts are emitted while dispatching saga",
-  async () => {
-    function* root() {
-      for (let i = 0; i < 10_000; i += 1) {
-        yield* put({ type: "test" });
-      }
-      yield* sleep(0);
+test("should not cause stack overflow when puts are emitted while dispatching saga", async () => {
+  function* root() {
+    for (let i = 0; i < 10_000; i += 1) {
+      yield* put({ type: "test" });
     }
+    yield* sleep(0);
+  }
 
-    const store = createStore({ initialState: {} });
-    await store.run(() => root());
-    expect(true).toBe(true);
-  },
-);
+  const store = createStore({ initialState: {} });
+  await store.run(() => root());
+  expect(true).toBe(true);
+});
 
-it(
-  putTests,
-  "should not miss `put` that was emitted directly after creating a task (caused by another `put`)",
-  async () => {
-    const actual: string[] = [];
+test("should not miss `put` that was emitted directly after creating a task (caused by another `put`)", async () => {
+  const actual: string[] = [];
 
-    function* root() {
-      yield* spawn(function* firstspawn() {
-        yield* sleep(10);
-        yield* put({ type: "c" });
-        yield* put({ type: "do not miss" });
-      });
+  function* root() {
+    yield* spawn(function* firstspawn() {
+      yield* sleep(10);
+      yield* put({ type: "c" });
+      yield* put({ type: "do not miss" });
+    });
 
-      yield* take("c");
+    yield* take("c");
 
-      const tsk = yield* spawn(function* () {
-        yield* take("do not miss");
-        actual.push("didn't get missed");
-      });
-      yield* tsk;
-    }
+    const tsk = yield* spawn(function* () {
+      yield* take("do not miss");
+      actual.push("didn't get missed");
+    });
+    yield* tsk;
+  }
 
-    const store = createStore({ initialState: {} });
-    await store.run(root);
-    const expected = ["didn't get missed"];
-    expect(actual).toEqual(expected);
-  },
-);
+  const store = createStore({ initialState: {} });
+  await store.run(root);
+  const expected = ["didn't get missed"];
+  expect(actual).toEqual(expected);
+});

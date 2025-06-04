@@ -16,7 +16,7 @@ import {
   updateStore,
   waitForLoader,
 } from "../store/index.js";
-import { assertLike, asserts, describe, expect, it } from "../test.js";
+import { assertLike, expect, test } from "../test.js";
 
 interface User {
   id: string;
@@ -43,9 +43,7 @@ const testStore = () => {
   return { schema, store };
 };
 
-const tests = describe("middleware");
-
-it(tests, "basic", () => {
+test("basic", () => {
   const { store, schema } = testStore();
   const query = createApi<ApiCtx>();
   query.use(mdw.api({ schema }));
@@ -106,7 +104,7 @@ it(tests, "basic", () => {
   });
 });
 
-it(tests, "with loader", () => {
+test("with loader", () => {
   const { schema, store } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api({ schema }));
@@ -148,7 +146,7 @@ it(tests, "with loader", () => {
   });
 });
 
-it(tests, "with item loader", () => {
+test("with item loader", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api({ schema }));
@@ -193,7 +191,7 @@ it(tests, "with item loader", () => {
   });
 });
 
-it(tests, "with POST", () => {
+test("with POST", () => {
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.queryCtx);
@@ -201,7 +199,7 @@ it(tests, "with POST", () => {
   query.use(query.routes());
   query.use(function* fetchApi(ctx, next) {
     const request = ctx.req();
-    asserts.assertEquals(request, {
+    expect(request).toEqual({
       url: "/users",
       headers: {},
       method: "POST",
@@ -244,7 +242,7 @@ it(tests, "with POST", () => {
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
-it(tests, "simpleCache", () => {
+test("simpleCache", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api({ schema }));
@@ -273,7 +271,7 @@ it(tests, "simpleCache", () => {
   });
 });
 
-it(tests, "overriding default loader behavior", () => {
+test("overriding default loader behavior", () => {
   const { store, schema } = testStore();
   const api = createApi<ApiCtx>();
   api.use(mdw.api({ schema }));
@@ -319,14 +317,11 @@ it(tests, "overriding default loader behavior", () => {
   });
 });
 
-it(tests, "mdw.api() - error handler", () => {
+test("mdw.api() - error handler", () => {
   let err = false;
   console.error = (msg: string) => {
     if (err) return;
-    asserts.assertEquals(
-      msg,
-      "Error: something happened.  Check the endpoint [/users]",
-    );
+    expect(msg).toBe("Error: something happened.  Check the endpoint [/users]");
     err = true;
   };
 
@@ -344,7 +339,7 @@ it(tests, "mdw.api() - error handler", () => {
   store.dispatch(fetchUsers());
 });
 
-it(tests, "createApi with own key", async () => {
+test("createApi with own key", async () => {
   const { schema, store } = testStore();
   const query = createApi();
   query.use(mdw.api({ schema }));
@@ -405,17 +400,14 @@ it(tests, "createApi with own key", async () => {
     : createKey("/users [POST]", { email: newUEmail });
 
   const s = store.getState();
-  asserts.assertEquals(schema.cache.selectById(s, { id: expectedKey }), {
+  expect(schema.cache.selectById(s, { id: expectedKey })).toEqual({
     "1": { id: "1", name: "test", email: newUEmail },
   });
 
-  asserts.assert(
-    expectedKey.split("|")[1] === theTestKey,
-    "the keypart should match the input",
-  );
+  expect(expectedKey.split("|")[1]).toEqual(theTestKey);
 });
 
-it(tests, "createApi with custom key but no payload", async () => {
+test("createApi with custom key but no payload", async () => {
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.api({ schema }));
@@ -474,17 +466,14 @@ it(tests, "createApi with custom key but no payload", async () => {
     : createKey("/users [GET]", null);
 
   const s = store.getState();
-  asserts.assertEquals(schema.cache.selectById(s, { id: expectedKey }), {
+  expect(schema.cache.selectById(s, { id: expectedKey })).toEqual({
     "1": mockUser,
   });
 
-  asserts.assert(
-    expectedKey.split("|")[1] === theTestKey,
-    "the keypart should match the input",
-  );
+  expect(expectedKey.split("|")[1]).toBe(theTestKey);
 });
 
-it(tests, "errorHandler", () => {
+test("errorHandler", () => {
   let a = 0;
   const query = createApi<ApiCtx>();
   query.use(function* errorHandler<Ctx extends ThunkCtx = ThunkCtx>(
@@ -540,7 +529,7 @@ it(tests, "errorHandler", () => {
   expect(a).toEqual(2);
 });
 
-it(tests, "stub predicate", async () => {
+test("stub predicate", async () => {
   let actual: { ok: boolean } = { ok: false };
   const { store, schema } = testStore();
   const api = createApi();

@@ -21,7 +21,7 @@ import {
   updateStore,
   waitForLoader,
 } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
 interface User {
   id: string;
@@ -46,9 +46,7 @@ const jsonBlob = (data: unknown) => {
   return JSON.stringify(data);
 };
 
-const tests = describe("createApi()");
-
-it(tests, "POST", async () => {
+test("POST", async () => {
   expect.assertions(2);
   const query = createApi();
   query.use(mdw.queryCtx);
@@ -119,7 +117,7 @@ it(tests, "POST", async () => {
   });
 });
 
-it(tests, "POST with uri", () => {
+test("POST with uri", () => {
   expect.assertions(1);
   const query = createApi();
   query.use(mdw.queryCtx);
@@ -167,7 +165,7 @@ it(tests, "POST with uri", () => {
   store.dispatch(createUser({ email: mockUser.email }));
 });
 
-it(tests, "middleware - with request fn", () => {
+test("middleware - with request fn", () => {
   expect.assertions(2);
   const query = createApi();
   query.use(mdw.queryCtx);
@@ -188,7 +186,7 @@ it(tests, "middleware - with request fn", () => {
   store.dispatch(createUser());
 });
 
-it(tests, "run() on endpoint action - should run the effect", () => {
+test("run() on endpoint action - should run the effect", () => {
   expect.assertions(1);
   const api = createApi<TestCtx>();
   api.use(api.routes());
@@ -217,7 +215,7 @@ it(tests, "run() on endpoint action - should run the effect", () => {
   store.dispatch(action2());
 });
 
-it(tests, "run() from a normal saga", async () => {
+test("run() from a normal saga", async () => {
   expect.assertions(6);
   const api = createApi();
   api.use(api.routes());
@@ -264,14 +262,16 @@ it(tests, "run() from a normal saga", async () => {
   const payload = { name: "/users/:id [GET]", options: { id: "1" } };
 
   expect(extractedResults.actionType).toEqual(`${API_ACTION_PREFIX}${action1}`);
-  expect(extractedResults.actionPayload?.name).toEqual(payload.name);
-  expect(extractedResults.actionPayload?.options).toEqual(payload.options);
+  expect((extractedResults.actionPayload as any).name).toEqual(payload.name);
+  expect((extractedResults.actionPayload as any).options).toEqual(
+    payload.options,
+  );
   expect(extractedResults.name).toEqual("/users/:id [GET]");
   expect(extractedResults.payload).toEqual({ id: "1" });
   expect(acc).toEqual("ab");
 });
 
-it(tests, "with hash key on a large post", async () => {
+test("with hash key on a large post", async () => {
   const { store, schema } = testStore();
   const query = createApi();
   query.use(mdw.api({ schema }));
@@ -338,7 +338,7 @@ it(tests, "with hash key on a large post", async () => {
   });
 });
 
-it(tests, "two identical endpoints", () => {
+test("two identical endpoints", () => {
   const actual: string[] = [];
   const { store, schema } = testStore();
   const api = createApi();
@@ -367,7 +367,7 @@ interface TestCtx<P = any, S = any> extends ApiCtx<P, S, { message: string }> {
 }
 
 // this is strictly for testing types
-it(tests, "ensure types for get() endpoint", () => {
+test("ensure types for get() endpoint", () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -405,7 +405,7 @@ interface FetchUserProps {
 type FetchUserCtx = TestCtx<FetchUserProps>;
 
 // this is strictly for testing types
-it(tests, "ensure ability to cast `ctx` in function definition", () => {
+test("ensure ability to cast `ctx` in function definition", () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {
@@ -439,41 +439,37 @@ it(tests, "ensure ability to cast `ctx` in function definition", () => {
 type FetchUserSecondCtx = TestCtx<any, { result: string }>;
 
 // this is strictly for testing types
-it(
-  tests,
-  "ensure ability to cast `ctx` in function definition with no props",
-  () => {
-    const api = createApi<TestCtx>();
-    api.use(api.routes());
-    api.use(function* (ctx, next) {
+test("ensure ability to cast `ctx` in function definition with no props", () => {
+  const api = createApi<TestCtx>();
+  api.use(api.routes());
+  api.use(function* (ctx, next) {
+    yield* next();
+    const data = { result: "wow" };
+    ctx.json = { ok: true, value: data };
+  });
+
+  const acc: string[] = [];
+  const action1 = api.get<never, { result: string }>(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx: FetchUserSecondCtx, next) {
+      ctx.something = false;
+
       yield* next();
-      const data = { result: "wow" };
-      ctx.json = { ok: true, value: data };
-    });
 
-    const acc: string[] = [];
-    const action1 = api.get<never, { result: string }>(
-      "/users",
-      { supervisor: takeEvery },
-      function* (ctx: FetchUserSecondCtx, next) {
-        ctx.something = false;
+      if (ctx.json.ok) {
+        acc.push(ctx.json.value.result);
+      }
+    },
+  );
 
-        yield* next();
+  const store = createStore({ initialState: { users: {} } });
+  store.run(api.bootup);
+  store.dispatch(action1());
+  expect(acc).toEqual(["wow"]);
+});
 
-        if (ctx.json.ok) {
-          acc.push(ctx.json.value.result);
-        }
-      },
-    );
-
-    const store = createStore({ initialState: { users: {} } });
-    store.run(api.bootup);
-    store.dispatch(action1());
-    expect(acc).toEqual(["wow"]);
-  },
-);
-
-it(tests, "should bubble up error", () => {
+test("should bubble up error", () => {
   let error: any = null;
   const { store } = testStore();
   const api = createApi();
@@ -504,7 +500,7 @@ it(tests, "should bubble up error", () => {
 });
 
 // this is strictly for testing types
-it(tests, "useCache - derive api success from endpoint", () => {
+test("useCache - derive api success from endpoint", () => {
   const api = createApi<TestCtx>();
   api.use(api.routes());
   api.use(function* (ctx, next) {

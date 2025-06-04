@@ -1,9 +1,8 @@
 import { clearTimers, put, run, sleep, spawn, timer } from "../index.js";
-import { describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
-const tests = describe("timer()");
-
-it(tests, "should call thunk at most once every timer", async () => {
+test("should call thunk at most once every timer", async () => {
+  expect.assertions(1);
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {
@@ -21,7 +20,8 @@ it(tests, "should call thunk at most once every timer", async () => {
   expect(called).toBe(2);
 });
 
-it(tests, "should let user cancel timer", async () => {
+test("should let user cancel timer", async () => {
+  expect.assertions(1);
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {
@@ -37,7 +37,8 @@ it(tests, "should let user cancel timer", async () => {
   expect(called).toBe(2);
 });
 
-it(tests, "should let user cancel timer with action obj", async () => {
+test("should let user cancel timer with action obj", async () => {
+  expect.assertions(1);
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {
@@ -54,7 +55,8 @@ it(tests, "should let user cancel timer with action obj", async () => {
   expect(called).toBe(2);
 });
 
-it(tests, "should let user cancel timer with wildcard", async () => {
+test("should let user cancel timer with wildcard", async () => {
+  expect.assertions(1);
   let called = 0;
   await run(function* () {
     yield* spawn(function* () {

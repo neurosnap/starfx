@@ -1,12 +1,10 @@
 import React from "react";
 import { Provider } from "../react.js";
 import { createSchema, createStore, slice } from "../store/index.js";
-import { asserts, describe, it } from "../test.js";
-
-const tests = describe("react");
+import { expect, test } from "../test.js";
 
 // typing test
-it(tests, () => {
+test("react types", () => {
   const [schema, initialState] = createSchema({
     cache: slice.table(),
     loaders: slice.loaders(),
@@ -17,5 +15,5 @@ it(tests, () => {
     store,
     children: React.createElement("div"),
   });
-  asserts.equal(true, true);
+  expect(true).toBe(true);
 });

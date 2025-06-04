@@ -5,11 +5,9 @@ import {
   createStore,
   slice,
 } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
-const batch = describe("batch mdw");
-
-it(batch, "should batch notify subscribers based on mdw", async () => {
+test("should batch notify subscribers based on mdw", async () => {
   const [schema, initialState] = createSchema({
     cache: slice.table({ empty: {} }),
     loaders: slice.loaders(),

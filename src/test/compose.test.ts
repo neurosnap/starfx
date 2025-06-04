@@ -1,9 +1,7 @@
 import { Err, Ok, type Result, compose, run, safe, sleep } from "../index.js";
-import { asserts, describe, expect, it } from "../test.js";
+import { expect, test } from "../test.js";
 
-const tests = describe("compose()");
-
-it(tests, "should compose middleware", async () => {
+test("should compose middleware", async () => {
   const mdw = compose<{ one: string; three: string; result: Result<void> }>([
     function* (ctx, next) {
       ctx.one = "two";
@@ -29,7 +27,7 @@ it(tests, "should compose middleware", async () => {
   expect(actual).toEqual(expected);
 });
 
-it(tests, "order of execution", async () => {
+test("order of execution", async () => {
   const mdw = compose<{ actual: string; result: Result<void> }>([
     function* (ctx, next) {
       ctx.actual += "a";
@@ -64,12 +62,12 @@ it(tests, "order of execution", async () => {
   expect(actual).toEqual(expected);
 });
 
-it(tests, "when error is discovered, it should throw", async () => {
+test("when error is discovered, it should throw", async () => {
   const err = new Error("boom");
   const mdw = compose([
     function* (_, next) {
       yield* next();
-      asserts.fail();
+      expect.fail();
     },
     function* (_, next) {
       yield* next();

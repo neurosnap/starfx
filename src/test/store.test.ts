@@ -12,9 +12,7 @@ import {
   createStore,
   updateStore,
 } from "../store/index.js";
-import { describe, expect, it } from "../test.js";
-
-const tests = describe("store");
+import { expect, test } from "../test.js";
 
 interface User {
   id: string;
@@ -52,47 +50,43 @@ const updateUser =
     const users = findUsers(state);
     users[id].name = name;
 
-    users[2] = undefined;
+    (users as any)[2] = undefined;
     users[3] = { id: "", name: "" };
 
     // or mutate state directly without selectors
     state.dev = true;
   };
 
-it(
-  tests,
-  "update store and receives update from channel `StoreUpdateContext`",
-  async () => {
-    expect.assertions(1);
-    const [scope] = createScope();
-    const initialState: Partial<State> = {
-      users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
-      dev: false,
-    };
-    createStore({ scope, initialState });
-    let store;
-    await scope.run(function* (): Operation<Result<void>[]> {
-      const result = yield* parallel([
-        function* () {
-          store = yield* StoreContext;
-          const chan = yield* StoreUpdateContext;
-          const msgList = yield* chan.subscribe();
-          yield* msgList.next();
-        },
-        function* () {
-          yield* updateStore(updateUser({ id: "1", name: "eric" }));
-        },
-      ]);
-      return yield* result;
-    });
-    expect(store?.getState()).toEqual({
-      users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
-      dev: true,
-    });
-  },
-);
+test("update store and receives update from channel `StoreUpdateContext`", async () => {
+  expect.assertions(1);
+  const [scope] = createScope();
+  const initialState: Partial<State> = {
+    users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
+    dev: false,
+  };
+  createStore({ scope, initialState });
+  let store;
+  await scope.run(function* (): Operation<Result<void>[]> {
+    const result = yield* parallel([
+      function* () {
+        store = yield* StoreContext;
+        const chan = yield* StoreUpdateContext;
+        const msgList = yield* chan;
+        yield* msgList.next();
+      },
+      function* () {
+        yield* updateStore(updateUser({ id: "1", name: "eric" }));
+      },
+    ]);
+    return yield* result;
+  });
+  expect((store as any)?.getState()).toEqual({
+    users: { 1: { id: "1", name: "eric" }, 3: { id: "", name: "" } },
+    dev: true,
+  });
+});
 
-it(tests, "update store and receives update from `subscribe()`", async () => {
+test("update store and receives update from `subscribe()`", async () => {
   expect.assertions(1);
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
@@ -116,7 +110,7 @@ it(tests, "update store and receives update from `subscribe()`", async () => {
   });
 });
 
-it(tests, "emit Action and update store", async () => {
+test("emit Action and update store", async () => {
   expect.assertions(1);
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
@@ -147,7 +141,7 @@ it(tests, "emit Action and update store", async () => {
   });
 });
 
-it(tests, "resets store", async () => {
+test("resets store", async () => {
   expect.assertions(2);
   const initialState: Partial<State> = {
     users: { 1: { id: "1", name: "testing" }, 2: { id: "2", name: "wow" } },
