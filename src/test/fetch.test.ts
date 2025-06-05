@@ -1,3 +1,4 @@
+import nock from "nock";
 import { type ApiCtx, createApi, mdw, takeEvery } from "../index.js";
 import {
   createSchema,
@@ -6,9 +7,7 @@ import {
   waitForLoader,
   waitForLoaders,
 } from "../store/index.js";
-import { describe, expect, install, it, mock } from "../test.js";
-
-install();
+import { expect, test } from "../test.js";
 
 const baseUrl = "https://starfx.com";
 const mockUser = { id: "1", email: "test@starfx.com" };
@@ -26,101 +25,85 @@ const getTestData = (ctx: ApiCtx) => {
   return { request: { ...ctx.req() }, json: { ...ctx.json } };
 };
 
-const tests = describe("mdw.fetch()");
+test("should be able to fetch a resource and save automatically", async () => {
+  nock(baseUrl).get("/users").reply(200, mockUser);
 
-it(
-  tests,
-  "should be able to fetch a resource and save automatically",
-  async () => {
-    mock("GET@/users", () => {
-      return new Response(JSON.stringify(mockUser));
-    });
+  const { store, schema } = testStore();
+  const api = createApi();
+  api.use(mdw.api({ schema }));
+  api.use(api.routes());
+  api.use(mdw.headers);
+  api.use(mdw.fetch({ baseUrl }));
 
-    const { store, schema } = testStore();
-    const api = createApi();
-    api.use(mdw.api({ schema }));
-    api.use(api.routes());
-    api.use(mdw.headers);
-    api.use(mdw.fetch({ baseUrl }));
+  const actual: any[] = [];
+  const fetchUsers = api.get(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.cache = true;
+      yield* next();
 
-    const actual: any[] = [];
-    const fetchUsers = api.get(
-      "/users",
-      { supervisor: takeEvery },
-      function* (ctx, next) {
-        ctx.cache = true;
-        yield* next();
+      actual.push(ctx.request);
+      actual.push(ctx.json);
+    },
+  );
 
-        actual.push(ctx.request);
-        actual.push(ctx.json);
+  store.run(api.bootup);
+
+  const action = fetchUsers();
+  store.dispatch(action);
+
+  await store.run(waitForLoader(schema.loaders, action));
+
+  const state = store.getState();
+  expect(state.cache[action.payload.key]).toEqual(mockUser);
+  expect(actual).toEqual([
+    {
+      url: `${baseUrl}/users`,
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+    },
+    { ok: true, value: mockUser },
+  ]);
+});
 
-    store.run(api.bootup);
+test("should be able to fetch a resource and parse as text instead of json", async () => {
+  nock(baseUrl).get("/users").reply(200, "this is some text");
 
-    const action = fetchUsers();
-    store.dispatch(action);
+  const { store, schema } = testStore();
+  const api = createApi();
+  api.use(mdw.api({ schema }));
+  api.use(api.routes());
+  api.use(mdw.fetch({ baseUrl }));
 
-    await store.run(waitForLoader(schema.loaders, action));
+  let actual = null;
+  const fetchUsers = api.get(
+    "/users",
+    { supervisor: takeEvery },
+    function* (ctx, next) {
+      ctx.cache = true;
+      ctx.bodyType = "text";
+      yield* next();
+      actual = ctx.json;
+    },
+  );
 
-    const state = store.getState();
-    expect(state.cache[action.payload.key]).toEqual(mockUser);
-    expect(actual).toEqual([
-      {
-        url: `${baseUrl}/users`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-      { ok: true, value: mockUser },
-    ]);
-  },
-);
+  store.run(api.bootup);
 
-it(
-  tests,
-  "should be able to fetch a resource and parse as text instead of json",
-  async () => {
-    mock("GET@/users", () => {
-      return new Response("this is some text");
-    });
+  const action = fetchUsers();
+  store.dispatch(action);
 
-    const { store, schema } = testStore();
-    const api = createApi();
-    api.use(mdw.api({ schema }));
-    api.use(api.routes());
-    api.use(mdw.fetch({ baseUrl }));
+  await store.run(waitForLoader(schema.loaders, action));
 
-    let actual = null;
-    const fetchUsers = api.get(
-      "/users",
-      { supervisor: takeEvery },
-      function* (ctx, next) {
-        ctx.cache = true;
-        ctx.bodyType = "text";
-        yield* next();
-        actual = ctx.json;
-      },
-    );
+  const data = "this is some text";
+  expect(actual).toEqual({ ok: true, value: data });
+});
 
-    store.run(api.bootup);
-
-    const action = fetchUsers();
-    store.dispatch(action);
-
-    await store.run(waitForLoader(schema.loaders, action));
-
-    const data = "this is some text";
-    expect(actual).toEqual({ ok: true, value: data });
-  },
-);
-
-it(tests, "error handling", async () => {
+test("error handling", async () => {
   const errMsg = { message: "something happened" };
-  mock("GET@/users", () => {
-    return new Response(JSON.stringify(errMsg), { status: 500 });
-  });
+  nock(baseUrl).get("/users").reply(500, errMsg);
 
   const { schema, store } = testStore();
   const api = createApi();
@@ -152,10 +135,8 @@ it(tests, "error handling", async () => {
   expect(actual).toEqual({ ok: false, error: errMsg });
 });
 
-it(tests, "status 204", async () => {
-  mock("GET@/users", () => {
-    return new Response(null, { status: 204 });
-  });
+test("status 204", async () => {
+  nock(baseUrl).get("/users").reply(204);
 
   const { schema, store } = testStore();
   const api = createApi();
@@ -191,10 +172,8 @@ it(tests, "status 204", async () => {
   expect(actual).toEqual({ ok: true, value: {} });
 });
 
-it(tests, "malformed json", async () => {
-  mock("GET@/users", () => {
-    return new Response("not json", { status: 200 });
-  });
+test("malformed json", async () => {
+  nock(baseUrl).get("/users").reply(200, "not json");
 
   const { schema, store } = testStore();
   const api = createApi();
@@ -234,10 +213,8 @@ it(tests, "malformed json", async () => {
   });
 });
 
-it(tests, "POST", async () => {
-  mock("POST@/users", () => {
-    return new Response(JSON.stringify(mockUser));
-  });
+test("POST", async () => {
+  nock(baseUrl).post("/users").reply(200, mockUser);
 
   const { schema, store } = testStore();
   const api = createApi();
@@ -284,10 +261,8 @@ it(tests, "POST", async () => {
   });
 });
 
-it(tests, "POST multiple endpoints with same uri", async () => {
-  mock("POST@/users/1/something", () => {
-    return new Response(JSON.stringify(mockUser));
-  });
+test("POST multiple endpoints with same uri", async () => {
+  nock(baseUrl).post("/users/1/something").reply(200, mockUser).persist();
 
   const { store, schema } = testStore();
   const api = createApi();
@@ -370,7 +345,7 @@ it(tests, "POST multiple endpoints with same uri", async () => {
   });
 });
 
-it(tests, "slug in url but payload has empty string for slug value", () => {
+test("slug in url but payload has empty string for slug value", () => {
   const { store, schema } = testStore();
   const api = createApi();
   api.use(mdw.api({ schema }));
@@ -401,17 +376,16 @@ it(tests, "slug in url but payload has empty string for slug value", () => {
   expect(actual).toEqual(data);
 });
 
-it(tests, "with success - should keep retrying fetch request", async () => {
-  let counter = 0;
-  mock("GET@/users", () => {
-    counter += 1;
-    if (counter > 4) {
-      return new Response(JSON.stringify(mockUser));
-    }
-    return new Response(JSON.stringify({ message: "error" }), {
-      status: 400,
-    });
-  });
+test("with success - should keep retrying fetch request", async () => {
+  nock(baseUrl)
+    .get("/users")
+    .reply(400, { message: "error" })
+    .get("/users")
+    .reply(400, { message: "error" })
+    .get("/users")
+    .reply(400, { message: "error" })
+    .get("/users")
+    .reply(200, mockUser);
 
   const { schema, store } = testStore();
   const api = createApi();
@@ -449,76 +423,65 @@ it(tests, "with success - should keep retrying fetch request", async () => {
   expect(actual).toEqual({ ok: true, value: mockUser });
 });
 
-it(
-  tests,
-  "fetch retry - with failure - should keep retrying and then quit",
-  async () => {
-    mock("GET@/users", () => {
-      return new Response(JSON.stringify({ message: "error" }), {
-        status: 400,
-      });
-    });
+test("fetch retry - with failure - should keep retrying and then quit", async () => {
+  expect.assertions(1);
+  nock(baseUrl).get("/users").reply(400, { message: "error" }).persist();
 
-    const { schema, store } = testStore();
-    let actual = null;
-    const api = createApi();
-    api.use(mdw.api({ schema }));
-    api.use(api.routes());
-    api.use(mdw.fetch({ baseUrl }));
+  const { schema, store } = testStore();
+  let actual = null;
+  const api = createApi();
+  api.use(mdw.api({ schema }));
+  api.use(api.routes());
+  api.use(mdw.fetch({ baseUrl }));
 
-    const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
-      function* (ctx, next) {
-        ctx.cache = true;
-        yield* next();
-        actual = ctx.json;
-      },
-      mdw.fetchRetry((n) => (n > 2 ? -1 : 10)),
-    ]);
+  const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
+    function* (ctx, next) {
+      ctx.cache = true;
+      yield* next();
+      actual = ctx.json;
+    },
+    mdw.fetchRetry((n) => (n > 2 ? -1 : 10)),
+  ]);
 
-    store.run(api.bootup);
-    const action = fetchUsers();
-    store.dispatch(action);
+  store.run(api.bootup);
+  const action = fetchUsers();
+  store.dispatch(action);
 
-    const loader = await store.run(waitForLoader(schema.loaders, action));
-    if (!loader.ok) {
-      throw loader.error;
-    }
-    const data = { message: "error" };
-    expect(actual).toEqual({ ok: false, error: data });
-  },
-);
+  const loader = await store.run(waitForLoader(schema.loaders, action));
+  if (!loader.ok) {
+    throw loader.error;
+  }
+  const data = { message: "error" };
+  expect(actual).toEqual({ ok: false, error: data });
+});
 
-it(
-  tests,
-  "should *not* make http request and instead simply mock response",
-  async () => {
-    const { schema, store } = testStore();
-    let actual = null;
-    const api = createApi();
-    api.use(mdw.api({ schema }));
-    api.use(api.routes());
-    api.use(mdw.fetch({ baseUrl }));
+test("should *not* make http request and instead simply mock response", async () => {
+  const { schema, store } = testStore();
+  let actual = null;
+  const api = createApi();
+  api.use(mdw.api({ schema }));
+  api.use(api.routes());
+  api.use(mdw.fetch({ baseUrl }));
 
-    const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
-      function* (ctx, next) {
-        yield* next();
-        actual = ctx.json;
-      },
-      mdw.response(new Response(JSON.stringify(mockUser))),
-    ]);
+  const fetchUsers = api.get("/users", { supervisor: takeEvery }, [
+    function* (ctx, next) {
+      yield* next();
+      actual = ctx.json;
+    },
+    mdw.response(new Response(JSON.stringify(mockUser))),
+  ]);
 
-    store.run(api.bootup);
-    store.dispatch(fetchUsers());
+  store.run(api.bootup);
+  store.dispatch(fetchUsers());
 
-    const loader = await store.run(waitForLoader(schema.loaders, fetchUsers));
-    if (!loader.ok) {
-      throw loader.error;
-    }
-    expect(actual).toEqual({ ok: true, value: mockUser });
-  },
-);
+  const loader = await store.run(waitForLoader(schema.loaders, fetchUsers));
+  if (!loader.ok) {
+    throw loader.error;
+  }
+  expect(actual).toEqual({ ok: true, value: mockUser });
+});
 
-it(tests, "should use dynamic mdw to mock response", async () => {
+test("should use dynamic mdw to mock response", async () => {
   const { schema, store } = testStore();
   let actual = null;
   const api = createApi();

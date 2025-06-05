@@ -3,7 +3,7 @@ import { expect, test } from "../../../test.js";
 
 import { createObj } from "../../../store/slice/obj.js";
 
-export interface ICurrentUser {
+interface ICurrentUser {
   username: string;
   userId: number;
   isadmin: boolean;
