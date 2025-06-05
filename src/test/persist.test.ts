@@ -14,6 +14,7 @@ import { expect, test } from "../test.js";
 import type { LoaderItemState } from "../types.js";
 
 test("can persist to storage adapters", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -59,6 +60,7 @@ test("can persist to storage adapters", async () => {
 });
 
 test("rehydrates state", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -94,6 +96,7 @@ test("rehydrates state", async () => {
 });
 
 test("persists inbound state using transform 'in' function", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -153,6 +156,7 @@ test("persists inbound state using transform 'in' function", async () => {
 });
 
 test("persists inbound state using tranform in (2)", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -214,6 +218,7 @@ test("persists inbound state using tranform in (2)", async () => {
 });
 
 test("persists a filtered nested part of a slice", async () => {
+  expect.assertions(5);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -305,14 +310,15 @@ test("persists a filtered nested part of a slice", async () => {
     ]);
     yield* group;
   });
-  expect(ls).toBe('{"token":"1"');
-  expect(ls).toBe('"message":"loading A-second"');
-  expect(ls).toBe('"id":"C"');
-  expect(ls).toBe(/"message":"loading A-first"/);
-  expect(ls).not.toMatch(/"id":"B"/);
+  expect(ls).toContain('{"token":"1"');
+  expect(ls).toContain('"message":"loading A-second"');
+  expect(ls).toContain('"id":"C"');
+  expect(ls).not.toContain('"message":"loading A-first"');
+  expect(ls).not.toMatch('"id":"B"');
 });
 
 test("handles the empty state correctly", async () => {
+  expect.assertions(1);
   const [_schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -357,6 +363,7 @@ test("handles the empty state correctly", async () => {
 });
 
 test("in absence of the inbound transformer, persists as it is", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -407,6 +414,7 @@ test("in absence of the inbound transformer, persists as it is", async () => {
 });
 
 test("handles errors gracefully, defaluts to identity function", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -450,6 +458,7 @@ test("handles errors gracefully, defaluts to identity function", async () => {
 });
 
 test("allowdList is filtered out after the inbound  transformer is applied", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     counter: slice.num(0),
@@ -500,6 +509,7 @@ test("allowdList is filtered out after the inbound  transformer is applied", asy
 });
 
 test("the inbound transformer can be redifined during runtime", async () => {
+  expect.assertions(2);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -559,6 +569,7 @@ test("the inbound transformer can be redifined during runtime", async () => {
 });
 
 test("persists state using transform 'out' function", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     counter: slice.num(0),
@@ -608,6 +619,7 @@ test("persists state using transform 'out' function", async () => {
 });
 
 test("persists outbound state using tranform setOutTransformer", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     counter: slice.num(0),
@@ -663,6 +675,7 @@ test("persists outbound state using tranform setOutTransformer", async () => {
 });
 
 test("persists outbound a filtered nested part of a slice", async () => {
+  expect.assertions(1);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     loaders: slice.loaders(),
@@ -718,6 +731,7 @@ test("persists outbound a filtered nested part of a slice", async () => {
 });
 
 test("the outbound transformer can be reset during runtime", async () => {
+  expect.assertions(3);
   const [schema, initialState] = createSchema({
     token: slice.str(),
     counter: slice.num(0),
