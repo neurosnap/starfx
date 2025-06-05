@@ -4,6 +4,7 @@ import {
   type ApiCtx,
   type Operation,
   call,
+  createAction,
   createApi,
   createKey,
   keepAlive,
@@ -107,8 +108,11 @@ test("POST", async () => {
 
   await store.run(
     waitFor(function* (): Operation<boolean> {
-      const res = yield* select((state: AnyState) => state.users["1"].id);
-      return res !== "";
+      const res = yield* select((state) => state);
+      return (
+        (res as { users: Record<string, User> }).users["1"]?.email ===
+        mockUser.email
+      );
     }),
   );
 
@@ -236,7 +240,8 @@ test("run() from a normal saga", async () => {
     name: null,
     payload: null,
   };
-  const action2 = () => ({ type: "ACTION" });
+  // const action2 = () => ({ type: "ACTION" });
+  const action2 = createAction("ACTION");
   function* onAction() {
     const ctx = yield* safe(() => action1.run(action1({ id: "1" })));
     if (!ctx.ok) {

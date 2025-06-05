@@ -113,7 +113,7 @@ export function* waitFor(predicate: Callable<boolean>) {
 
   while (true) {
     yield* take("*");
-    const result = yield* call(() => predicate as any);
+    const result = yield* call(predicate as any);
     if (result) {
       return;
     }
