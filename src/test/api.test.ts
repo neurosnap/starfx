@@ -240,8 +240,7 @@ test("run() from a normal saga", async () => {
     name: null,
     payload: null,
   };
-  // const action2 = () => ({ type: "ACTION" });
-  const action2 = createAction("ACTION");
+  const action2 = () => ({ type: "ACTION" });
   function* onAction() {
     const ctx = yield* safe(() => action1.run(action1({ id: "1" })));
     if (!ctx.ok) {

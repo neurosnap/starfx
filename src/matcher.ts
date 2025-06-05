@@ -23,6 +23,15 @@ export type ActionPattern<Guard extends AnyAction = AnyAction> =
   | ActionSubPattern<Guard>
   | ActionSubPattern<Guard>[];
 
+function isThunk(fn: any): boolean {
+  return (
+    typeof fn === "function" &&
+    typeof fn.run === "function" &&
+    typeof fn.name === "string" &&
+    typeof fn.key === "string" &&
+    typeof fn.toString === "function"
+  );
+}
 export function matcher(pattern: ActionPattern): Predicate {
   if (pattern === "*") {
     return (input) => !!input;
@@ -36,7 +45,8 @@ export function matcher(pattern: ActionPattern): Predicate {
     return (input) => pattern.some((p) => matcher(p)(input));
   }
 
-  if (typeof pattern === "function" && pattern.toString) {
+  // detects thunk action creators
+  if (isThunk(pattern)) {
     return (input) => pattern.toString() === input.type;
   }
 
