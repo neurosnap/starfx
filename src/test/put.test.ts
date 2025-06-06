@@ -6,7 +6,7 @@ test("should send actions through channel", async () => {
   const actual: string[] = [];
 
   function* genFn(arg: string) {
-    const actions = yield* ActionContext;
+    const actions = yield* ActionContext.expect();
     const task = yield* spawn(function* () {
       for (const action of yield* each(actions)) {
         actual.push(action.type);

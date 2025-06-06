@@ -101,7 +101,7 @@ export function createStore<S extends AnyState>({
   }
 
   function* notifyChannelMdw(_: UpdaterCtx<S>, next: Next) {
-    const chan = yield* StoreUpdateContext;
+    const chan = yield* StoreUpdateContext.expect();
     yield* chan.send();
     yield* next();
   }

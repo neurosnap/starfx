@@ -449,12 +449,15 @@ test("handles errors gracefully, defaluts to identity function", async () => {
     middleware: [mdw],
   });
 
+  const err = console.error;
+  console.error = () => {};
   await store.run(function* (): Operation<void> {
     yield* persistor.rehydrate();
     yield* schema.update(schema.loaders.success({ id: PERSIST_LOADER_ID }));
     yield* schema.update(schema.token.set("1234"));
   });
   expect(store.getState().token).toBe("1234");
+  console.error = err;
 });
 
 test("allowdList is filtered out after the inbound  transformer is applied", async () => {

@@ -8,7 +8,7 @@ import {
   waitFor,
 } from "../index.js";
 import { createStore, updateStore } from "../store/index.js";
-import { describe, expect, test } from "../test.js";
+import { expect, test } from "../test.js";
 
 import type { Next, ThunkCtx } from "../index.js";
 // deno-lint-ignore no-explicit-any
@@ -556,7 +556,7 @@ test("it should call the api once even if we register it twice", () => {
   expect(acc).toBe("a");
 });
 
-test("Should call the API only once, even if registered multiple times, with multiple APIs defined.", () => {
+test("should call the API only once, even if registered multiple times, with multiple APIs defined.", () => {
   expect.assertions(2);
   const api1 = createThunks<RoboCtx>();
   api1.use(api1.routes());

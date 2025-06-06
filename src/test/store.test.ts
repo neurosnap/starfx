@@ -69,8 +69,8 @@ test("update store and receives update from channel `StoreUpdateContext`", async
   await scope.run(function* (): Operation<Result<void>[]> {
     const result = yield* parallel([
       function* () {
-        store = yield* StoreContext;
-        const chan = yield* StoreUpdateContext;
+        store = yield* StoreContext.expect();
+        const chan = yield* StoreUpdateContext.expect();
         const msgList = yield* chan;
         yield* msgList.next();
       },

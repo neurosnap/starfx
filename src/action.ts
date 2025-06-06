@@ -23,7 +23,7 @@ export const ActionContext = createContext(
 export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
   return {
     [Symbol.iterator]: function* () {
-      const actions = yield* ActionContext;
+      const actions = yield* ActionContext.expect();
       const match = matcher(pattern);
       yield* SignalQueueFactory.set(() => createFilterQueue(match) as any);
       return yield* actions;
@@ -49,7 +49,7 @@ export function emit({
 }
 
 export function* put(action: AnyAction | AnyAction[]) {
-  const signal = yield* ActionContext;
+  const signal = yield* ActionContext.expect();
   return emit({
     signal,
     action,
