@@ -21,6 +21,8 @@ jobs:
         with:
           node-version: 18.x
           registry-url: https://registry.npmjs.com
+      - name: install
+        run: npm install
       - name: build
         run: npm run build
       - name: publish
