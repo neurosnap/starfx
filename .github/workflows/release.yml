@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: setup deno
-        uses: denoland/setup-deno@v2
       - name: get version
         id: vars
         run: echo ::set-output name=version::$(echo ${{github.ref_name}} | sed 's/^v//')
@@ -24,11 +22,9 @@ jobs:
           node-version: 18.x
           registry-url: https://registry.npmjs.com
       - name: build
-        run: deno task npm $NPM_VERSION
-        env:
-          NPM_VERSION: ${{steps.vars.outputs.version}}
+        run: npm run build
       - name: publish
         run: npm publish --access=public
-        working-directory: ./npm
+        working-directory: .
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
