@@ -1,0 +1,38 @@
+name: build and test
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+permissions:
+  contents: read
+
+jobs:
+  bnt:
+    name: ${{ matrix.example }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - ./examples/vite-react
+          - ./examples/parcel-react
+          - ./examples/tests-rtl
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: npm install
+        working-directory: ${{ matrix.example }}
+        run: npm install
+
+      - name: test
+        working-directory: ${{ matrix.example }}
+        run: npm run test --if-present
+
+      - name: build
+        working-directory: ${{ matrix.example }}
+        run: npm run build --if-present

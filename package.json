@@ -1,0 +1,75 @@
+{
+  "name": "starfx",
+  "version": "0.14.0",
+  "description": "A micro-mvc framework for react apps",
+  "type": "module",
+  "files": ["/dist"],
+  "sideEffects": false,
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/types/index.d.ts",
+  "module": "./dist/esm/index.js",
+  "scripts": {
+    "test": "vitest --exclude examples",
+    "lint": "npx @biomejs/biome check --write",
+    "fmt": "npx @biomejs/biome check --write --linter-enabled=false",
+    "ci": "npx @biomejs/biome ci .",
+    "template": "tsx ./api-type-template.mts",
+    "build": "tsx ./build.mts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neurosnap/starfx.git"
+  },
+  "author": "Eric Bower",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/neurosnap/starfx/issues"
+  },
+  "homepage": "https://github.com/neurosnap/starfx#readme",
+  "dependencies": {
+    "effection": "^3.5.0",
+    "immer": "^10.1.1",
+    "react-redux": "^9.2.0",
+    "reselect": "^5.1.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "execa": "^9.6.0",
+    "nock": "^14.0.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/react.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/react.js"
+      }
+    },
+    "./package.json": "./package.json"
+  }
+}

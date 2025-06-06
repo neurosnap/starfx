@@ -1,11 +1,3 @@
 fmt:
-	deno fmt
+	npm run fmt
 .PHONY:
-
-lint:
-	deno lint
-.PHONY: lint
-
-test:
-	deno task test
-.PHONY: test

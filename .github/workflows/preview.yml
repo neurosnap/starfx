@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: setup deno
-        uses: denoland/setup-deno@v2
       - name: get version
         id: vars
         run: echo ::set-output name=version::$(echo ${{github.ref_name}} | sed 's/^v//')
@@ -21,16 +19,12 @@ jobs:
         with:
           node-version: 18.x
           registry-url: https://registry.npmjs.com
+      - name: install
+        run: npm install
       - name: build
-        run: deno task npm $NPM_VERSION
+        run: npm run build
         env:
           NPM_VERSION: ${{steps.vars.outputs.version}}
 
-      - name: checkout neurosnap/starfx-examples
-        uses: actions/checkout@v4
-        with:
-          repository: neurosnap/starfx-examples
-          path: examples
-
       - name: Publish Preview Versions
-        run: npx pkg-pr-new publish './npm' --template './examples/*'
+        run: npx pkg-pr-new publish '.' --template './examples/*'
