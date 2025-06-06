@@ -27,4 +27,4 @@ jobs:
           NPM_VERSION: ${{steps.vars.outputs.version}}
 
       - name: Publish Preview Versions
-        run: npx pkg-pr-new publish './dist' --template './examples/*'
+        run: npx pkg-pr-new publish '.' --template './examples/*'
