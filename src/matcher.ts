@@ -1,3 +1,4 @@
+import { clearTimers } from "./supervisor.js";
 import type { AnyAction } from "./types.js";
 
 type ActionType = string;
@@ -6,7 +7,7 @@ type Predicate<Guard extends AnyAction = AnyAction> = (
   action: Guard,
 ) => boolean;
 type StringableActionCreator<A extends AnyAction = AnyAction> = {
-  (...args: unknown[]): A;
+  (...args: any[]): A;
   toString(): string;
 };
 type SubPattern<Guard extends AnyAction = AnyAction> =
@@ -27,11 +28,17 @@ function isThunk(fn: any): boolean {
   return (
     typeof fn === "function" &&
     typeof fn.run === "function" &&
+    typeof fn.use === "function" &&
     typeof fn.name === "string" &&
     typeof fn.key === "string" &&
     typeof fn.toString === "function"
   );
 }
+
+function isActionCreator(fn: any): boolean {
+  return !!fn && fn._starfx === true;
+}
+
 export function matcher(pattern: ActionPattern): Predicate {
   if (pattern === "*") {
     return (input) => !!input;
@@ -45,14 +52,19 @@ export function matcher(pattern: ActionPattern): Predicate {
     return (input) => pattern.some((p) => matcher(p)(input));
   }
 
-  // detects thunk action creators
   if (isThunk(pattern)) {
     return (input) => pattern.toString() === input.type;
   }
 
-  if (typeof pattern === "function") {
+  if (typeof pattern === "function" && !isActionCreator(pattern)) {
     return (input) => pattern(input) as boolean;
+  }
+
+  // starfx-branded action creator
+  if (isActionCreator(pattern)) {
+    return (input: AnyAction) => pattern.toString() === input.type;
   }
 
   throw new Error("invalid pattern");
 }
+

@@ -8,6 +8,7 @@ import {
   createContext,
   createSignal,
   each,
+  sleep,
   spawn,
 } from "effection";
 import { type ActionPattern, matcher } from "./matcher.js";
@@ -64,7 +65,6 @@ export function* take(pattern: ActionPattern): Operation<Action> {
   for (const action of yield* each(fd)) {
     return action;
   }
-
   return { type: "take failed, this should not be possible" };
 }
 
@@ -141,6 +141,12 @@ export function createAction(actionType: string) {
     payload,
   });
   fn.toString = () => actionType;
-
+  //branding our creator //
+  Object.defineProperty(fn, "_starfx", {
+    value: true,
+    enumerable: false, // hide from Object.keys and spreads
+    configurable: false,
+    writable: false,
+  });
   return fn;
 }
