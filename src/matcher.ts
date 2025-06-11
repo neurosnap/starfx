@@ -67,4 +67,3 @@ export function matcher(pattern: ActionPattern): Predicate {
 
   throw new Error("invalid pattern");
 }
-

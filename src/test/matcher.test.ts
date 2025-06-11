@@ -1,5 +1,5 @@
 import {
-  ThunkCtx,
+  type ThunkCtx,
   createAction,
   createThunks,
   sleep,
