@@ -52,6 +52,7 @@ export interface AnyAction extends Action {
   payload?: any;
   meta?: any;
   error?: boolean;
+  [extraProps: string]: any;
 }
 
 export interface ActionWithPayload<P> extends AnyAction {
