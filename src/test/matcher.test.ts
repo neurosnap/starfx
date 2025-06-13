@@ -3,7 +3,6 @@ import {
   createAction,
   createThunks,
   sleep,
-  spawn,
   takeLatest,
 } from "../index.js";
 import { matcher } from "../matcher.js";
@@ -82,7 +81,39 @@ test("typed createAction should work with takeLatest without type casting", asyn
   await task.halt();
 });
 
-test("should correctly identify starfx thunk as a thunk", () => {
+test("should correctly identify starfx thunk as a thunk", async () => {
+  expect.assertions(6);
+
+  const thunks = createThunks();
+  thunks.use(thunks.routes());
+
+  const store = createStore({
+    initialState: {
+      users: {},
+    },
+  });
+  store.run(thunks.bootup);
+
+  const myThunk = thunks.create("my-thunk", function* (_ctx, next) {
+    yield* next();
+  });
+
+  // Test that thunk has the expected properties for isThunk detection
+  expect(typeof myThunk.run).toBe("function");
+  expect(typeof myThunk.use).toBe("function");
+  expect(typeof myThunk.name).toBe("string");
+  expect(typeof myThunk.toString).toBe("function");
+
+  // Verify it does NOT have the _starfx property (that's for action creators)
+  expect((myThunk as any)._starfx).toBeUndefined();
+
+  // Verify it does NOT have a key property directly on the function
+  expect(typeof (myThunk as any).key).toBe("undefined");
+
+  await new Promise((resolve) => setTimeout(resolve, 10));
+});
+
+test("matcher should correctly identify thunk functions", async () => {
   expect.assertions(3);
 
   const thunks = createThunks();
@@ -95,17 +126,22 @@ test("should correctly identify starfx thunk as a thunk", () => {
   });
   store.run(thunks.bootup);
 
-  const myThunk = thunks.create("my-thunk", function* (ctx, next) {
+  const myThunk = thunks.create("my-thunk", function* (_ctx, next) {
     yield* next();
   });
 
-  // Test that thunk has the expected properties for isThunk detection
-  expect(typeof myThunk.run).toBe("function");
-  expect(typeof myThunk.name).toBe("string");
-  expect(typeof myThunk.toString).toBe("function");
+  // Test that the matcher correctly identifies the thunk
+  const match = matcher(myThunk);
+  expect(match({ type: "my-thunk", payload: {} })).toBe(true);
+  expect(match({ type: "other-action", payload: {} })).toBe(false);
+
+  // Verify the thunk's toString method returns the correct type
+  expect(myThunk.toString()).toBe("my-thunk");
+
+  await new Promise((resolve) => setTimeout(resolve, 10));
 });
 
-/// the bug that determined we needed to write this matcher
+// the bug that determined we needed to write this matcher
 test("some bug: createAction incorrectly matching all actions", async () => {
   expect.assertions(1);
 
@@ -145,7 +181,7 @@ test("should show the difference between createAction and thunk properties", () 
 
   // starfx thunk
   const thunks = createThunks();
-  const myThunk = thunks.create("test-thunk", function* (ctx: ThunkCtx, next) {
+  const myThunk = thunks.create("test-thunk", function* (_ctx: ThunkCtx, next) {
     yield* next();
   });
 
@@ -162,21 +198,31 @@ test("should show the difference between createAction and thunk properties", () 
   expect(typeof myThunk.name).toBe("string"); // actionFn
 });
 
-test("debug: what path does createAction take in matcher", () => {
-  expect.assertions(6);
+test("debug: what path does createAction take in matcher", async () => {
+  expect.assertions(7);
 
   const actionCreator = createAction<{ test: string }>("test/action");
 
-  // Check what the isThunk function sees
+  // Check that createAction has the _starfx branding property
+  expect((actionCreator as any)._starfx).toBe(true);
+
+  // Verify it's NOT identified as a thunk (should fail isThunk checks)
   const hasRun = typeof (actionCreator as any).run === "function";
-  const hasName = typeof actionCreator.name === "string";
+  const hasUse = typeof (actionCreator as any).use === "function";
   const hasKey = typeof (actionCreator as any).key === "string";
+  expect(hasRun).toBe(false);
+  expect(hasUse).toBe(false);
+  expect(hasKey).toBe(false);
+
+  // Verify it has the properties needed for isActionCreator path
   const hasToString = typeof actionCreator.toString === "function";
   const isFunction = typeof actionCreator === "function";
-  expect(hasRun).toBe(false);
-  expect(hasName).toBe(true); // function.name property
-  expect(hasKey).toBe(false);
   expect(hasToString).toBe(true);
   expect(isFunction).toBe(true);
-  expect(actionCreator.name).toBe("fn"); // function name, not thunk name
+
+  // Most importantly: verify the matcher correctly identifies it as an action creator
+  const match = matcher(actionCreator);
+  expect(match({ type: "test/action", payload: { test: "value" } })).toBe(true);
+
+  await new Promise((resolve) => setTimeout(resolve, 10));
 });

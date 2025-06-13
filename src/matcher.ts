@@ -1,4 +1,3 @@
-import { clearTimers } from "./supervisor.js";
 import type { AnyAction } from "./types.js";
 
 type ActionType = string;
@@ -30,7 +29,6 @@ function isThunk(fn: any): boolean {
     typeof fn.run === "function" &&
     typeof fn.use === "function" &&
     typeof fn.name === "string" &&
-    typeof fn.key === "string" &&
     typeof fn.toString === "function"
   );
 }
@@ -60,7 +58,6 @@ export function matcher(pattern: ActionPattern): Predicate {
     return (input) => pattern(input) as boolean;
   }
 
-  // starfx-branded action creator
   if (isActionCreator(pattern)) {
     return (input: AnyAction) => pattern.toString() === input.type;
   }

@@ -8,7 +8,6 @@ import {
   createContext,
   createSignal,
   each,
-  sleep,
   spawn,
 } from "effection";
 import { type ActionPattern, matcher } from "./matcher.js";
@@ -141,10 +140,9 @@ export function createAction(actionType: string) {
     payload,
   });
   fn.toString = () => actionType;
-  //branding our creator //
   Object.defineProperty(fn, "_starfx", {
     value: true,
-    enumerable: false, // hide from Object.keys and spreads
+    enumerable: false,
     configurable: false,
     writable: false,
   });
