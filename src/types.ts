@@ -42,6 +42,7 @@ export interface Payload<P = any> {
 
 export interface Action {
   type: string;
+  [extraProps: string]: any;
 }
 
 export type ActionFn = () => { toString: () => string };
@@ -52,6 +53,7 @@ export interface AnyAction extends Action {
   payload?: any;
   meta?: any;
   error?: boolean;
+  [extraProps: string]: any;
 }
 
 export interface ActionWithPayload<P> extends AnyAction {
