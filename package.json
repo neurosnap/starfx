@@ -29,7 +29,6 @@
   "dependencies": {
     "effection": "^3.5.0",
     "immer": "^10.1.1",
-    "react-redux": "^9.2.0",
     "reselect": "^5.1.1"
   },
   "devDependencies": {
@@ -47,7 +46,19 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "react-redux": "9.x"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-redux": {
+      "optional": true
+    }
   },
   "exports": {
     ".": {
