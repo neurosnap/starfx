@@ -25,6 +25,7 @@ export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
     [Symbol.iterator]: function* () {
       const actions = yield* ActionContext.expect();
       const match = matcher(pattern);
+      console.log({ actions, match, pattern });
       yield* SignalQueueFactory.set(() => createFilterQueue(match) as any);
       return yield* actions;
     },
@@ -44,6 +45,7 @@ export function emit({
     }
     action.map((a) => signal.send(a));
   } else {
+    console.log("sending =>", action);
     signal.send(action);
   }
 }
@@ -73,6 +75,7 @@ export function* takeEvery<T>(
 ) {
   const fd = useActions(pattern);
   for (const action of yield* each(fd)) {
+    console.log({ action, fd });
     yield* spawn(() => op(action));
     yield* each.next();
   }

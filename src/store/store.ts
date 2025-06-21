@@ -9,12 +9,10 @@ import { enablePatches, produceWithPatches } from "immer";
 import { API_ACTION_PREFIX, ActionContext, emit } from "../action.js";
 import { type BaseMiddleware, compose } from "../compose.js";
 import type { AnyAction, AnyState, Next } from "../types.js";
-import { StoreContext, StoreUpdateContext } from "./context.js";
+import { StoreContext, StoreUpdateContext, ThunksContext } from "./context.js";
 import { createRun } from "./run.js";
 import type { FxStore, Listener, StoreUpdater, UpdaterCtx } from "./types.js";
 const stubMsg = "This is merely a stub, not implemented";
-
-let id = 0;
 
 // https://github.com/reduxjs/redux/blob/4a6d2fb227ba119d3498a43fab8f53fe008be64c/src/createStore.js#L344
 function observable() {
@@ -33,8 +31,6 @@ export interface CreateStore<S extends AnyState> {
   initialState: S;
   middleware?: BaseMiddleware<UpdaterCtx<S>>[];
 }
-
-export const IdContext = createContext("starfx:id", 0);
 
 export function createStore<S extends AnyState>({
   initialState,
@@ -55,7 +51,7 @@ export function createStore<S extends AnyState>({
 
   const signal = createSignal<AnyAction, void>();
   scope.set(ActionContext, signal);
-  scope.set(IdContext, id++);
+  scope.set(ThunksContext, [] as string[]);
 
   function getScope() {
     return scope;
@@ -144,6 +140,7 @@ export function createStore<S extends AnyState>({
   }
 
   function dispatch(action: AnyAction | AnyAction[]) {
+    console.log("dispatching", { signal, action });
     emit({ signal, action });
   }
 
@@ -188,8 +185,7 @@ export function createStore<S extends AnyState>({
     [Symbol.observable]: observable,
   };
 
-  // deno-lint-ignore no-explicit-any
-  store.getScope().set(StoreContext, store as any);
+  scope.set(StoreContext, store as any);
   return store;
 }
 

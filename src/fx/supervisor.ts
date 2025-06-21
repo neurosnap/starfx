@@ -26,7 +26,9 @@ export function supervise<T>(
     let waitFor = backoff(attempt);
 
     while (waitFor >= 0) {
+      console.log("supervising safe op");
       const res = yield* safe(op);
+      console.log("supervised safe op");
 
       if (res.ok) {
         attempt = 0;

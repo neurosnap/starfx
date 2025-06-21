@@ -6,6 +6,7 @@ import {
   put,
   takeEvery,
   waitFor,
+  take,
 } from "../index.js";
 import { createStore, updateStore } from "../store/index.js";
 import { expect, test } from "../test.js";
@@ -135,7 +136,7 @@ test("when create a query fetch pipeline - execute all middleware and save to re
   const store = createStore<TestState>({
     initialState: { users: {}, tickets: {} },
   });
-  store.run(api.bootup);
+  store.run(api.register);
 
   store.dispatch(fetchUsers());
 
@@ -377,9 +378,10 @@ test("run() on endpoint action with payload - should run the effect", () => {
   expect(curCtx.request).toEqual({ method: "expect this" });
 });
 
-test("middleware order of execution", async () => {
+test.only("middleware order of execution", async () => {
   expect.assertions(1);
   let acc = "";
+  console.log("created");
   const api = createThunks();
   api.use(api.routes());
 
@@ -411,9 +413,10 @@ test("middleware order of execution", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action());
 
+  console.log("dispatched in test");
   await store.run(waitFor(() => acc === "abcdefg"));
   expect(acc).toBe("abcdefg");
 });
@@ -503,7 +506,7 @@ test("should only call thunk once", () => {
   );
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action2());
   expect(acc).toBe("a");
 });
@@ -609,16 +612,16 @@ test("should unregister the thunk when the registration function exits", async (
   expect(acc).toBe("b");
 });
 
-test("should allow multiple stores to register a thunk", () => {
+test("should allow multiple stores to register a thunk", async () => {
   expect.assertions(1);
   const api1 = createThunks<RoboCtx>();
+  let acc = "";
   api1.use(api1.routes());
   const storeA = createStore({ initialState: {} });
   const storeB = createStore({ initialState: {} });
   storeA.run(api1.register);
   storeB.run(api1.register);
-  let acc = "";
-  const action = api1.create("/users", function* () {
+  const action = api1.create("/users", function* (_, next) {
     acc += "b";
   });
   storeA.dispatch(action());
