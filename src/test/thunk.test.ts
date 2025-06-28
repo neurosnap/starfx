@@ -135,7 +135,7 @@ test("when create a query fetch pipeline - execute all middleware and save to re
   const store = createStore<TestState>({
     initialState: { users: {}, tickets: {} },
   });
-  store.run(api.bootup);
+  store.run(api.register);
 
   store.dispatch(fetchUsers());
 
@@ -173,7 +173,7 @@ test("when providing a generator the to api.create function - should call that g
   const store = createStore<TestState>({
     initialState: { users: {}, tickets: {} },
   });
-  store.run(api.bootup);
+  store.run(api.register);
 
   store.dispatch(fetchTickets());
   expect(store.getState()).toEqual({
@@ -201,7 +201,7 @@ test("error handling", () => {
   const action = api.create("/error", { supervisor: takeEvery });
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action());
   expect(called).toBe(true);
 });
@@ -227,7 +227,7 @@ test("error handling inside create", () => {
     },
   );
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action());
   expect(called).toBe(true);
 });
@@ -259,7 +259,7 @@ test("error inside endpoint mdw", () => {
       users: {},
     },
   });
-  store.run(query.bootup);
+  store.run(query.register);
   store.dispatch(fetchUsers());
   expect(called).toBe(true);
 });
@@ -291,7 +291,7 @@ test("create fn is an array", () => {
   ]);
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action());
 });
 
@@ -323,7 +323,7 @@ test("run() on endpoint action - should run the effect", () => {
   );
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action2());
   expect(acc).toBe("ab");
   expect(curCtx.action).toMatchObject({
@@ -364,7 +364,7 @@ test("run() on endpoint action with payload - should run the effect", () => {
   );
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action2());
   expect(acc).toBe("ab");
   expect(curCtx.action).toMatchObject({
@@ -411,7 +411,7 @@ test("middleware order of execution", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action());
 
   await store.run(waitFor(() => acc === "abcdefg"));
@@ -441,7 +441,7 @@ test("retry with actionFn", async () => {
   });
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action());
 
   await store.run(waitFor(() => acc === "agag"));
@@ -472,7 +472,7 @@ test("retry with actionFn with payload", async () => {
   );
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action({ page: 1 }));
 
   await store.run(waitFor(() => acc === "agag"));
@@ -503,7 +503,7 @@ test("should only call thunk once", () => {
   );
 
   const store = createStore({ initialState: {} });
-  store.run(api.bootup);
+  store.run(api.register);
   store.dispatch(action2());
   expect(acc).toBe("a");
 });
