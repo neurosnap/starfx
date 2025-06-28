@@ -6,7 +6,7 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "starfx": "^0.13.3"
+    "starfx": "file:../.."
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.9",
