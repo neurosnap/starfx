@@ -4,11 +4,11 @@ import {
   Ok,
   type Operation,
   createContext,
-  createScope,
   createSignal,
   each,
   ensure,
   useScope,
+  type Scope,
 } from "effection";
 import { API_ACTION_PREFIX, takeEvery } from "../action.js";
 import { compose } from "../compose.js";
@@ -140,9 +140,10 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   } = { supervisor: takeEvery },
 ): ThunksApi<Ctx> {
   const storeRegistration = new Set();
-  const watch = createSignal<Callable<unknown>>();
+  const watch = createSignal<any>();
+
   const middleware: Middleware<Ctx>[] = [];
-  const visors: { [key: string]: Callable<unknown> } = {};
+  const visors: { [key: string]: any } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
   let dynamicMiddlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {
@@ -218,9 +219,9 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     }
 
     // maintains a history for any future registration
-    visors[name] = curVisor;
+    visors[name] = () => supervise(curVisor);
     // signals for any stores already listening
-    watch.send(curVisor);
+    watch.send(() => supervise(curVisor));
 
     const errMsg = `[${name}] is being called before its thunk has been registered. Run \`store.run(thunks.register)\` where \`thunks\` is the name of your \`createThunks\` or \`createApi\` variable.`;
     const actionFn = (options?: Ctx["payload"]) => {
@@ -254,9 +255,12 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
   function manage<Resource>(name: string, resource: Operation<Resource>) {
     const CustomContext = createContext<Resource>(name);
-    function* curVisor() {
-      const providedResource = yield* resource;
-      CustomContext.set(providedResource);
+    function curVisor(scope: Scope) {
+      function* kickoff() {
+        const providedResource = yield* resource;
+        scope.set(CustomContext, providedResource);
+      }
+      return kickoff;
     }
 
     // maintains a history for any future registration
@@ -270,29 +274,26 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   }
 
   function* register() {
-    const parent = yield* useScope();
-    const parentStoreId = parent.get(IdContext);
-    if (storeRegistration.has(parentStoreId)) {
+    const scope = yield* useScope();
+    const parentStoreId = scope.get(IdContext);
+    if (parentStoreId && storeRegistration.has(parentStoreId)) {
       console.warn("This thunk instance is already registered.");
       return;
     }
     storeRegistration.add(parentStoreId);
 
-    const [thunkScope, destroy] = createScope(parent);
-
     yield* ensure(function* () {
       storeRegistration.delete(parentStoreId);
-      yield* destroy();
     });
 
     // Register any thunks created before listening to signal
     for (const created of Object.values(visors)) {
-      yield* thunkScope.spawn(supervise(created));
+      yield* scope.spawn(created(scope));
     }
 
     // wait for further thunk create
     for (const watched of yield* each(watch)) {
-      yield* thunkScope.spawn(supervise(watched));
+      yield* scope.spawn(watched(scope));
       yield* each.next();
     }
   }
