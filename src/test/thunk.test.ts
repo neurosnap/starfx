@@ -4,13 +4,14 @@ import {
   createThunks,
   sleep as delay,
   put,
+  resource,
   takeEvery,
   waitFor,
 } from "../index.js";
 import { createStore, updateStore } from "../store/index.js";
-import { expect, test } from "../test.js";
+import { expect, test, describe } from "../test.js";
 
-import type { Next, ThunkCtx } from "../index.js";
+import type { Next, Operation, ThunkCtx } from "../index.js";
 // deno-lint-ignore no-explicit-any
 interface RoboCtx<D = Record<string, unknown>, P = any> extends ThunkCtx<P> {
   url: string;
@@ -625,4 +626,72 @@ test("should allow multiple stores to register a thunk", () => {
   storeB.dispatch(action());
 
   expect(acc).toBe("bb");
+});
+
+describe(".manage", () => {
+  function guessAge(): Operation<{ guess: number }> {
+    return resource(function* (provide) {
+      yield* provide({
+        get guess() {
+          return Math.floor(Math.random() * 100);
+        },
+      });
+    });
+  }
+
+  test("starts without error", () => {
+    expect.assertions(1);
+
+    const thunk = createThunks<RoboCtx>();
+    thunk.use(thunk.routes());
+    const TestContext = thunk.manage("test:context", guessAge());
+    const store = createStore({ initialState: {} });
+    store.run(thunk.register);
+    let acc = "";
+    const action = thunk.create("/users", function* (payload, next) {
+      acc += "b";
+      next();
+    });
+    store.dispatch(action());
+
+    expect(acc).toBe("b");
+  });
+
+  test("expects resource", () => {
+    expect.assertions(1);
+
+    const thunk = createThunks<RoboCtx>();
+    thunk.use(thunk.routes());
+    const TestContext = thunk.manage("test:context", guessAge());
+    const store = createStore({ initialState: {} });
+    store.run(thunk.register);
+    let acc = "";
+    const action = thunk.create("/users", function* (payload, next) {
+      const c = yield* TestContext.expect();
+      if (c) acc += "b";
+      next();
+    });
+    store.dispatch(action());
+
+    expect(acc).toBe("b");
+  });
+
+  test("uses resource", () => {
+    expect.assertions(1);
+
+    const thunk = createThunks<RoboCtx>();
+    thunk.use(thunk.routes());
+    const TestContext = thunk.manage("test:context", guessAge());
+    const store = createStore({ initialState: {} });
+    store.run(thunk.register);
+    let acc = 0;
+    const action = thunk.create("/users", function* (payload, next) {
+      const c = yield* TestContext.expect();
+      acc += c.guess;
+      next();
+    });
+    store.dispatch(action());
+
+    expect(acc).toBeGreaterThan(0);
+  });
 });
