@@ -1,3 +1,5 @@
+import React from "react";
+import "@testing-library/jest-dom";
 import { expect, test } from "@jest/globals";
 import { fireEvent, render, screen, waitFor } from "./utils";
 import { fetchUsers } from "../src/api";
@@ -20,7 +22,7 @@ test("fetches users", async () => {
           id: 2,
           name: "Ervin Howell",
         },
-      ]),
+      ])
     );
     yield* next();
   });
