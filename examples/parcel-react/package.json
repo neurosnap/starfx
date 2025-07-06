@@ -5,8 +5,12 @@
     "start": "parcel --host 0.0.0.0",
     "build": "parcel build"
   },
+  "browserslist": "> 0.5%, last 2 versions, not dead",
   "@parcel/resolver-default": {
     "packageExports": true
+  },
+  "alias": {
+    "node:process": false
   },
   "devDependencies": {
     "parcel": "^2.15.4",
