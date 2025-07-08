@@ -21,7 +21,7 @@ export function supervise<T>(
   op: Callable<T>,
   backoff: (attemp: number) => number = superviseBackoff,
 ) {
-  return function* () {
+  return function* (): Operation<void> {
     let attempt = 1;
     let waitFor = backoff(attempt);
 

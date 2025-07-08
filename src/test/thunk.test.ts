@@ -9,7 +9,7 @@ import {
   waitFor,
 } from "../index.js";
 import { createStore, updateStore } from "../store/index.js";
-import { expect, test, describe } from "../test.js";
+import { describe, expect, test } from "../test.js";
 
 import type { Next, Operation, ThunkCtx } from "../index.js";
 // deno-lint-ignore no-explicit-any

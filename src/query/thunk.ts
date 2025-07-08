@@ -3,12 +3,12 @@ import {
   type Context,
   Ok,
   type Operation,
+  type Scope,
   createContext,
   createSignal,
   each,
   ensure,
   useScope,
-  type Scope,
 } from "effection";
 import { API_ACTION_PREFIX, takeEvery } from "../action.js";
 import { compose } from "../compose.js";
@@ -17,7 +17,7 @@ import { createKey } from "./create-key.js";
 import { isFn, isObject } from "./util.js";
 
 import { IdContext } from "../store/store.js";
-import type { ActionWithPayload, AnyAction, Next, Payload } from "../types.js";
+import type { ActionWithPayload, Next, Payload } from "../types.js";
 import type {
   CreateAction,
   CreateActionPayload,
@@ -97,6 +97,7 @@ export interface ThunksApi<Ctx extends ThunkCtx> {
     fn: MiddlewareCo<Gtx>,
   ): CreateActionWithPayload<Gtx, P>;
 }
+type Visors = (scope: Scope) => () => Operation<void>;
 
 /**
  * Creates a middleware pipeline.
@@ -140,10 +141,10 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   } = { supervisor: takeEvery },
 ): ThunksApi<Ctx> {
   const storeRegistration = new Set();
-  const watch = createSignal<any>();
+  const watch = createSignal<Visors>();
 
   const middleware: Middleware<Ctx>[] = [];
-  const visors: { [key: string]: any } = {};
+  const visors: { [key: string]: Visors } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
   let dynamicMiddlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {
@@ -214,7 +215,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
     middlewareMap[name] = fn || defaultMiddleware;
 
     const tt = req ? (req as any).supervisor : supervisor;
-    function* curVisor() {
+    function* curVisor(): Operation<void> {
       yield* tt(type, onApi);
     }
 
@@ -256,7 +257,7 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
   function manage<Resource>(name: string, resource: Operation<Resource>) {
     const CustomContext = createContext<Resource>(name);
     function curVisor(scope: Scope) {
-      function* kickoff() {
+      function* kickoff(): Operation<void> {
         const providedResource = yield* resource;
         scope.set(CustomContext, providedResource);
       }
