@@ -1,10 +1,10 @@
-import React from "react";
-import { render } from "@testing-library/react";
+import React, { type ReactElement } from "react";
+import { render, type RenderOptions } from "@testing-library/react";
 import { Provider } from "starfx/react";
 import { schema } from "../src/api";
 import { setupStore } from "../src/store";
 
-const AllTheProviders = ({ children }) => {
+const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const store = setupStore({});
   return (
     <Provider schema={schema} store={store}>
@@ -13,8 +13,10 @@ const AllTheProviders = ({ children }) => {
   );
 };
 
-const customRender = (ui, options) =>
-  render(ui, { wrapper: AllTheProviders, ...options });
+const customRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, "wrapper">
+) => render(ui, { wrapper: AllTheProviders, ...options });
 
 // re-export everything
 export * from "@testing-library/react";

@@ -25,7 +25,13 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: npm install
+      - name: npm install in starfx root
+        run: npm install
+
+      - name: build starfx
+        run: npm run build
+
+      - name: npm install (uses built starfx)
         working-directory: ${{ matrix.example }}
         run: npm install
 

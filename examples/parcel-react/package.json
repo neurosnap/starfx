@@ -5,16 +5,20 @@
     "start": "parcel --host 0.0.0.0",
     "build": "parcel build"
   },
+  "browserslist": "> 0.5%, last 2 versions, not dead",
   "@parcel/resolver-default": {
     "packageExports": true
   },
+  "alias": {
+    "node:process": false
+  },
   "devDependencies": {
-    "parcel": "^2.11.0",
+    "parcel": "^2.15.4",
     "process": "^0.11.10"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "starfx": "^0.13.0"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "starfx": "file:../.."
   }
 }
