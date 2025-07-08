@@ -17,7 +17,11 @@ function App({ id }: { id: string }) {
       <div>hi there, {user.name}</div>
       <button onClick={() => dispatch(fetchUsers())}>Fetch users</button>
       {userList.map((u) => {
-        return <div key={u.id}>({u.id}) {u.name}</div>;
+        return (
+          <div key={u.id}>
+            ({u.id}) {u.name}; age {u.age}
+          </div>
+        );
       })}
     </div>
   );
