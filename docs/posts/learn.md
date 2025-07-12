@@ -75,7 +75,10 @@ We highly recommend reading the
 [Thinking in Effection](https://frontside.com/effection/docs/thinking-in-effection)
 page because it should help here.
 
-# Data strategy: preload then refresh
+# Data loading strategy: `stale-while-revalidate`
+
+The idea comes from HTTP caching mechanisms:
+[`stale-while-revalidate`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#stale-while-revalidate)
 
 The idea is simple:
 
