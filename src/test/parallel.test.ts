@@ -1,5 +1,5 @@
 import type { Operation, Result } from "../index.js";
-import { Err, Ok, each, parallel, run, sleep, spawn } from "../index.js";
+import { Err, Ok, each, parallel, run, sleep, spawn, until } from "../index.js";
 import { expect, test } from "../test.js";
 
 interface Defer<T> {
@@ -112,7 +112,7 @@ test("should resolve all async items", async () => {
       yield* sleep(15);
       two.resolve(2);
     });
-    const results = yield* parallel([one, () => two.promise]);
+    const results = yield* parallel([one, () => until(two.promise)]);
     return yield* results;
   });
 
@@ -126,7 +126,10 @@ test("should stop all operations when there is an error", async () => {
 
   function* genFn() {
     try {
-      const results = yield* parallel([() => one.promise, () => two.promise]);
+      const results = yield* parallel([
+        () => until(one.promise),
+        () => until(two.promise),
+      ]);
       actual = yield* results;
     } catch (_) {
       actual = [Err(new Error("should not get hit"))];

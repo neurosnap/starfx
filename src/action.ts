@@ -1,5 +1,4 @@
 import {
-  type Callable,
   type Operation,
   type Signal,
   SignalQueueFactory,
@@ -60,11 +59,15 @@ export function take<P>(
   pattern: ActionPattern,
 ): Operation<ActionWithPayload<P>>;
 export function* take(pattern: ActionPattern): Operation<Action> {
-  const fd = useActions(pattern);
-  for (const action of yield* each(fd)) {
-    return action;
+  const actionStream = useActions(pattern);
+  const subscription = yield* actionStream;
+  const result = yield* subscription.next();
+  if (result.done) {
+    return {
+      type: "Action stream closed before a matching action was received",
+    };
   }
-  return { type: "take failed, this should not be possible" };
+  return result.value;
 }
 
 export function* takeEvery<T>(
@@ -104,15 +107,15 @@ export function* takeLeading<T>(
   }
 }
 
-export function* waitFor(predicate: Callable<boolean>) {
-  const init = yield* call(predicate as any);
+export function* waitFor(predicate: () => Operation<boolean>) {
+  const init = yield* predicate();
   if (init) {
     return;
   }
 
   while (true) {
     yield* take("*");
-    const result = yield* call(predicate as any);
+    const result = yield* predicate();
     if (result) {
       return;
     }

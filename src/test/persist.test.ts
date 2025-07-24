@@ -50,6 +50,8 @@ test("can persist to storage adapters", async () => {
         yield* schema.update(schema.token.set(action.payload));
       },
       function* () {
+        // TODO we may need to consider how to handle this, is it a breaking change?
+        yield* sleep(1);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);
@@ -146,6 +148,8 @@ test("persists inbound state using transform 'in' function", async () => {
         yield* schema.update(schema.token.set(action.payload));
       },
       function* () {
+        // TODO we may need to consider how to handle this, is it a breaking change?
+        yield* sleep(1);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);
@@ -209,6 +213,8 @@ test("persists inbound state using tranform in (2)", async () => {
         yield* schema.update(schema.token.set(action.payload));
       },
       function* () {
+        // TODO we may need to consider how to handle this, is it a breaking change?
+        yield* sleep(1);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);
@@ -404,6 +410,8 @@ test("in absence of the inbound transformer, persists as it is", async () => {
         yield* schema.update(schema.token.set(action.payload));
       },
       function* () {
+        // TODO we may need to consider how to handle this, is it a breaking change?
+        yield* sleep(1);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);

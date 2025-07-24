@@ -4,6 +4,7 @@ import {
   type Operation,
   call,
   run,
+  sleep,
   spawn,
   supervise,
   superviseBackoff,
@@ -45,6 +46,7 @@ test("should recover with backoff pressure", async () => {
         actions.push(action);
       }
     });
+    yield* sleep(1);
     yield* call(supervise(op, backoff));
   });
 

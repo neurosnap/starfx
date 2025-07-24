@@ -92,7 +92,7 @@ test("should correctly identify starfx thunk as a thunk", async () => {
       users: {},
     },
   });
-  store.run(thunks.bootup);
+  store.run(thunks.register);
 
   const myThunk = thunks.create("my-thunk", function* (_ctx, next) {
     yield* next();
@@ -124,7 +124,7 @@ test("matcher should correctly identify thunk functions", async () => {
       users: {},
     },
   });
-  store.run(thunks.bootup);
+  store.run(thunks.register);
 
   const myThunk = thunks.create("my-thunk", function* (_ctx, next) {
     yield* next();
