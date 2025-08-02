@@ -167,7 +167,7 @@ export function createStore<S extends AnyState>({
     });
   }
 
-  const store = {
+  const store: FxStore<S> = {
     getScope,
     getState,
     subscribe,
@@ -188,8 +188,7 @@ export function createStore<S extends AnyState>({
     [Symbol.observable]: observable,
   };
 
-  // deno-lint-ignore no-explicit-any
-  store.getScope().set(StoreContext, store as any);
+  scope.set(StoreContext, store as FxStore<AnyState>);
   return store;
 }
 

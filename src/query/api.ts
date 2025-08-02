@@ -71,6 +71,7 @@ export function createApi<Ctx extends ApiCtx = ApiCtx>(
     bootup: thunks.register,
     register: thunks.register,
     create: thunks.create,
+    manage: thunks.manage,
     routes: thunks.routes,
     reset: thunks.reset,
     cache: () => {
