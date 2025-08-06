@@ -7,6 +7,7 @@ import {
   createContext,
   createSignal,
   each,
+  lift,
   spawn,
 } from "effection";
 import { type ActionPattern, matcher } from "./matcher.js";
@@ -23,7 +24,7 @@ export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
   return {
     [Symbol.iterator]: function* () {
       const actions = yield* ActionContext.expect();
-      const match = matcher(pattern);
+      const match = yield* lift(matcher)(pattern);
       yield* SignalQueueFactory.set(() => createFilterQueue(match) as any);
       return yield* actions;
     },
@@ -49,7 +50,7 @@ export function emit({
 
 export function* put(action: AnyAction | AnyAction[]) {
   const signal = yield* ActionContext.expect();
-  return emit({
+  return yield* lift(emit)({
     signal,
     action,
   });

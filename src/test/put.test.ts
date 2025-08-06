@@ -80,25 +80,23 @@ test("should not cause stack overflow when puts are emitted while dispatching sa
   expect(true).toBe(true);
 });
 
-// TODO due to the nature of this test and the updates in v4, it seems that fixing it will push it outside of what it actually was intended to test
-test.skip("should not miss `put` that was emitted directly after creating a task (caused by another `put`)", async () => {
+test("should not miss `put` that was emitted directly after creating a task (caused by another `put`)", async () => {
   const actual: string[] = [];
 
   function* root() {
+    const tsk = yield* spawn(function* () {
+      yield* take("do not miss");
+      actual.push("didn't get missed");
+    });
+
     yield* spawn(function* firstspawn() {
-      yield* sleep(1);
+      yield* sleep(0);
       yield* put({ type: "c" });
       yield* put({ type: "do not miss" });
     });
 
-    yield* sleep(1);
     yield* take("c");
 
-    const tsk = yield* spawn(function* () {
-      yield* sleep(1);
-      yield* take("do not miss");
-      actual.push("didn't get missed");
-    });
     yield* tsk;
   }
 
