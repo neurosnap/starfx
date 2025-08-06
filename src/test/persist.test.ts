@@ -51,7 +51,7 @@ test("can persist to storage adapters", async () => {
       },
       function* () {
         // TODO we may need to consider how to handle this, is it a breaking change?
-        yield* sleep(1);
+        yield* sleep(0);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);
@@ -149,7 +149,7 @@ test("persists inbound state using transform 'in' function", async () => {
       },
       function* () {
         // TODO we may need to consider how to handle this, is it a breaking change?
-        yield* sleep(1);
+        yield* sleep(0);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);
@@ -214,7 +214,7 @@ test("persists inbound state using tranform in (2)", async () => {
       },
       function* () {
         // TODO we may need to consider how to handle this, is it a breaking change?
-        yield* sleep(1);
+        yield* sleep(0);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);
@@ -295,7 +295,6 @@ test("persists a filtered nested part of a slice", async () => {
         );
         yield* schema.update(schema.loaders.start({ id: "B" }));
         yield* schema.update(schema.loaders.start({ id: "C" }));
-        yield* sleep(300);
         yield* schema.update(schema.loaders.success({ id: "A" }));
         yield* schema.update(schema.loaders.success({ id: "B" }));
         yield* schema.update(schema.loaders.success({ id: "C" }));
@@ -307,7 +306,6 @@ test("persists a filtered nested part of a slice", async () => {
         );
         yield* schema.update(schema.loaders.start({ id: "B" }));
         yield* schema.update(schema.loaders.start({ id: "C" }));
-        yield* sleep(300);
         yield* schema.update(schema.loaders.success({ id: "A" }));
         yield* schema.update(schema.loaders.success({ id: "B" }));
         yield* schema.update(schema.loaders.success({ id: "C" }));
@@ -411,7 +409,7 @@ test("in absence of the inbound transformer, persists as it is", async () => {
       },
       function* () {
         // TODO we may need to consider how to handle this, is it a breaking change?
-        yield* sleep(1);
+        yield* sleep(0);
         yield* put({ type: "SET_TOKEN", payload: "1234" });
       },
     ]);

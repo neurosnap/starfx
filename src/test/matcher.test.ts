@@ -153,7 +153,6 @@ test("some bug: createAction incorrectly matching all actions", async () => {
   // Create a saga that should only respond to this specific action
   function* testFn(action: any) {
     matchedActions.push(action.type);
-    yield* sleep(1);
   }
 
   function* root() {

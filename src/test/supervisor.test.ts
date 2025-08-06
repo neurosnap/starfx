@@ -46,7 +46,8 @@ test("should recover with backoff pressure", async () => {
         actions.push(action);
       }
     });
-    yield* sleep(1);
+    // sleep to progress the spawned task
+    yield* sleep(0);
     yield* call(supervise(op, backoff));
   });
 

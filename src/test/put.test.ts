@@ -13,7 +13,8 @@ test("should send actions through channel", async () => {
         yield* each.next();
       }
     });
-    yield* sleep(1);
+    // sleep to progress the spawned task
+    yield* sleep(0);
 
     yield* put({
       type: arg,
@@ -40,7 +41,6 @@ test("should handle nested puts", async () => {
       type: "a",
     });
     actual.push("put a");
-    yield* sleep(1);
   }
 
   function* genB() {
@@ -49,14 +49,14 @@ test("should handle nested puts", async () => {
       type: "b",
     });
     actual.push("put b");
-    yield* sleep(1);
   }
 
   function* root() {
+    // sleep to progress each spawned task
     yield* spawn(genB);
-    yield* sleep(1);
+    yield* sleep(0);
     yield* spawn(genA);
-    yield* sleep(1);
+    yield* sleep(0);
   }
 
   const store = createStore({ initialState: {} });
@@ -72,7 +72,6 @@ test("should not cause stack overflow when puts are emitted while dispatching sa
     for (let i = 0; i < 10_000; i += 1) {
       yield* put({ type: "test" });
     }
-    yield* sleep(0);
   }
 
   const store = createStore({ initialState: {} });
@@ -89,8 +88,10 @@ test("should not miss `put` that was emitted directly after creating a task (cau
       actual.push("didn't get missed");
     });
 
+    // sleep to progress the spawned task
+    yield* sleep(0);
+
     yield* spawn(function* firstspawn() {
-      yield* sleep(0);
       yield* put({ type: "c" });
       yield* put({ type: "do not miss" });
     });

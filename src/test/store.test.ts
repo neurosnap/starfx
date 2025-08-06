@@ -77,7 +77,7 @@ test("update store and receives update from channel `StoreUpdateContext`", async
       },
       function* () {
         // TODO we may need to consider how to handle this, is it a breaking change?
-        yield* sleep(1);
+        yield* sleep(0);
         yield* updateStore(updateUser({ id: "1", name: "eric" }));
       },
     ]);
@@ -131,7 +131,7 @@ test("emit Action and update store", async () => {
       },
       function* () {
         // TODO we may need to consider how to handle this, is it a breaking change?
-        yield* sleep(1);
+        yield* sleep(0);
         yield* put({ type: "UPDATE_USER", payload: { id: "1", name: "eric" } });
       },
     ]);
