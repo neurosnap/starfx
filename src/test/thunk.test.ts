@@ -14,8 +14,8 @@ import { describe, expect, test } from "../test.js";
 import type {
   CreateAction,
   CreateActionWithPayload,
-  Operation,
   Next,
+  Operation,
   ThunkCtx,
 } from "../index.js";
 import type { IfAny } from "../query/types.js";
