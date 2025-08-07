@@ -143,7 +143,6 @@ export function createThunks<Ctx extends ThunkCtx = ThunkCtx<any>>(
 
   const middleware: Middleware<Ctx>[] = [];
   const visors: { [key: string]: Visors } = {};
-  // const visors: { [key: string]: () => Operation<void> } = {};
   const middlewareMap: { [key: string]: Middleware<Ctx> } = {};
   let dynamicMiddlewareMap: { [key: string]: Middleware<Ctx> } = {};
   const actionMap: {

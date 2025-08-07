@@ -430,7 +430,6 @@ test("middleware order of execution", async () => {
   store.run(api.register);
   store.dispatch(action());
 
-  await store.run(api.register);
   await store.run(function* () {
     return yield* waitFor(function* () {
       return acc === "abcdefg";
@@ -465,7 +464,6 @@ test("retry with actionFn", async () => {
   store.run(api.register);
   store.dispatch(action());
 
-  await store.run(api.register);
   await store.run(function* () {
     return yield* waitFor(function* () {
       return acc === "agag";
@@ -501,7 +499,6 @@ test("retry with actionFn with payload", async () => {
   store.run(api.register);
   store.dispatch(action({ page: 1 }));
 
-  await store.run(api.register);
   await store.run(function* () {
     return yield* waitFor(function* () {
       return acc === "agag";
