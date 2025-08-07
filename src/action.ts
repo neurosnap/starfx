@@ -24,7 +24,7 @@ export function useActions(pattern: ActionPattern): Stream<AnyAction, void> {
   return {
     [Symbol.iterator]: function* () {
       const actions = yield* ActionContext.expect();
-      const match = yield* lift(matcher)(pattern);
+      const match = matcher(pattern);
       yield* SignalQueueFactory.set(() => createFilterQueue(match) as any);
       return yield* actions;
     },

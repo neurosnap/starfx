@@ -298,6 +298,8 @@ test("persists a filtered nested part of a slice", async () => {
         yield* schema.update(schema.loaders.success({ id: "A" }));
         yield* schema.update(schema.loaders.success({ id: "B" }));
         yield* schema.update(schema.loaders.success({ id: "C" }));
+        // wait a tick to ensure ordering
+        yield* sleep(0);
         yield* schema.update(
           schema.loaders.start({
             id: "A [POST]|5678",
