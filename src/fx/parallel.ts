@@ -89,16 +89,12 @@ export function parallel<T, TArgs extends unknown[] = []>(
       yield* immediate.close();
     });
 
-    function* wait(): Operation<Result<T>[]> {
-      yield* task;
-      return results;
-    }
-
     yield* provide({
       sequence,
       immediate,
       *[Symbol.iterator]() {
-        return yield* wait();
+        yield* task;
+        return results;
       },
     });
   });

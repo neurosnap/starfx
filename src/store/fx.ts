@@ -56,9 +56,8 @@ export function* waitForLoaders<M extends AnyState>(
   loaders: LoaderOutput<M, AnyState>,
   actions: (ThunkAction | ActionFnWithPayload)[],
 ): Operation<Result<LoaderState<M>>[]> {
-  const group = yield* parallel<LoaderState<M>>(
-    actions.map((action) => () => waitForLoader(loaders, action)),
-  );
+  const ops = actions.map((action) => () => waitForLoader(loaders, action));
+  const group = yield* parallel<LoaderState<M>>(ops);
   return yield* group;
 }
 

@@ -1,5 +1,5 @@
 import nock from "nock";
-import { type ApiCtx, createApi, mdw, takeEvery } from "../index.js";
+import { type ApiCtx, createApi, mdw, sleep, takeEvery } from "../index.js";
 import {
   createSchema,
   createStore,
@@ -301,9 +301,13 @@ test("POST multiple endpoints with same uri", async () => {
   store.dispatch(action1);
   store.dispatch(action2);
 
-  const results = await store.run(() =>
-    waitForLoaders(schema.loaders, [action1, action2]),
-  );
+  const results = await store.run(function* () {
+    // it seems to fire the second action before it has subscribed, wait a tick
+    // since this is more than ensuring an order by controlling with an async point
+    // we need to sleep for 10 instead of 0
+    yield* sleep(10);
+    return yield* waitForLoaders(schema.loaders, [action1, action2]);
+  });
   if (!results.ok) {
     throw results.error;
   }
